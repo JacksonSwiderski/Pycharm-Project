@@ -1,0 +1,164 @@
+import pygame
+import sys
+
+# Initialize Pygame
+pygame.init()
+
+# Screen settings
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Platformer RPG")
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GREEN = (100, 200, 100)
+BLUE = (100, 100, 200)
+GRAY = (50, 50, 50)
+
+# Fonts
+font = pygame.font.Font(None, 48)
+small_font = pygame.font.Font(None, 32)
+
+# Game states
+STATE_MENU = "menu"
+STATE_LEVEL_SELECT = "level_select"
+STATE_PLATFORMER = "platformer"
+STATE_COMBAT = "combat"
+
+current_state = STATE_MENU
+clock = pygame.time.Clock()
+
+
+def draw_button(text, x, y, width, height, color, hover_color):
+    """Draw a button and return True if clicked."""
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+
+    rect = pygame.Rect(x, y, width, height)
+    is_hovered = rect.collidepoint(mouse)
+
+    pygame.draw.rect(screen, hover_color if is_hovered else color, rect, border_radius=8)
+    pygame.draw.rect(screen, WHITE, rect, 2, border_radius=8)
+
+    text_surface = small_font.render(text, True, WHITE)
+    text_rect = text_surface.get_rect(center=rect.center)
+    screen.blit(text_surface, text_rect)
+
+    return is_hovered and click[0]
+
+
+def main_menu():
+    """Main menu screen."""
+    global current_state
+
+    screen.fill(GRAY)
+
+    # Title
+    title = font.render("PLATFORMER RPG", True, WHITE)
+    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 100))
+
+    # Buttons
+    if draw_button("Play", 300, 250, 200, 50, GREEN, (120, 220, 120)):
+        pygame.time.delay(150)  # Prevent double-click
+        current_state = STATE_LEVEL_SELECT
+
+    if draw_button("Test Platformer", 300, 320, 200, 50, BLUE, (120, 120, 220)):
+        pygame.time.delay(150)
+        current_state = STATE_PLATFORMER
+
+    if draw_button("Test Combat", 300, 390, 200, 50, BLUE, (120, 120, 220)):
+        pygame.time.delay(150)
+        current_state = STATE_COMBAT
+
+    if draw_button("Quit", 300, 460, 200, 50, (150, 50, 50), (180, 80, 80)):
+        pygame.quit()
+        sys.exit()
+
+
+def level_select():
+    """Level selection screen."""
+    global current_state
+
+    screen.fill(GRAY)
+
+    title = font.render("SELECT LEVEL", True, WHITE)
+    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
+
+    levels = ["Grassy Plains", "Desert", "Mountains", "Jungle", "Volcanic"]
+
+    for i, level_name in enumerate(levels):
+        row = i // 3
+        col = i % 3
+        x = 100 + col * 220
+        y = 150 + row * 100
+
+        if draw_button(level_name, x, y, 180, 60, GREEN, (120, 220, 120)):
+            pygame.time.delay(150)
+            current_state = STATE_PLATFORMER  # For now, all go to platformer
+
+    if draw_button("Back", 20, 550, 100, 40, (100, 100, 100), (130, 130, 130)):
+        pygame.time.delay(150)
+        current_state = STATE_MENU
+
+
+# Import test modules (these will be separate files)
+# For now, we'll include simple placeholder functions
+def run_platformer():
+    """Run platformer test - placeholder until test_plat.py is imported."""
+    global current_state
+    from test_plat import platformer_loop
+    result = platformer_loop(screen, clock)
+    if result == "menu":
+        current_state = STATE_MENU
+    elif result == "combat":
+        current_state = STATE_COMBAT
+
+
+def run_combat():
+    """Run combat test - placeholder until test_cmbt.py is imported."""
+    global current_state
+    from test_cmbt import combat_loop
+    result = combat_loop(screen, clock)
+    if result == "menu":
+        current_state = STATE_MENU
+    elif result == "platformer":
+        current_state = STATE_PLATFORMER
+
+
+# Main game loop
+def main():
+    global current_state
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    if current_state != STATE_MENU:
+                        current_state = STATE_MENU
+                    else:
+                        running = False
+
+        # State machine
+        if current_state == STATE_MENU:
+            main_menu()
+        elif current_state == STATE_LEVEL_SELECT:
+            level_select()
+        elif current_state == STATE_PLATFORMER:
+            run_platformer()
+        elif current_state == STATE_COMBAT:
+            run_combat()
+
+        pygame.display.flip()
+        clock.tick(60)
+
+    pygame.quit()
+    sys.exit()
+
+
+if __name__ == "__main__":
+    main()
