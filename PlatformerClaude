@@ -1,0 +1,203 @@
+# Test code for collisions/movements/physics etc.
+import pygame
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GREEN = (100, 200, 100)
+BROWN = (139, 90, 43)
+BLUE = (135, 206, 235)
+RED = (200, 50, 50)
+
+# Player settings
+PLAYER_WIDTH = 32
+PLAYER_HEIGHT = 48
+GRAVITY = 0.8
+JUMP_STRENGTH = -15
+MOVE_SPEED = 5
+
+
+class Player:
+    def __init__(self, x, y):
+        self.rect = pygame.Rect(x, y, PLAYER_WIDTH, PLAYER_HEIGHT)
+        self.vel_x = 0
+        self.vel_y = 0
+        self.on_ground = False
+        self.health = 100
+        self.color = GREEN
+
+    def handle_input(self, keys):
+        """Handle player keyboard input."""
+        self.vel_x = 0
+
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            self.vel_x = -MOVE_SPEED
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            self.vel_x = MOVE_SPEED
+        if (keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]) and self.on_ground:
+            self.vel_y = JUMP_STRENGTH
+            self.on_ground = False
+
+    def apply_gravity(self):
+        """Apply gravity to player."""
+        self.vel_y += GRAVITY
+        if self.vel_y > 15:  # Terminal velocity
+            self.vel_y = 15
+
+    def move_and_collide(self, platforms):
+        """Move player and handle collisions with platforms."""
+        # Horizontal movement
+        self.rect.x += self.vel_x
+        for platform in platforms:
+            if self.rect.colliderect(platform):
+                if self.vel_x > 0:  # Moving right
+                    self.rect.right = platform.left
+                elif self.vel_x < 0:  # Moving left
+                    self.rect.left = platform.right
+
+        # Vertical movement
+        self.rect.y += self.vel_y
+        self.on_ground = False
+        for platform in platforms:
+            if self.rect.colliderect(platform):
+                if self.vel_y > 0:  # Falling
+                    self.rect.bottom = platform.top
+                    self.vel_y = 0
+                    self.on_ground = True
+                elif self.vel_y < 0:  # Jumping up
+                    self.rect.top = platform.bottom
+                    self.vel_y = 0
+
+    def draw(self, screen):
+        """Draw the player."""
+        pygame.draw.rect(screen, self.color, self.rect)
+        # Simple face
+        eye_y = self.rect.y + 10
+        pygame.draw.circle(screen, BLACK, (self.rect.x + 10, eye_y), 4)
+        pygame.draw.circle(screen, BLACK, (self.rect.x + 22, eye_y), 4)
+
+
+class Enemy:
+    def __init__(self, x, y, patrol_range=100):
+        self.rect = pygame.Rect(x, y, 30, 30)
+        self.start_x = x
+        self.patrol_range = patrol_range
+        self.direction = 1
+        self.speed = 2
+        self.color = RED
+
+    def update(self):
+        """Simple patrol behavior."""
+        self.rect.x += self.speed * self.direction
+
+        if self.rect.x > self.start_x + self.patrol_range:
+            self.direction = -1
+        elif self.rect.x < self.start_x:
+            self.direction = 1
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.color, self.rect)
+
+
+def platformer_loop(screen, clock):
+    """
+    Main platformer test loop.
+    Returns: "menu" to go back, "combat" to switch to combat
+    """
+    SCREEN_WIDTH = screen.get_width()
+    SCREEN_HEIGHT = screen.get_height()
+
+    # Create player
+    player = Player(100, 400)
+
+    # Create platforms
+    platforms = [
+        pygame.Rect(0, 550, 800, 50),  # Ground
+        pygame.Rect(200, 450, 150, 20),  # Platform 1
+        pygame.Rect(450, 380, 150, 20),  # Platform 2
+        pygame.Rect(150, 300, 150, 20),  # Platform 3
+        pygame.Rect(500, 220, 150, 20),  # Platform 4
+        pygame.Rect(50, 200, 80, 20),  # Small platform
+    ]
+
+    # Create enemies
+    enemies = [
+        Enemy(250, 420, 100),
+        Enemy(480, 350, 80),
+    ]
+
+    # Combat trigger zone (for testing transition)
+    combat_zone = pygame.Rect(700, 500, 50, 50)
+
+    font = pygame.font.Font(None, 24)
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return "menu"
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return "menu"
+                if event.key == pygame.K_c:  # Quick combat test
+                    return "combat"
+
+        # Input
+        keys = pygame.key.get_pressed()
+        player.handle_input(keys)
+
+        # Update
+        player.apply_gravity()
+        player.move_and_collide(platforms)
+
+        for enemy in enemies:
+            enemy.update()
+            # Check collision with player
+            if player.rect.colliderect(enemy.rect):
+                return "combat"  # Transition to combat on enemy touch
+
+        # Check combat zone
+        if player.rect.colliderect(combat_zone):
+            return "combat"
+
+        # Keep player on screen
+        if player.rect.left < 0:
+            player.rect.left = 0
+        if player.rect.right > SCREEN_WIDTH:
+            player.rect.right = SCREEN_WIDTH
+        if player.rect.top > SCREEN_HEIGHT:  # Fell off
+            player.rect.x = 100
+            player.rect.y = 400
+            player.vel_y = 0
+
+        # Draw
+        screen.fill(BLUE)  # Sky
+
+        # Draw platforms
+        for platform in platforms:
+            pygame.draw.rect(screen, BROWN, platform)
+            pygame.draw.rect(screen, (100, 60, 30), platform, 2)
+
+        # Draw combat zone
+        pygame.draw.rect(screen, (200, 200, 50), combat_zone)
+        zone_text = font.render("COMBAT", True, BLACK)
+        screen.blit(zone_text, (combat_zone.x - 5, combat_zone.y - 20))
+
+        # Draw enemies
+        for enemy in enemies:
+            enemy.draw(screen)
+
+        # Draw player
+        player.draw(screen)
+
+        # UI
+        instructions = font.render("WASD/Arrows: Move | SPACE: Jump | ESC: Menu | C: Combat Test", True, BLACK)
+        screen.blit(instructions, (10, 10))
+
+        health_text = font.render(f"Health: {player.health}", True, BLACK)
+        screen.blit(health_text, (10, 35))
+
+        pygame.display.flip()
+        clock.tick(60)
+
+    return "menu"
