@@ -1,31 +1,103 @@
-# Main Code
 import pygame
-import random
-import sys
 
 pygame.init()
 
-screen = pygame.display.set_mode((1200, 650))
+screen_width = 1200
+screen_height = 650
+
+screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Pygame Project')
 
 clock = pygame.time.Clock()
 
-# Main Game Loop
+state = 'MENU'
+
+# Main Functions
+
+def start_game():
+    global state
+    state = 'LVLSELECT'
+
+def open_settings():
+    global state
+    state = 'SETTINGS'
+
+def quit_game():
+    pygame.quit()
+    exit()
+
+# Classes
+class Button:
+    def __init__(self, text, x, y, w, h, callback):
+        self.text = text
+        self.rect = pygame.Rect(x, y, w, h)
+        self.callback = callback
+        self.color = (70, 70, 70)
+        self.hover_color = (120, 120, 120)
+        self.font = pygame.font.Font(None, 40)
+
+    def draw(self, screen):
+        mouse = pygame.mouse.get_pos()
+
+        if self.rect.collidepoint(mouse):
+            color = self.hover_color
+        else:
+            color = self.color
+
+        pygame.draw.rect(screen, color, self.rect)
+
+        text_surf = self.font.render(self.text, True, (255, 255, 255))
+        screen.blit(
+            text_surf,
+            (self.rect.centerx - text_surf.get_width() // 2,
+             self.rect.centery - text_surf.get_height() // 2)
+        )
+
+        def handle_event(self, event):
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.rect.collidepoint(event.pos):
+                    self.callback(0)
+
+# Assets
+# Main Menu
+# Buttons
+
+menu_buttons = [
+    Button('Start', 300, 200, 200, 60, start_game),
+    Button('Settings', 300, 300, 200, 60, open_settings),
+    Button('Quit', 300, 400, 200, 60, quit_game)
+]
+
+# Main Loop
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
+# Key Buttons
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
+
+# Screen States
+
+        if state == 'MENU':
+            draw_menu()
 
     screen.fill((0, 0, 0))
 
     pygame.display.flip()
     clock.tick(60)
 
+def draw_menu(screen):
+    screen.fill((20, 20, 40))
 
-pygame.quit()
-sys.exit()
+    font = pygame.font.Font(None, 80)
+    title = font.render("MY GAME", True, (255, 255, 255))
+
+    screen.blit(title, (400 - title.get_width() // 2, 80))
+
+    for b in menu_buttons:
+        b.draw(screen)
