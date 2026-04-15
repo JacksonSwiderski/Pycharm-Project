@@ -56,25 +56,25 @@ def main_menu():
     screen.fill(GRAY)
 
     # Title
-    title = font.render("PLATFORMER RPG", True, WHITE)
-    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 100))
+    createTitle()
 
     # Buttons
     if draw_button("Play", 300, 250, 200, 50, GREEN, (120, 220, 120)):
         pygame.time.delay(150)  # Prevent double-click
         current_state = STATE_LEVEL_SELECT
 
-    if draw_button("Test Platformer", 300, 320, 200, 50, BLUE, (120, 120, 220)):
+    if draw_button("Test Platformer", 300, 320, 200, 50, (65, 65, 65), (88, 88, 88)):
         pygame.time.delay(150)
         current_state = STATE_PLATFORMER
 
-    if draw_button("Test Combat", 300, 390, 200, 50, BLUE, (120, 120, 220)):
-        pygame.time.delay(150)
-        current_state = STATE_COMBAT
-
-    if draw_button("Quit", 300, 460, 200, 50, (150, 50, 50), (180, 80, 80)):
+    if draw_button("Quit", 300, 390, 200, 50, (150, 50, 50), (180, 80, 80)):
         pygame.quit()
         sys.exit()
+
+
+def createTitle():
+    title = font.render("PLATFORMER RPG", True, WHITE)
+    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 100))
 
 
 def level_select():
@@ -119,13 +119,14 @@ def run_platformer():
 def run_combat():
     """Run combat test - placeholder until test_cmbt.py is imported."""
     global current_state
-    from test_cmbt import combat_loop
-    result = combat_loop(screen, clock)
-    if result == "menu":
-        current_state = STATE_MENU
-    elif result == "platformer":
-        current_state = STATE_PLATFORMER
-
+    print("Combat Ran..")
+    current_state = STATE_PLATFORMER
+    # from test_cmbt import combat_loop
+    # result = combat_loop(screen, clock)
+    # if result == "menu":
+    #     current_state = STATE_MENU
+    # elif result == "platformer":
+    #     current_state = STATE_PLATFORMER
 
 # Main game loop
 def main():
@@ -142,7 +143,6 @@ def main():
                         current_state = STATE_MENU
                     else:
                         running = False
-
         # State machine
         if current_state == STATE_MENU:
             main_menu()
