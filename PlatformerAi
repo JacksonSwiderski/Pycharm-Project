@@ -8,16 +8,15 @@ BROWN = (139, 90, 43)
 BLUE = (135, 206, 235)
 RED = (200, 50, 50)
 
-# Player settings
-PLAYER_WIDTH = 32
-PLAYER_HEIGHT = 48
+
+# Settings
 GRAVITY = 0.8
 JUMP_STRENGTH = -15
 MOVE_SPEED = 7
 
 
 class Player:
-    def __init__(self, x, y, frames=None, fps=8):
+    def __init__(self, x, y, chosenCharacter=None, fps=10):
         self.rect = pygame.Rect(x, y, 30, 50)
 
         self.vel_x = 0
@@ -25,14 +24,13 @@ class Player:
         self.on_ground = False
         self.health = 100
 
-        # Animation
-        self.frames = frames if frames else []
+        # animation
+        self.chosenCharacter = chosenCharacter if chosenCharacter else []
         self.fps = fps
         self.frame_index = 0
         self.frame_timer = 0
         self.facing_right = True
 
-        # ✅ FIX: prevents jump/idle flicker
         self.air_timer = 0
 
     def handle_input(self, keys):
@@ -56,40 +54,37 @@ class Player:
             self.vel_y = 15
 
     def move_and_collide(self, platforms):
-        # Horizontal
         self.rect.x += self.vel_x
-        for platform in platforms:
-            if self.rect.colliderect(platform):
+        for p in platforms:
+            if self.rect.colliderect(p):
                 if self.vel_x > 0:
-                    self.rect.right = platform.left
+                    self.rect.right = p.left
                 elif self.vel_x < 0:
-                    self.rect.left = platform.right
+                    self.rect.left = p.right
 
-        # Vertical
         self.rect.y += self.vel_y
         self.on_ground = False
 
-        for platform in platforms:
-            if self.rect.colliderect(platform):
+        for p in platforms:
+            if self.rect.colliderect(p):
                 if self.vel_y > 0:
-                    self.rect.bottom = platform.top
+                    self.rect.bottom = p.top
                     self.vel_y = 0
                     self.on_ground = True
                 elif self.vel_y < 0:
-                    self.rect.top = platform.bottom
+                    self.rect.top = p.bottom
                     self.vel_y = 0
 
-        # ✅ FIX: stabilize ground/air state
         if self.on_ground:
             self.air_timer = 0
         else:
             self.air_timer += 1
 
     def update_animation(self, dt):
-        if not self.frames:
+        if not self.chosenCharacter:
             return
 
-        # 🟦 JUMP (stable check using buffer)
+        # jump frame
         if self.air_timer > 1:
             self.frame_index = 3
             self.frame_timer = 0
@@ -97,13 +92,13 @@ class Player:
 
         moving = self.vel_x != 0
 
-        # 🟨 IDLE
+        # idle
         if not moving:
             self.frame_index = 2
             self.frame_timer = 0
             return
 
-        # 🟩 RUN
+        # run animation
         self.frame_timer += dt
         if self.frame_timer >= 1 / self.fps:
             self.frame_timer = 0
@@ -112,14 +107,14 @@ class Player:
                 self.frame_index = 0
 
     def draw(self, screen):
-        if self.frames:
-            frame = self.frames[self.frame_index]
+        if self.chosenCharacter:
+            frame = self.chosenCharacter[self.frame_index]
 
             if not self.facing_right:
                 frame = pygame.transform.flip(frame, True, False)
 
             draw_x = self.rect.x + (self.rect.width - frame.get_width()) // 2
-            draw_y = self.rect.y + (self.rect.height - frame.get_height())
+            draw_y = self.rect.bottom - frame.get_height()
 
             screen.blit(frame, (draw_x, draw_y))
         else:
@@ -130,35 +125,36 @@ class Enemy:
     def __init__(self, x, y, patrol_range=100):
         self.rect = pygame.Rect(x, y, 30, 30)
         self.start_x = x
-        self.patrol_range = patrol_range
-        self.direction = 1
+        self.range = patrol_range
+        self.dir = 1
         self.speed = 2
 
     def update(self):
-        self.rect.x += self.speed * self.direction
+        self.rect.x += self.speed * self.dir
 
-        if self.rect.x > self.start_x + self.patrol_range:
-            self.direction = -1
+        if self.rect.x > self.start_x + self.range:
+            self.dir = -1
         elif self.rect.x < self.start_x:
-            self.direction = 1
+            self.dir = 1
 
     def draw(self, screen):
         pygame.draw.rect(screen, RED, self.rect)
 
 
-def platformer_loop(screen, clock):
+def platformer_loop(screen, clock, show_hitboxes):
     SCREEN_WIDTH = screen.get_width()
     SCREEN_HEIGHT = screen.get_height()
 
     SCALE = 4
-    frames = [
-        pygame.transform.scale(pygame.image.load("AlienSkin1.png").convert_alpha(), (13*SCALE, 17*SCALE)),
-        pygame.transform.scale(pygame.image.load("AlienSkin2.png").convert_alpha(), (13*SCALE, 17*SCALE)),
-        pygame.transform.scale(pygame.image.load("AlienSkin3.png").convert_alpha(), (13*SCALE, 17*SCALE)),
-        pygame.transform.scale(pygame.image.load("AlienSkinJump.png").convert_alpha(), (13*SCALE, 17*SCALE)),
+
+    alienSkin = [
+        pygame.transform.scale(pygame.image.load("AlienSkin1.png").convert_alpha(), (11*SCALE, 15*SCALE)),
+        pygame.transform.scale(pygame.image.load("AlienSkin2.png").convert_alpha(), (11*SCALE, 15*SCALE)),
+        pygame.transform.scale(pygame.image.load("AlienSkin3.png").convert_alpha(), (11*SCALE, 15*SCALE)),
+        pygame.transform.scale(pygame.image.load("AlienSkinJump.png").convert_alpha(), (11*SCALE, 15*SCALE)),
     ]
 
-    player = Player(100, 400, frames)
+    player = Player(100, 400, alienSkin)
 
     platforms = [
         pygame.Rect(0, 550, 800, 50),
@@ -178,29 +174,38 @@ def platformer_loop(screen, clock):
     font = pygame.font.Font(None, 24)
 
     while True:
+        dt = clock.tick(60) / 1000
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return "menu"
+                return "menu", show_hitboxes
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    return "menu"
+                    return "menu", show_hitboxes
+
                 if event.key == pygame.K_c:
-                    return "combat"
+                    return "combat", show_hitboxes
+
+                if event.key == pygame.K_F3:
+                    show_hitboxes = not show_hitboxes
 
         keys = pygame.key.get_pressed()
         player.handle_input(keys)
 
         player.apply_gravity()
         player.move_and_collide(platforms)
+        player.update_animation(dt)
 
         for enemy in enemies:
             enemy.update()
             if player.rect.colliderect(enemy.rect):
-                return "combat"
+                return "combat", show_hitboxes
 
         if player.rect.colliderect(combat_zone):
-            return "combat"
+            return "combat", show_hitboxes
 
+        # screen bounds
         if player.rect.left < 0:
             player.rect.left = 0
         if player.rect.right > SCREEN_WIDTH:
@@ -210,23 +215,28 @@ def platformer_loop(screen, clock):
             player.rect.y = 400
             player.vel_y = 0
 
-        dt = clock.tick(60) / 1000
-        player.update_animation(dt)
-
+        # draw
         screen.fill(BLUE)
 
-        for platform in platforms:
-            pygame.draw.rect(screen, BROWN, platform)
+        for p in platforms:
+            pygame.draw.rect(screen, BROWN, p)
 
         pygame.draw.rect(screen, (200, 200, 50), combat_zone)
-        screen.blit(font.render("COMBAT", True, BLACK), (combat_zone.x - 5, combat_zone.y - 20))
+        screen.blit(font.render("COMBAT", True, BLACK), (combat_zone.x, combat_zone.y - 20))
 
-        for enemy in enemies:
-            enemy.draw(screen)
+        for e in enemies:
+            e.draw(screen)
 
         player.draw(screen)
 
-        screen.blit(font.render("WASD/Arrows: Move | SPACE: Jump | ESC: Menu | C: Combat", True, BLACK), (10, 10))
-        screen.blit(font.render(f"Health: {player.health}", True, BLACK), (10, 35))
+        # HITBOX VISUALS (blue outlines)
+        if show_hitboxes:
+            pygame.draw.rect(screen, (255, 255, 0), player.rect, 2)
+
+            for e in enemies:
+                pygame.draw.rect(screen, (0, 255, 0), e.rect, 2)
+
+            for p in platforms:
+                pygame.draw.rect(screen, (0, 0, 255), p, 2)
 
         pygame.display.flip()
