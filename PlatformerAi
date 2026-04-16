@@ -187,7 +187,9 @@ def platformer_loop(screen, clock, show_hitboxes):
                 if event.key == pygame.K_c:
                     return "combat", show_hitboxes
 
-                if event.key == pygame.K_F3:
+                keys = pygame.key.get_pressed()
+
+                if keys[pygame.K_F3] and keys[pygame.K_b] or keys[pygame.K_BACKQUOTE]:
                     show_hitboxes = not show_hitboxes
 
         keys = pygame.key.get_pressed()
