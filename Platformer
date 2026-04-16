@@ -232,7 +232,7 @@ def platformer_loop(screen, clock, show_hitboxes):
         controls = [
             "WASD / Arrows: Move",
             "SPACE: Jump",
-            "F3 or `: Hitboxes",
+            "F3 or `: Toggle Hitboxes",
             "ESC: Menu"
         ]
 
