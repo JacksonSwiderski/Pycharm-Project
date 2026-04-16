@@ -27,6 +27,8 @@ STATE_LEVEL_SELECT = "level_select"
 STATE_PLATFORMER = "platformer"
 STATE_COMBAT = "combat"
 
+show_hitboxes = False
+
 current_state = STATE_MENU
 clock = pygame.time.Clock()
 
@@ -102,18 +104,20 @@ def level_select():
         pygame.time.delay(150)
         current_state = STATE_MENU
 
-
 # Import test modules (these will be separate files)
 # For now, we'll include simple placeholder functions
 def run_platformer():
-    """Run platformer test - placeholder until test_plat.py is imported."""
-    global current_state
+    global current_state, show_hitboxes
+
     from test_plat import platformer_loop
-    result = platformer_loop(screen, clock)
+
+    result, show_hitboxes = platformer_loop(screen, clock, show_hitboxes)
+
     if result == "menu":
         current_state = STATE_MENU
     elif result == "combat":
         current_state = STATE_COMBAT
+
 
 
 def run_combat():
