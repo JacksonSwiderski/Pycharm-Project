@@ -8,7 +8,7 @@ pygame.init()
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Platformer RPG")
+pygame.display.set_caption("Chrono Clash")
 
 # Colors
 WHITE = (255, 255, 255)
@@ -21,6 +21,10 @@ GRAY = (50, 50, 50)
 font = pygame.font.Font(None, 48)
 small_font = pygame.font.Font(None, 32)
 
+# Logo (NEW)
+logo = pygame.image.load("ChronoClashLogo.png").convert_alpha()
+logo = pygame.transform.scale(logo, (500, 300))
+
 # Game states
 STATE_MENU = "menu"
 STATE_LEVEL_SELECT = "level_select"
@@ -28,13 +32,11 @@ STATE_PLATFORMER = "platformer"
 STATE_COMBAT = "combat"
 
 show_hitboxes = False
-
 current_state = STATE_MENU
 clock = pygame.time.Clock()
 
 
 def draw_button(text, x, y, width, height, color, hover_color):
-    """Draw a button and return True if clicked."""
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
@@ -51,21 +53,28 @@ def draw_button(text, x, y, width, height, color, hover_color):
     return is_hovered and click[0]
 
 
+# UPDATED TITLE FUNCTION (LOGO INSTEAD OF TEXT)
+def createTitle():
+    screen.blit(
+        logo,
+        (SCREEN_WIDTH // 2 - logo.get_width() // 2, 15)
+    )
+
+
 def main_menu():
-    """Main menu screen."""
     global current_state
 
     screen.fill(GRAY)
 
-    # Title
+    # Logo title
     createTitle()
 
     # Buttons
     if draw_button("Play", 300, 250, 200, 50, GREEN, (120, 220, 120)):
-        pygame.time.delay(150)  # Prevent double-click
+        pygame.time.delay(150)
         current_state = STATE_LEVEL_SELECT
 
-    if draw_button("Test Platformer", 300, 320, 200, 50, (65, 65, 65), (88, 88, 88)):
+    if draw_button("Testing", 300, 320, 200, 50, (65, 65, 65), (88, 88, 88)):
         pygame.time.delay(150)
         current_state = STATE_PLATFORMER
 
@@ -74,13 +83,7 @@ def main_menu():
         sys.exit()
 
 
-def createTitle():
-    title = font.render("PLATFORMER RPG", True, WHITE)
-    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 100))
-
-
 def level_select():
-    """Level selection screen."""
     global current_state
 
     screen.fill(GRAY)
@@ -98,14 +101,13 @@ def level_select():
 
         if draw_button(level_name, x, y, 180, 60, GREEN, (120, 220, 120)):
             pygame.time.delay(150)
-            current_state = STATE_PLATFORMER  # For now, all go to platformer
+            current_state = STATE_PLATFORMER
 
     if draw_button("Back", 20, 550, 100, 40, (100, 100, 100), (130, 130, 130)):
         pygame.time.delay(150)
         current_state = STATE_MENU
 
-# Import test modules (these will be separate files)
-# For now, we'll include simple placeholder functions
+
 def run_platformer():
     global current_state, show_hitboxes
 
@@ -119,20 +121,13 @@ def run_platformer():
         current_state = STATE_COMBAT
 
 
-
 def run_combat():
-    """Run combat test - placeholder until test_cmbt.py is imported."""
     global current_state
+
     print("Combat Ran..")
     current_state = STATE_PLATFORMER
-    # from test_cmbt import combat_loop
-    # result = combat_loop(screen, clock)
-    # if result == "menu":
-    #     current_state = STATE_MENU
-    # elif result == "platformer":
-    #     current_state = STATE_PLATFORMER
 
-# Main game loop
+
 def main():
     global current_state
 
@@ -141,13 +136,14 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     if current_state != STATE_MENU:
                         current_state = STATE_MENU
                     else:
                         running = False
-        # State machine
+
         if current_state == STATE_MENU:
             main_menu()
         elif current_state == STATE_LEVEL_SELECT:
