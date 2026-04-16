@@ -3,4 +3,4 @@
 install pygame:
   - "pip install pygame-ce"
 
-Toggle Hitboxes (F3)
+Toggle Hitboxes (F3 + B -- Or -- `)
