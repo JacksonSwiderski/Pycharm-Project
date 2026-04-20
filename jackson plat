@@ -1,0 +1,257 @@
+import pygame
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GREEN = (100, 200, 100)
+BROWN = (139, 90, 43)
+BLUE = (135, 206, 235)
+RED = (200, 50, 50)
+
+
+# Settings
+GRAVITY = 0.8
+JUMP_STRENGTH = -15
+MOVE_SPEED = 7
+
+
+class Player:
+    def __init__(self, x, y, chosenCharacter=None, fps=10):
+        self.rect = pygame.Rect(x, y, 30, 50)
+
+        self.vel_x = 0
+        self.vel_y = 0
+        self.on_ground = False
+        self.health = 100
+
+        # animation
+        self.chosenCharacter = chosenCharacter if chosenCharacter else []
+        self.fps = fps
+        self.frame_index = 0
+        self.frame_timer = 0
+        self.facing_right = True
+
+        self.air_timer = 0
+
+    def handle_input(self, keys):
+        self.vel_x = 0
+
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            self.vel_x = -MOVE_SPEED
+            self.facing_right = False
+
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            self.vel_x = MOVE_SPEED
+            self.facing_right = True
+
+        if (keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]) and self.on_ground:
+            self.vel_y = JUMP_STRENGTH
+            self.on_ground = False
+
+    def apply_gravity(self):
+        self.vel_y += GRAVITY
+        if self.vel_y > 15:
+            self.vel_y = 15
+
+    def move_and_collide(self, platforms):
+        self.rect.x += self.vel_x
+        for p in platforms:
+            if self.rect.colliderect(p):
+                if self.vel_x > 0:
+                    self.rect.right = p.left
+                elif self.vel_x < 0:
+                    self.rect.left = p.right
+
+        self.rect.y += self.vel_y
+        self.on_ground = False
+
+        for p in platforms:
+            if self.rect.colliderect(p):
+                if self.vel_y > 0:
+                    self.rect.bottom = p.top
+                    self.vel_y = 0
+                    self.on_ground = True
+                elif self.vel_y < 0:
+                    self.rect.top = p.bottom
+                    self.vel_y = 0
+
+        if self.on_ground:
+            self.air_timer = 0
+        else:
+            self.air_timer += 1
+
+    def update_animation(self, dt):
+        if not self.chosenCharacter:
+            return
+
+        if self.air_timer > 1:
+            self.frame_index = 3
+            self.frame_timer = 0
+            return
+
+        moving = self.vel_x != 0
+
+        if not moving:
+            self.frame_index = 2
+            self.frame_timer = 0
+            return
+
+        self.frame_timer += dt
+        if self.frame_timer >= 1 / self.fps:
+            self.frame_timer = 0
+            self.frame_index += 1
+            if self.frame_index > 1:
+                self.frame_index = 0
+
+    def draw(self, screen):
+        if self.chosenCharacter:
+            frame = self.chosenCharacter[self.frame_index]
+
+            if not self.facing_right:
+                frame = pygame.transform.flip(frame, True, False)
+
+            draw_x = self.rect.x + (self.rect.width - frame.get_width()) // 2
+            draw_y = self.rect.bottom - frame.get_height()
+
+            screen.blit(frame, (draw_x, draw_y))
+        else:
+            pygame.draw.rect(screen, GREEN, self.rect)
+
+
+class Enemy:
+    def __init__(self, x, y, patrol_range=100, name='enemy', hp=50):
+        self.rect = pygame.Rect(x, y, 30, 30)
+        self.start_x = x
+        self.range = patrol_range
+        self.dir = 1
+        self.speed = 2
+
+        self.name = name
+        self.hp = hp
+
+    def update(self):
+        self.rect.x += self.speed * self.dir
+
+        if self.rect.x > self.start_x + self.range:
+            self.dir = -1
+        elif self.rect.x < self.start_x:
+            self.dir = 1
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, RED, self.rect)
+
+
+def platformer_loop(screen, clock, show_hitboxes):
+    SCREEN_WIDTH = screen.get_width()
+    SCREEN_HEIGHT = screen.get_height()
+
+    SCALE = 4
+
+    alienSkin = [
+        pygame.transform.scale(pygame.image.load("AlienSkin1.png").convert_alpha(), (11*SCALE, 15*SCALE)),
+        pygame.transform.scale(pygame.image.load("AlienSkin2.png").convert_alpha(), (11*SCALE, 15*SCALE)),
+        pygame.transform.scale(pygame.image.load("AlienSkin3.png").convert_alpha(), (11*SCALE, 15*SCALE)),
+        pygame.transform.scale(pygame.image.load("AlienSkinJump.png").convert_alpha(), (11*SCALE, 15*SCALE)),
+    ]
+
+    player = Player(100, 400, alienSkin)
+
+    platforms = [
+        pygame.Rect(0, 550, 800, 50),
+        pygame.Rect(200, 450, 150, 20),
+        pygame.Rect(450, 380, 150, 20),
+        pygame.Rect(150, 300, 150, 20),
+        pygame.Rect(500, 220, 150, 20),
+        pygame.Rect(50, 200, 80, 20),
+    ]
+
+    enemies = [
+        Enemy(225, 420, 100, 'Test Enemy 1', 40),
+        Enemy(465, 350, 80, 'Test Enemy 2', 60)
+    ]
+
+    combat_zone = pygame.Rect(700, 500, 50, 50)
+    font = pygame.font.Font(None, 24)
+    ui_font = pygame.font.Font(None, 22)  # ✅ NEW
+
+    while True:
+        dt = clock.tick(60) / 1000
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return "menu", show_hitboxes
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return "menu", show_hitboxes
+
+                if event.key == pygame.K_c:
+                    return ("combat", enemy), show_hitboxes
+
+                # toggle hitboxes
+                if event.key == pygame.K_F3 or event.key == pygame.K_BACKQUOTE:
+                    show_hitboxes = not show_hitboxes
+
+        keys = pygame.key.get_pressed()
+        player.handle_input(keys)
+
+        player.apply_gravity()
+        player.move_and_collide(platforms)
+        player.update_animation(dt)
+
+        for enemy in enemies:
+            enemy.update()
+            if player.rect.colliderect(enemy.rect):
+                print('Enemy hit.')
+                return "combat", show_hitboxes
+
+        if player.rect.colliderect(combat_zone):
+            return "combat", show_hitboxes
+
+        # bounds
+        if player.rect.left < 0:
+            player.rect.left = 0
+        if player.rect.right > SCREEN_WIDTH:
+            player.rect.right = SCREEN_WIDTH
+        if player.rect.top > SCREEN_HEIGHT:
+            player.rect.x = 100
+            player.rect.y = 400
+            player.vel_y = 0
+
+        # DRAW
+        screen.fill(BLUE)
+
+        for p in platforms:
+            pygame.draw.rect(screen, BROWN, p)
+
+        pygame.draw.rect(screen, (200, 200, 50), combat_zone)
+        screen.blit(font.render("COMBAT", True, BLACK), (combat_zone.x, combat_zone.y - 20))
+
+        for e in enemies:
+            e.draw(screen)
+
+        player.draw(screen)
+
+        # ✅ CONTROLS TEXT (TOP LEFT UI)
+        controls = [
+            "WASD / Arrows: Move",
+            "SPACE: Jump",
+            "F3 or `: Toggle Hitboxes",
+            "ESC: Menu"
+        ]
+
+        for i, line in enumerate(controls):
+            txt = ui_font.render(line, True, WHITE)
+            screen.blit(txt, (10, 10 + i * 18))
+
+        # HITBOXES
+        if show_hitboxes:
+            pygame.draw.rect(screen, (255, 255, 0), player.rect, 2)
+
+            for e in enemies:
+                pygame.draw.rect(screen, (0, 255, 0), e.rect, 2)
+
+            for p in platforms:
+                pygame.draw.rect(screen, (0, 0, 255), p, 2)
+
+        pygame.display.flip()
