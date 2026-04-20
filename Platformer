@@ -11,8 +11,8 @@ RED = (200, 50, 50)
 
 # Settings
 GRAVITY = 0.8
-JUMP_STRENGTH = -15
-MOVE_SPEED = 7
+JUMP_STRENGTH = -10
+MOVE_SPEED = 5
 
 
 class Player:
@@ -142,13 +142,15 @@ def platformer_loop(screen, clock, show_hitboxes):
     SCREEN_WIDTH = screen.get_width()
     SCREEN_HEIGHT = screen.get_height()
 
-    SCALE = 4
+    SCALE = 2
+    SPRITE_W = 11 * SCALE
+    SPRITE_H = 15 * SCALE
 
     alienSkin = [
-        pygame.transform.scale(pygame.image.load("AlienSkin1.png").convert_alpha(), (11*SCALE, 15*SCALE)),
-        pygame.transform.scale(pygame.image.load("AlienSkin2.png").convert_alpha(), (11*SCALE, 15*SCALE)),
-        pygame.transform.scale(pygame.image.load("AlienSkin3.png").convert_alpha(), (11*SCALE, 15*SCALE)),
-        pygame.transform.scale(pygame.image.load("AlienSkinJump.png").convert_alpha(), (11*SCALE, 15*SCALE)),
+        pygame.transform.scale(pygame.image.load("AlienSkin1.png").convert_alpha(), (SPRITE_W, SPRITE_H)),
+        pygame.transform.scale(pygame.image.load("AlienSkin2.png").convert_alpha(), (SPRITE_W, SPRITE_H)),
+        pygame.transform.scale(pygame.image.load("AlienSkin3.png").convert_alpha(), (SPRITE_W, SPRITE_H)),
+        pygame.transform.scale(pygame.image.load("AlienSkinJump.png").convert_alpha(), (SPRITE_W, SPRITE_H)),
     ]
 
     player = Player(100, 400, alienSkin)
