@@ -34,7 +34,7 @@ STATE_COMBAT = "combat"
 show_hitboxes = False
 current_state = STATE_MENU
 clock = pygame.time.Clock()
-
+selected_level = None
 
 def draw_button(text, x, y, width, height, color, hover_color):
     mouse = pygame.mouse.get_pos()
@@ -84,7 +84,7 @@ def main_menu():
 
 
 def level_select():
-    global current_state
+    global current_state, selected_level
 
     screen.fill(GRAY)
 
@@ -101,6 +101,10 @@ def level_select():
 
         if draw_button(level_name, x, y, 180, 60, GREEN, (120, 220, 120)):
             pygame.time.delay(150)
+
+            selected_level = i
+            print("Selected level:", selected_level)  # (debug, optional)
+
             current_state = STATE_PLATFORMER
 
     if draw_button("Back", 20, 550, 100, 40, (100, 100, 100), (130, 130, 130)):
@@ -113,7 +117,7 @@ def run_platformer():
 
     from test_plat import platformer_loop
 
-    result, show_hitboxes = platformer_loop(screen, clock, show_hitboxes)
+    result, show_hitboxes = platformer_loop(screen, clock, show_hitboxes, selected_level)
 
     if result == "menu":
         current_state = STATE_MENU
