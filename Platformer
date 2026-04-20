@@ -8,23 +8,22 @@ BROWN = (139, 90, 43)
 BLUE = (135, 206, 235)
 RED = (200, 50, 50)
 
-
 # Settings
 GRAVITY = 0.8
 JUMP_STRENGTH = -10
 MOVE_SPEED = 5
 
+mousePixelToggle = True # to find pixels/ does not work rn
 
 class Player:
     def __init__(self, x, y, chosenCharacter=None, fps=10):
-        self.rect = pygame.Rect(x, y, 30, 50)
+        self.rect = pygame.Rect(x, y, 22, 30)
 
         self.vel_x = 0
         self.vel_y = 0
         self.on_ground = False
         self.health = 100
 
-        # animation
         self.chosenCharacter = chosenCharacter if chosenCharacter else []
         self.fps = fps
         self.frame_index = 0
@@ -75,10 +74,7 @@ class Player:
                     self.rect.top = p.bottom
                     self.vel_y = 0
 
-        if self.on_ground:
-            self.air_timer = 0
-        else:
-            self.air_timer += 1
+        self.air_timer = 0 if self.on_ground else self.air_timer + 1
 
     def update_animation(self, dt):
         if not self.chosenCharacter:
@@ -89,9 +85,7 @@ class Player:
             self.frame_timer = 0
             return
 
-        moving = self.vel_x != 0
-
-        if not moving:
+        if self.vel_x == 0:
             self.frame_index = 2
             self.frame_timer = 0
             return
@@ -99,9 +93,7 @@ class Player:
         self.frame_timer += dt
         if self.frame_timer >= 1 / self.fps:
             self.frame_timer = 0
-            self.frame_index += 1
-            if self.frame_index > 1:
-                self.frame_index = 0
+            self.frame_index = 1 - self.frame_index
 
     def draw(self, screen):
         if self.chosenCharacter:
@@ -138,9 +130,11 @@ class Enemy:
         pygame.draw.rect(screen, RED, self.rect)
 
 
-def platformer_loop(screen, clock, show_hitboxes):
+def platformer_loop(screen, clock, show_hitboxes, level):
     SCREEN_WIDTH = screen.get_width()
     SCREEN_HEIGHT = screen.get_height()
+
+    show_controls = True
 
     SCALE = 2
     SPRITE_W = 11 * SCALE
@@ -155,14 +149,15 @@ def platformer_loop(screen, clock, show_hitboxes):
 
     player = Player(100, 400, alienSkin)
 
-    platforms = [
-        pygame.Rect(0, 550, 800, 50),
-        pygame.Rect(200, 450, 150, 20),
-        pygame.Rect(450, 380, 150, 20),
-        pygame.Rect(150, 300, 150, 20),
-        pygame.Rect(500, 220, 150, 20),
-        pygame.Rect(50, 200, 80, 20),
-    ]
+    if level == 0:
+        platforms = [pygame.Rect(0, 550, 800, 50)]
+    elif level == 1:
+        platforms = [pygame.Rect(0, 500, 800, 100)]
+    else:
+        platforms = [
+            pygame.Rect(0, 550, 800, 50),
+            pygame.Rect(200, 400, 100, 20)
+        ]
 
     enemies = [
         Enemy(225, 420, 100),
@@ -170,8 +165,9 @@ def platformer_loop(screen, clock, show_hitboxes):
     ]
 
     combat_zone = pygame.Rect(700, 500, 50, 50)
+
     font = pygame.font.Font(None, 24)
-    ui_font = pygame.font.Font(None, 22)  # ✅ NEW
+    ui_font = pygame.font.Font(None, 22)
 
     while True:
         dt = clock.tick(60) / 1000
@@ -181,15 +177,19 @@ def platformer_loop(screen, clock, show_hitboxes):
                 return "menu", show_hitboxes
 
             if event.type == pygame.KEYDOWN:
+
                 if event.key == pygame.K_ESCAPE:
                     return "menu", show_hitboxes
 
                 if event.key == pygame.K_c:
                     return "combat", show_hitboxes
 
-                # toggle hitboxes
-                if event.key == pygame.K_F3 or event.key == pygame.K_BACKQUOTE:
+                keys = pygame.key.get_pressed()
+
+                if keys[pygame.K_F3] and keys[pygame.K_b] or keys[pygame.K_BACKQUOTE]:
                     show_hitboxes = not show_hitboxes
+                if event.key == pygame.K_h:
+                    show_controls = not show_controls
 
         keys = pygame.key.get_pressed()
         player.handle_input(keys)
@@ -230,26 +230,35 @@ def platformer_loop(screen, clock, show_hitboxes):
 
         player.draw(screen)
 
-        # ✅ CONTROLS TEXT (TOP LEFT UI)
-        controls = [
-            "WASD / Arrows: Move",
-            "SPACE: Jump",
-            "F3 or `: Toggle Hitboxes",
-            "ESC: Menu"
-        ]
+        # CONTROLS
+        if show_controls:
+            controls = [
+                "WASD / Arrows: Move",
+                "SPACE: Jump",
+                "F3 or `: Toggle Hitboxes",
+                "H: Toggle Controls",
+                "ESC: Menu"
+            ]
 
-        for i, line in enumerate(controls):
-            txt = ui_font.render(line, True, WHITE)
-            screen.blit(txt, (10, 10 + i * 18))
+            for i, line in enumerate(controls):
+                txt = ui_font.render(line, True, WHITE)
+                screen.blit(txt, (10, 10 + i * 18))
 
         # HITBOXES
         if show_hitboxes:
             pygame.draw.rect(screen, (255, 255, 0), player.rect, 2)
-
             for e in enemies:
                 pygame.draw.rect(screen, (0, 255, 0), e.rect, 2)
-
             for p in platforms:
                 pygame.draw.rect(screen, (0, 0, 255), p, 2)
+
+        # 🔥 LIVE MOUSE PIXELS (FIXED)
+        mx, my = pygame.mouse.get_pos()
+
+        coords_text = ui_font.render(f"{mx}, {my}", True, WHITE)
+        screen.blit(coords_text, (10, SCREEN_HEIGHT - 25))
+
+        pygame.draw.line(screen, WHITE, (mx - 10, my), (mx + 10, my), 1)
+        pygame.draw.line(screen, WHITE, (mx, my - 10), (mx, my + 10), 1)
 
         pygame.display.flip()
