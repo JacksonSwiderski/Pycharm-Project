@@ -32,10 +32,9 @@ STATE_PLATFORMER = "platformer"
 STATE_COMBAT = "combat"
 
 show_hitboxes = False
+current_enemy = None
 current_state = STATE_MENU
 clock = pygame.time.Clock()
-
-enemy_id = None
 
 def draw_button(text, x, y, width, height, color, hover_color):
     mouse = pygame.mouse.get_pos()
@@ -110,20 +109,21 @@ def level_select():
 
 
 def run_platformer():
-    global current_state, show_hitboxes, enemy_id
+    global current_enemy, current_state, show_hitboxes, enemy_data
 
     from test_plat import platformer_loop
 
-    result, show_hitboxes = platformer_loop(screen, clock, show_hitboxes)
+    result, show_hitboxes, enemy_data = platformer_loop(screen, clock, show_hitboxes)
 
     if result == "menu":
         current_state = STATE_MENU
     elif isinstance(result, tuple) and result[0] == "combat":
         current_state = STATE_COMBAT
-        enemy_id = result[1]
+        enemy_data = result[1]
 
     print('Returned:', result)
     if result == 'combat':
+        current_enemy = enemy_data
         current_state = STATE_COMBAT
 
 
@@ -132,14 +132,7 @@ def run_combat():
 
     from test_cmbt import combat_loop
 
-    class EnemyData:
-        def __init__(self):
-            self.name = 'Enemy'
-            self.hp = 30
-
-    enemy_id = EnemyData()
-
-    result = combat_loop(screen, clock, enemy_id)
+    result = combat_loop(screen, clock, enemy_data)
 
     if result == 'menu':
         current_state = STATE_MENU
