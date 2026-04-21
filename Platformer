@@ -12,8 +12,47 @@ RED = (200, 50, 50)
 GRAVITY = 0.8
 JUMP_STRENGTH = -10
 MOVE_SPEED = 5
+DIRT_COLOR = (66, 44, 31)  # #422C1F
 
 mousePixelToggle = True # to find pixels/ does not work rn
+
+# ground tiles
+grass_img = pygame.image.load("GrasslandGround.jpg").convert()
+grass_img = pygame.transform.scale(grass_img, (32, 32))  # adjust if needed
+def draw_platform(screen, image, rect):
+    tile_w = image.get_width()
+    tile_h = image.get_height()
+
+    # Create a transparent surface the size of the platform
+    platform_surf = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+
+    # --- TOP: tile grass ---
+    for x in range(0, rect.width, tile_w):
+        draw_w = min(tile_w, rect.width - x)
+        tile = image.subsurface((0, 0, draw_w, tile_h))
+        platform_surf.blit(tile, (x, 0))
+
+    # --- BELOW: dirt fill ---
+    if rect.height > tile_h:
+        dirt_rect = pygame.Rect(0, tile_h, rect.width, rect.height - tile_h)
+        pygame.draw.rect(platform_surf, DIRT_COLOR, dirt_rect)
+
+    # --- CREATE ROUNDED MASK ---
+    radius = 5  # adjust for more/less roundness
+
+    mask = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+    pygame.draw.rect(mask, (255, 255, 255), (0, 0, rect.width, rect.height), border_radius=radius)
+
+    # Apply mask (this cuts corners)
+    platform_surf.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+
+    # Draw final result
+    screen.blit(platform_surf, (rect.x, rect.y))
+
+
+
+
+##
 
 class Player:
     def __init__(self, x, y, chosenCharacter=None, fps=10):
@@ -147,10 +186,20 @@ def platformer_loop(screen, clock, show_hitboxes, level):
         pygame.transform.scale(pygame.image.load("AlienSkinJump.png").convert_alpha(), (SPRITE_W, SPRITE_H)),
     ]
 
-    player = Player(100, 400, alienSkin)
+    player = Player(170, 505, alienSkin)
 
     if level == 0:
-        platforms = [pygame.Rect(0, 550, 800, 50)]
+        platforms = [pygame.Rect(0, 550, 800, 50),
+                     pygame.Rect(143, 517, 65, 15),
+                     pygame.Rect(44, 470, 65, 15),
+                     pygame.Rect(143, 426, 75, 15),
+                     pygame.Rect(285, 389, 75, 15),
+                     pygame.Rect(410, 355, 57, 15),
+                     pygame.Rect(355, 300, 40, 15),
+                     pygame.Rect(218, 300, 30, 15),
+                     pygame.Rect(87, 295, 30, 15),
+                     pygame.Rect(5, 238, 25, 15)]
+
     elif level == 1:
         platforms = [pygame.Rect(0, 500, 800, 100)]
     else:
@@ -220,7 +269,7 @@ def platformer_loop(screen, clock, show_hitboxes, level):
         screen.fill(BLUE)
 
         for p in platforms:
-            pygame.draw.rect(screen, BROWN, p)
+            draw_platform(screen, grass_img, p)
 
         pygame.draw.rect(screen, (200, 200, 50), combat_zone)
         screen.blit(font.render("COMBAT", True, BLACK), (combat_zone.x, combat_zone.y - 20))
