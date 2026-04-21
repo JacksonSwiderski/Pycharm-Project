@@ -1,4 +1,6 @@
 import pygame
+from enemy_data import slime
+
 
 # Colors
 WHITE = (255, 255, 255)
@@ -119,15 +121,14 @@ class Player:
 
 
 class Enemy:
-    def __init__(self, x, y, patrol_range=100, name='enemy', hp=50):
+    def __init__(self, x, y, patrol_range, enemy_data):
         self.rect = pygame.Rect(x, y, 30, 30)
         self.start_x = x
         self.range = patrol_range
         self.dir = 1
         self.speed = 2
 
-        self.name = name
-        self.hp = hp
+        self.enemy_data = enemy_data
 
     def update(self):
         self.rect.x += self.speed * self.dir
@@ -166,8 +167,8 @@ def platformer_loop(screen, clock, show_hitboxes):
     ]
 
     enemies = [
-        Enemy(225, 420, 100, 'Test Enemy 1', 40),
-        Enemy(465, 350, 80, 'Test Enemy 2', 60)
+        Enemy(225, 420, 100, slime),
+        Enemy(465, 350, 80, slime)
     ]
 
     combat_zone = pygame.Rect(700, 500, 50, 50)
@@ -179,11 +180,11 @@ def platformer_loop(screen, clock, show_hitboxes):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return "menu", show_hitboxes
+                return "menu", show_hitboxes, enemy.enemy_data
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    return "menu", show_hitboxes
+                    return "menu", show_hitboxes, enemy.enemy_data
 
                 if event.key == pygame.K_c:
                     return ("combat", enemy), show_hitboxes
@@ -203,7 +204,7 @@ def platformer_loop(screen, clock, show_hitboxes):
             enemy.update()
             if player.rect.colliderect(enemy.rect):
                 print('Enemy hit.')
-                return "combat", show_hitboxes
+                return "combat", show_hitboxes, enemy.enemy_data
 
         if player.rect.colliderect(combat_zone):
             return "combat", show_hitboxes
