@@ -7,6 +7,7 @@ GREEN = (100, 200, 100)
 BROWN = (139, 90, 43)
 BLUE = (135, 206, 235)
 RED = (200, 50, 50)
+clicked_points = []
 
 # Settings
 GRAVITY = 0.8
@@ -17,8 +18,11 @@ DIRT_COLOR = (66, 44, 31)  # #422C1F
 mousePixelToggle = True # to find pixels/ does not work rn
 
 # ground tiles
-grass_img = pygame.image.load("GrasslandGround.jpg").convert()
+grass_img = pygame.image.load("GrasslandGround.jpg")
 grass_img = pygame.transform.scale(grass_img, (32, 32))  # adjust if needed
+spawn_img = pygame.image.load("SpawnPointBed.png")
+spawn_img = pygame.transform.scale(spawn_img, (32, 32))  # adjust if needed
+
 def draw_platform(screen, image, rect):
     tile_w = image.get_width()
     tile_h = image.get_height()
@@ -188,6 +192,8 @@ def platformer_loop(screen, clock, show_hitboxes, level):
 
     player = Player(170, 505, alienSkin)
 
+    spawnpoints = []
+
     if level == 0:
         platforms = [pygame.Rect(0, 550, 800, 50),
                      pygame.Rect(143, 517, 65, 15),
@@ -199,6 +205,9 @@ def platformer_loop(screen, clock, show_hitboxes, level):
                      pygame.Rect(218, 300, 30, 15),
                      pygame.Rect(87, 295, 30, 15),
                      pygame.Rect(5, 238, 25, 15)]
+
+        spawnpoints = [pygame.Rect(158, 500, 10, 3),
+                       ]
 
     elif level == 1:
         platforms = [pygame.Rect(0, 500, 800, 100)]
@@ -237,6 +246,7 @@ def platformer_loop(screen, clock, show_hitboxes, level):
 
                 if keys[pygame.K_F3] and keys[pygame.K_b] or keys[pygame.K_BACKQUOTE]:
                     show_hitboxes = not show_hitboxes
+
                 if event.key == pygame.K_h:
                     show_controls = not show_controls
 
@@ -270,6 +280,9 @@ def platformer_loop(screen, clock, show_hitboxes, level):
 
         for p in platforms:
             draw_platform(screen, grass_img, p)
+
+        for s in spawnpoints:
+            screen.blit(spawn_img, (s.x, s.y))
 
         pygame.draw.rect(screen, (200, 200, 50), combat_zone)
         screen.blit(font.render("COMBAT", True, BLACK), (combat_zone.x, combat_zone.y - 20))
@@ -309,5 +322,15 @@ def platformer_loop(screen, clock, show_hitboxes, level):
 
         pygame.draw.line(screen, WHITE, (mx - 10, my), (mx + 10, my), 1)
         pygame.draw.line(screen, WHITE, (mx, my - 10), (mx, my + 10), 1)
+
+        for pos in clicked_points:
+            x, y = pos
+
+            # draw dot
+            pygame.draw.circle(screen, WHITE, (x, y), 3)
+
+            # draw text above
+            coords_text = ui_font.render(f"{x}, {y}", True, WHITE)
+            screen.blit(coords_text, (x - 20, y - 20))
 
         pygame.display.flip()
