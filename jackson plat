@@ -142,7 +142,7 @@ class Enemy:
         pygame.draw.rect(screen, RED, self.rect)
 
 
-def platformer_loop(screen, clock, show_hitboxes):
+def platformer_loop(screen, clock, show_hitboxes, player_x, player_y, defeated_enemies):
     SCREEN_WIDTH = screen.get_width()
     SCREEN_HEIGHT = screen.get_height()
 
@@ -155,7 +155,7 @@ def platformer_loop(screen, clock, show_hitboxes):
         pygame.transform.scale(pygame.image.load("AlienSkinJump.png").convert_alpha(), (11*SCALE, 15*SCALE)),
     ]
 
-    player = Player(100, 400, alienSkin)
+    player = Player(player_x, player_y, alienSkin)
 
     platforms = [
         pygame.Rect(0, 550, 800, 50),
@@ -166,9 +166,14 @@ def platformer_loop(screen, clock, show_hitboxes):
         pygame.Rect(50, 200, 80, 20),
     ]
 
-    enemies = [
+    all_enemies = [
         Enemy(225, 420, 100, slime),
         Enemy(465, 350, 80, slime)
+    ]
+
+    enemies = [
+        e for e in all_enemies
+        if e.enemy_data not in defeated_enemies
     ]
 
     combat_zone = pygame.Rect(700, 500, 50, 50)
@@ -204,7 +209,7 @@ def platformer_loop(screen, clock, show_hitboxes):
             enemy.update()
             if player.rect.colliderect(enemy.rect):
                 print('Enemy hit.')
-                return "combat", show_hitboxes, enemy.enemy_data
+                return "combat", show_hitboxes, enemy.enemy_data, player.rect.x, player.rect.y
 
         if player.rect.colliderect(combat_zone):
             return "combat", show_hitboxes
