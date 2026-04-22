@@ -1,3 +1,107 @@
+import random
+import pygame
+from enum import Enum
+import math
+
+class BattleState(Enum):
+    BATTLE_START = 1
+    PLAYER_TURN = 2
+    ENEMY_ATTACK = 3
+    RESULT = 4
+    OUTCOME = 5
+
+############### PLAYER MOVES ###############
+
+class Move:
+    def __init__(self, name, power, element, points):
+        self.name = name
+        self.power = power
+        self.element = element
+        self.points = points
+
+basic = Move('Dash Attack', 10, 'normal', 10)
+special = Move('Ray Blast', 25, 'energy', 5)
+stat = Move('Heal', -10, 'normal', 1)
+
+tackle = Move('Tackle', 10, 'normal', 10)
+bite = Move('Bite', 15, 'normal', 10)
+solidify = Move('Solidify', -15, 'normal', 5)
+
+############### UNITS ###############
+
+class Unit:
+    def __init__(self, name, hp, moves):
+        self.name = name
+        self.hp = hp
+        self.max_hp = hp
+        self.moves = moves
+
+
+############### MENUS ###############
+
+class MoveMenu:
+    def __init__(self, moves):
+        self.moves = moves
+        self.selected = 0
+
+    def update(self, events):
+        for e in events:
+            if e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_UP:
+                    self.selected = (self.selected - 1) % len(self.moves)
+                elif e.key == pygame.K_DOWN:
+                    self.selected = (self.selected + 1) % len(self.moves)
+                elif e.key == pygame.K_z:
+                    return self.moves[self.selected]
+        return None
+
+    def draw(self, screen):
+        font = pygame.font.Font(None, 32)
+
+        for i, move in enumerate(self.moves):
+            color = (255, 255, 0) if i == self.selected else (255, 255, 255)
+            text = font.render(move.name, True, color)
+            screen.blit(text, (50, 400 + i * 35))
+
+############### DAMAGE ###############
+
+def apply_move(attacker, defender, move):
+    if move.power < 0:
+        attacker.hp = min(attacker.max_hp, attacker.hp - move.power)
+        return f'{attacker.name} healed!'
+    else:
+        defender.hp -= move.power
+        defender.hp = max(0, defender.hp)
+        return f'{attacker.name} used {move.name}.'
+
+############### HEALTH BAR ###############
+
+def draw_hp_bar(screen, x, y, unit):
+    ratio = unit.hp / unit.max_hp if unit.max_hp > 0 else 0
+    pygame.draw.rect(screen, (255, 0, 0), (x, y, 200, 20))
+    pygame.draw.rect(screen, (0, 255, 0), (x, y, 200 * ratio, 20))
+    pygame.draw.rect(screen, (255, 255, 255), (x, y, 200, 20), 2)
+
+############### BATTLE  ###############
+
+class Battle:
+    def __init__(self, enemy_data):
+        global basic, special, stat, tackle, bite, solidify
+        self.turn_locked = False
+
+        self.player = Unit('Alien', 50, [basic, special, stat])
+        self.enemy = Unit(enemy_data.name, enemy_data.hp, enemy_data.moves)
+        self.enemy.max_hp = enemy_data.hp
+        self.float_timer = 0
+
+        self.menu = MoveMenu(self.player.moves)
+        self.state = BattleState.PLAYER_TURN
+        self.message = ''
+        self.font = pygame.font.Font(None, 32)
+
+
+    def update(self, events):
+        self.float_timer += 0.1
         if self.state == BattleState.PLAYER_TURN:
             move = self.menu.update(events)
             if move:
@@ -38,3 +142,55 @@
             for e in events:
                 if e.type == pygame.KEYDOWN and e.key == pygame.K_z:
                     return 'platformer'
+
+    def draw(self, screen):
+        screen.fill ((30, 30, 40))
+
+        self.player_sprite = pygame.image.load('AlienBattle.png').convert_alpha()
+        self.player_sprite = pygame.transform.scale(self.player_sprite, (150,170))
+        pygame.draw.rect(screen, (255, 100, 100), (600, 200, 80, 80))
+
+        draw_hp_bar(screen, 50, 50, self.player)
+        draw_hp_bar(screen, 550, 50, self.enemy)
+
+        screen.blit(self.font.render(self.player.name, True, (255, 255, 255)), (50, 20))
+        screen.blit(self.font.render(self.enemy.name, True, (255, 255, 255)), (550, 20))
+
+        float_offset = math.sin(self.float_timer) * 8
+        screen.blit(self.player_sprite, (100, 280 + float_offset))
+        pygame.draw.rect(screen, (255, 255, 255), (0, 500, 800, 100), 2)
+
+        # Menu
+        if self.state == BattleState.PLAYER_TURN:
+            self.menu.draw(screen)
+
+        # Text box
+
+        text_surface = self.font.render(self.message, True, (255, 255, 255))
+        screen.blit(text_surface, (20, 530))
+
+# This is making me want to cry
+
+def combat_loop(screen, clock, enemy_data):
+    print(enemy_data)
+    print(type(enemy_data))
+    print(dir(enemy_data))
+    battle = Battle(enemy_data)
+    while True:
+        events = pygame.event.get()
+
+        for event in events:
+            if event.type == pygame.QUIT:
+                return "menu"
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return "menu"
+
+        result = battle.update(events)
+        if result:
+            return result
+
+        battle.draw(screen)
+
+        pygame.display.flip()
+        clock.tick(60)
