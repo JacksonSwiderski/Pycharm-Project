@@ -1,6 +1,7 @@
 import pygame
 from enemy_data import slime
 
+pygame.mixer.init()
 
 # Colors
 WHITE = (255, 255, 255)
@@ -10,6 +11,10 @@ BROWN = (139, 90, 43)
 BLUE = (135, 206, 235)
 RED = (200, 50, 50)
 
+# Sounds
+
+walking = pygame.mixer.Sound('walking.wav')
+walking.set_volume(0.3)
 
 # Settings
 GRAVITY = 0.8
@@ -33,18 +38,25 @@ class Player:
         self.frame_timer = 0
         self.facing_right = True
 
+        self.walk_channel = pygame.mixer.Channel(0)
+        self.walking = False
+
+        self.walking_timer = 0
         self.air_timer = 0
 
     def handle_input(self, keys):
         self.vel_x = 0
+        moving = False
 
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.vel_x = -MOVE_SPEED
             self.facing_right = False
+            moving = True
 
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.vel_x = MOVE_SPEED
             self.facing_right = True
+            moving = True
 
         if (keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]) and self.on_ground:
             self.vel_y = JUMP_STRENGTH
@@ -105,6 +117,21 @@ class Player:
             if self.frame_index > 1:
                 self.frame_index = 0
 
+    def update_sound(self, dt, moving):
+        if moving and self.on_ground:
+            self.walk_timer += dt
+
+            if self.walk_timer > 0.35:
+                self.walk_channel.play(walking)
+                self.walk_timer = 0
+                self.walking = True
+        else:
+            self.walk_timer = 0
+
+            if self.walking:
+                self.walk_channel.stop()
+                self.walking = False
+
     def draw(self, screen):
         if self.chosenCharacter:
             frame = self.chosenCharacter[self.frame_index]
@@ -121,7 +148,7 @@ class Player:
 
 
 class Enemy:
-    def __init__(self, x, y, patrol_range, enemy_data):
+    def __init__(self, x, y, patrol_range, enemy_data, enemy_id):
         self.rect = pygame.Rect(x, y, 30, 30)
         self.start_x = x
         self.range = patrol_range
@@ -129,6 +156,7 @@ class Enemy:
         self.speed = 2
 
         self.enemy_data = enemy_data
+        self.enemy_id = enemy_id
 
     def update(self):
         self.rect.x += self.speed * self.dir
@@ -166,15 +194,14 @@ def platformer_loop(screen, clock, show_hitboxes, player_x, player_y, defeated_e
         pygame.Rect(50, 200, 80, 20),
     ]
 
-    all_enemies = [
-        Enemy(225, 420, 100, slime),
-        Enemy(465, 350, 80, slime)
+    enemies = [
+        Enemy(225, 420, 100, slime, 'slime_1'),
+        Enemy(465, 350, 80, slime, 'slime_2')
     ]
 
-    enemies = [
-        e for e in all_enemies
-        if e.enemy_data not in defeated_enemies
-    ]
+    enemies = [e for e in enemies if e.enemy_id not in defeated_enemies]
+
+    print('Remaining enemies:', [e.enemy_id for e in enemies])
 
     combat_zone = pygame.Rect(700, 500, 50, 50)
     font = pygame.font.Font(None, 24)
@@ -200,19 +227,24 @@ def platformer_loop(screen, clock, show_hitboxes, player_x, player_y, defeated_e
 
         keys = pygame.key.get_pressed()
         player.handle_input(keys)
-
         player.apply_gravity()
         player.move_and_collide(platforms)
+        moving = player.vel_x != 0
+        player.update_sound(dt, moving)
         player.update_animation(dt)
 
         for enemy in enemies:
             enemy.update()
             if player.rect.colliderect(enemy.rect):
-                print('Enemy hit.')
-                return "combat", show_hitboxes, enemy.enemy_data, player.rect.x, player.rect.y
+                print('Enemy hit:', enemy.enemy_id)
+                return "combat", show_hitboxes, enemy, player.rect.x, player.rect.y
 
         if player.rect.colliderect(combat_zone):
             return "combat", show_hitboxes
+
+        # Sounds
+
+
 
         # bounds
         if player.rect.left < 0:
