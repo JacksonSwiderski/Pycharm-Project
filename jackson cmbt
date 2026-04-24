@@ -90,8 +90,8 @@ class Battle:
         self.turn_locked = False
 
         self.player = Unit('Alien', 50, [basic, special, stat])
-        self.enemy = Unit(enemy_data.name, enemy_data.hp, enemy_data.moves)
-        self.enemy.max_hp = enemy_data.hp
+        self.enemy = Unit(enemy_data.enemy_data.name, enemy_data.enemy_data.hp, enemy_data.enemy_data.moves)
+        self.enemy.max_hp = enemy_data.enemy_data.hp
         self.float_timer = 0
 
         self.menu = MoveMenu(self.player.moves)
@@ -141,7 +141,10 @@ class Battle:
         elif self.state == BattleState.OUTCOME:
             for e in events:
                 if e.type == pygame.KEYDOWN and e.key == pygame.K_z:
-                    return 'platformer'
+                    if self.enemy.hp <= 0:
+                        return 'enemy_defeated'
+                    else:
+                        return 'platformer'
 
     def draw(self, screen):
         screen.fill ((30, 30, 40))
