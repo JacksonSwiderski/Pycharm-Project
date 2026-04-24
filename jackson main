@@ -5,6 +5,7 @@ from test_cmbt import combat_loop
 
 # Initialize Pygame
 pygame.init()
+pygame.mixer.init()
 
 # Screen settings
 SCREEN_WIDTH = 800
@@ -120,7 +121,7 @@ def run_platformer():
     global player_x, player_y
     global defeated_enemies
 
-    result, show_hitboxes, enemy, player_x, player_y = platformer_loop(
+    result, show_hitboxes, enemy_data, player_x, player_y = platformer_loop(
         screen,
         clock,
         False,
@@ -134,17 +135,21 @@ def run_platformer():
         return
 
     if result == "combat":
-        current_enemy = enemy
+        current_enemy = enemy_data
         current_state = STATE_COMBAT
 
 def run_combat():
-    global current_state, current_enemy
+    global current_state, current_enemy, defeated_enemy
 
     result = combat_loop(screen, clock, current_enemy)
 
     if result == "menu":
         current_state = STATE_MENU
     elif result == "platformer":
+        current_state = STATE_PLATFORMER
+    elif result == 'enemy_defeated':
+        defeated_enemies.append(current_enemy.enemy_id)
+        print(defeated_enemies)
         current_state = STATE_PLATFORMER
 
 
