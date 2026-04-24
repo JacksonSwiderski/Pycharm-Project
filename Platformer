@@ -53,9 +53,6 @@ def draw_platform(screen, image, rect):
     # Draw final result
     screen.blit(platform_surf, (rect.x, rect.y))
 
-
-
-
 ##
 
 class Player:
@@ -123,45 +120,60 @@ class Player:
         if not self.chosenCharacter:
             return
 
+        # AIR (jumping)
         if self.air_timer > 1:
             self.frame_index = 3
             self.frame_timer = 0
             return
 
+        # IDLE
         if self.vel_x == 0:
             self.frame_index = 2
             self.frame_timer = 0
             return
 
+        # WALKING
         self.frame_timer += dt
-        if self.frame_timer >= 1 / self.fps:
-            self.frame_timer = 0
-            self.frame_index = 1 - self.frame_index
 
-    def draw(self, screen):
+        if self.frame_timer >= 0.1:  # 👈 fixed speed (0.1 = fast, 0.2 = slower)
+            self.frame_timer = 0
+            self.frame_index += 1
+
+            # loop between frames 0 and 1
+            if self.frame_index > 1:
+                self.frame_index = 0
+
+    def draw(self, screen, camera_x):
         if self.chosenCharacter:
             frame = self.chosenCharacter[self.frame_index]
 
             if not self.facing_right:
                 frame = pygame.transform.flip(frame, True, False)
 
-            draw_x = self.rect.x + (self.rect.width - frame.get_width()) // 2
+            draw_x = self.rect.x - camera_x + (self.rect.width - frame.get_width()) // 2
             draw_y = self.rect.bottom - frame.get_height()
 
             screen.blit(frame, (draw_x, draw_y))
         else:
             pygame.draw.rect(screen, GREEN, self.rect)
 
+def world_to_screen(rect, camera_x):
+    return pygame.Rect(rect.x - camera_x, rect.y, rect.width, rect.height)
 
 class Enemy:
-    def __init__(self, x, y, patrol_range=100):
-        self.rect = pygame.Rect(x, y, 30, 30)
+    def __init__(self, x, y, patrol_range=100, frames=None):
+        self.rect = pygame.Rect(x, y, 22, 30)
         self.start_x = x
         self.range = patrol_range
         self.dir = 1
-        self.speed = 2
+        self.speed = 1
 
-    def update(self):
+        self.frames = frames if frames else []
+        self.frame_index = 0
+        self.frame_timer = 0
+
+    def update(self, dt):
+        # movement
         self.rect.x += self.speed * self.dir
 
         if self.rect.x > self.start_x + self.range:
@@ -169,11 +181,34 @@ class Enemy:
         elif self.rect.x < self.start_x:
             self.dir = 1
 
-    def draw(self, screen):
-        pygame.draw.rect(screen, RED, self.rect)
+        # animation
+        if self.frames:
+            self.frame_timer += dt
+
+            if self.frame_timer >= 0.25:  # speed of float animation
+                self.frame_timer = 0
+                self.frame_index += 1
+
+                if self.frame_index >= len(self.frames):
+                    self.frame_index = 0
+
+    def draw(self, screen, camera_x):
+        draw_x = self.rect.x - camera_x
+
+        if self.frames:
+            frame = self.frames[self.frame_index]
+
+            # flip if moving left
+            if self.dir < 0:
+                frame = pygame.transform.flip(frame, True, False)
+
+            screen.blit(frame, (draw_x, self.rect.y))
+        else:
+            pygame.draw.rect(screen, RED, (draw_x, self.rect.y, self.rect.width, self.rect.height))
 
 
 def platformer_loop(screen, clock, show_hitboxes, level):
+    dev_mode = False
     SCREEN_WIDTH = screen.get_width()
     SCREEN_HEIGHT = screen.get_height()
 
@@ -182,6 +217,13 @@ def platformer_loop(screen, clock, show_hitboxes, level):
     SCALE = 2
     SPRITE_W = 11 * SCALE
     SPRITE_H = 15 * SCALE
+
+    enemy_frames = [
+        pygame.transform.scale(pygame.image.load("RedEnemy1.png").convert_alpha(), (22, 30)),
+        pygame.transform.scale(pygame.image.load("RedEnemy2.png").convert_alpha(), (22, 30)),
+        pygame.transform.scale(pygame.image.load("RedEnemy3.png").convert_alpha(), (22, 30)),
+        pygame.transform.scale(pygame.image.load("RedEnemy4.png").convert_alpha(), (22, 30)),
+    ]
 
     alienSkin = [
         pygame.transform.scale(pygame.image.load("AlienSkin1.png").convert_alpha(), (SPRITE_W, SPRITE_H)),
@@ -195,7 +237,7 @@ def platformer_loop(screen, clock, show_hitboxes, level):
     spawnpoints = []
 
     if level == 0:
-        platforms = [pygame.Rect(0, 550, 800, 50),
+        platforms = [pygame.Rect(0, 550, 2000, 50),
                      pygame.Rect(143, 517, 65, 15),
                      pygame.Rect(44, 470, 65, 15),
                      pygame.Rect(143, 426, 75, 15),
@@ -218,11 +260,8 @@ def platformer_loop(screen, clock, show_hitboxes, level):
         ]
 
     enemies = [
-        Enemy(225, 420, 100),
-        Enemy(465, 350, 80),
+        Enemy(511, 520, 200, enemy_frames)
     ]
-
-    combat_zone = pygame.Rect(700, 500, 50, 50)
 
     font = pygame.font.Font(None, 24)
     ui_font = pygame.font.Font(None, 22)
@@ -250,6 +289,9 @@ def platformer_loop(screen, clock, show_hitboxes, level):
                 if event.key == pygame.K_h:
                     show_controls = not show_controls
 
+                if event.key == pygame.K_TAB:
+                    dev_mode = not dev_mode
+
         keys = pygame.key.get_pressed()
         player.handle_input(keys)
 
@@ -258,39 +300,40 @@ def platformer_loop(screen, clock, show_hitboxes, level):
         player.update_animation(dt)
 
         for enemy in enemies:
-            enemy.update()
+            enemy.update(dt)
             if player.rect.colliderect(enemy.rect):
                 return "combat", show_hitboxes
-
-        if player.rect.colliderect(combat_zone):
-            return "combat", show_hitboxes
 
         # bounds
         if player.rect.left < 0:
             player.rect.left = 0
-        if player.rect.right > SCREEN_WIDTH:
-            player.rect.right = SCREEN_WIDTH
         if player.rect.top > SCREEN_HEIGHT:
             player.rect.x = 100
             player.rect.y = 400
             player.vel_y = 0
 
+        # CAMERA
+        if dev_mode:
+            camera_x = 0
+        else:
+            camera_x = player.rect.x - SCREEN_WIDTH // 2
+            camera_x = max(0, camera_x)
+            camera_x = min(camera_x, 2000 - SCREEN_WIDTH)
+
         # DRAW
         screen.fill(BLUE)
 
         for p in platforms:
-            draw_platform(screen, grass_img, p)
+            shifted = pygame.Rect(p.x - camera_x, p.y, p.width, p.height)
+            draw_platform(screen, grass_img, shifted)
 
         for s in spawnpoints:
-            screen.blit(spawn_img, (s.x, s.y))
-
-        pygame.draw.rect(screen, (200, 200, 50), combat_zone)
-        screen.blit(font.render("COMBAT", True, BLACK), (combat_zone.x, combat_zone.y - 20))
+            screen.blit(spawn_img, (s.x - camera_x, s.y))
 
         for e in enemies:
-            e.draw(screen)
+            e.draw(screen, camera_x)
 
-        player.draw(screen)
+        player.draw(screen, camera_x)
 
         # CONTROLS
         if show_controls:
@@ -308,11 +351,32 @@ def platformer_loop(screen, clock, show_hitboxes, level):
 
         # HITBOXES
         if show_hitboxes:
-            pygame.draw.rect(screen, (255, 255, 0), player.rect, 2)
+
+            # PLAYER (screen space)
+            pygame.draw.rect(
+                screen,
+                (255, 255, 0),
+                (player.rect.x - camera_x, player.rect.y, player.rect.width, player.rect.height),
+                2
+            )
+
+            # ENEMIES (screen space)
             for e in enemies:
-                pygame.draw.rect(screen, (0, 255, 0), e.rect, 2)
+                pygame.draw.rect(
+                    screen,
+                    (0, 255, 0),
+                    (e.rect.x - camera_x, e.rect.y, e.rect.width, e.rect.height),
+                    2
+                )
+
+            # PLATFORMS (screen space)
             for p in platforms:
-                pygame.draw.rect(screen, (0, 0, 255), p, 2)
+                pygame.draw.rect(
+                    screen,
+                    (0, 0, 255),
+                    (p.x - camera_x, p.y, p.width, p.height),
+                    2
+                )
 
         # 🔥 LIVE MOUSE PIXELS (FIXED)
         mx, my = pygame.mouse.get_pos()
