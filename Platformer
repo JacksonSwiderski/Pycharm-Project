@@ -11,9 +11,9 @@ clicked_points = []
 
 # Settings
 GRAVITY = 0.8
-JUMP_STRENGTH = -10
+JUMP_STRENGTH = -17
 MOVE_SPEED = 5
-DIRT_COLOR = (66, 44, 31)  # #422C1F
+DIRT_COLOR = (1, 2, 5)  # #010205
 
 mousePixelToggle = True # to find pixels/ does not work rn
 
@@ -232,23 +232,24 @@ def platformer_loop(screen, clock, show_hitboxes, level):
         pygame.transform.scale(pygame.image.load("AlienSkinJump.png").convert_alpha(), (SPRITE_W, SPRITE_H)),
     ]
 
-    player = Player(170, 505, alienSkin)
+    player = Player(22, 286, alienSkin)
 
     spawnpoints = []
 
     if level == 0:
-        platforms = [pygame.Rect(0, 550, 2000, 50),
-                     pygame.Rect(143, 517, 65, 15),
-                     pygame.Rect(44, 470, 65, 15),
-                     pygame.Rect(143, 426, 75, 15),
-                     pygame.Rect(285, 389, 75, 15),
-                     pygame.Rect(410, 355, 57, 15),
-                     pygame.Rect(355, 300, 40, 15),
-                     pygame.Rect(218, 300, 30, 15),
-                     pygame.Rect(87, 295, 30, 15),
-                     pygame.Rect(5, 238, 25, 15)]
+        platforms = [
+            pygame.Rect(0, 308, 135, 300),
+            pygame.Rect(135, 345, 53, 260),
+            pygame.Rect(187, 375, 269, 230),
+            pygame.Rect(544, 348, 145, 32),
+            pygame.Rect(689, 364, 53, 240),
+            pygame.Rect(171, 258, 45, 17),
+            pygame.Rect(200, 268, 86, 28),
+            pygame.Rect(515, 214, 118, 41),
+            pygame.Rect(578, 242, 75, 27),
+        ]
 
-        spawnpoints = [pygame.Rect(158, 500, 10, 3),
+        spawnpoints = [pygame.Rect(15, 286, 10, 3),
                        ]
 
     elif level == 1:
@@ -260,7 +261,7 @@ def platformer_loop(screen, clock, show_hitboxes, level):
         ]
 
     enemies = [
-        Enemy(511, 520, 200, enemy_frames)
+        Enemy(525, 190, 80, enemy_frames)
     ]
 
     font = pygame.font.Font(None, 24)
