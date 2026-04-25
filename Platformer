@@ -18,8 +18,8 @@ DIRT_COLOR = (66, 44, 31)  # #422C1F
 mousePixelToggle = True # to find pixels/ does not work rn
 
 # ground tiles
-grass_img = pygame.image.load("GroundTop.png")
-grass_img = pygame.transform.scale(grass_img, (32, 32))  # adjust if needed
+grass_img = pygame.image.load("GroundTop2.png")
+grass_img = pygame.transform.scale(grass_img, (111, 120))  # adjust if needed
 spawn_img = pygame.image.load("SpawnPointBed.png")
 spawn_img = pygame.transform.scale(spawn_img, (32, 32))  # adjust if needed
 
