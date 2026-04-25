@@ -1,0 +1,154 @@
+import pygame
+from test_plat import draw_platform
+
+pygame.init()
+
+# 👇 MAKE WINDOW BIG ENOUGH FOR FULL MAP
+SCREEN_WIDTH = 2000   # match your largest map width
+SCREEN_HEIGHT = 600
+dragging = False
+start_pos = (0, 0)
+current_pos = (0, 0)
+
+saved_rects = []
+
+font = pygame.font.Font(None, 22)
+
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Map Maker / Full Level View")
+
+clock = pygame.time.Clock()
+
+# load images (same as your main file)
+grass_img = pygame.image.load("GrasslandGround.jpg")
+grass_img = pygame.transform.scale(grass_img, (32, 32))
+
+spawn_img = pygame.image.load("SpawnPointBed.png")
+spawn_img = pygame.transform.scale(spawn_img, (32, 32))
+
+
+def load_level(level):
+    if level == 0:
+        platforms = [
+            pygame.Rect(0, 550, 2000, 50),
+            pygame.Rect(143, 517, 65, 15),
+            pygame.Rect(44, 470, 65, 15),
+            pygame.Rect(143, 426, 75, 15),
+            pygame.Rect(285, 389, 75, 15),
+            pygame.Rect(410, 355, 57, 15),
+            pygame.Rect(355, 300, 40, 15),
+            pygame.Rect(218, 300, 30, 15),
+            pygame.Rect(87, 295, 30, 15),
+            pygame.Rect(5, 238, 25, 15)
+        ]
+
+        spawnpoints = [
+            pygame.Rect(158, 500, 10, 3)
+        ]
+
+    elif level == 1:
+        platforms = [pygame.Rect(0, 500, 800, 100)]
+        spawnpoints = []
+
+    else:
+        platforms = [
+            pygame.Rect(0, 550, 800, 50),
+            pygame.Rect(200, 400, 100, 20)
+        ]
+        spawnpoints = []
+
+    return platforms, spawnpoints
+
+
+# 👇 CHANGE THIS TO TEST DIFFERENT LEVELS
+LEVEL = 0
+
+platforms, spawnpoints = load_level(LEVEL)
+
+
+# MAIN LOOP
+running = True
+while running:
+    clock.tick(60)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:  # LEFT CLICK → start drag
+                dragging = True
+                start_pos = pygame.mouse.get_pos()
+
+        if event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:  # LEFT RELEASE → stop drag
+                dragging = False
+
+            if event.button == 3:  # RIGHT CLICK → CONFIRM rectangle
+                x1, y1 = start_pos
+                x2, y2 = current_pos
+
+                rect = pygame.Rect(
+                    min(x1, x2),
+                    min(y1, y2),
+                    abs(x2 - x1),
+                    abs(y2 - y1)
+                )
+
+                saved_rects.append(rect)
+                print(f"pygame.Rect({rect.x}, {rect.y}, {rect.width}, {rect.height}),")
+
+        if event.type == pygame.MOUSEMOTION:
+            current_pos = pygame.mouse.get_pos()
+
+    screen.fill((135, 206, 235))  # sky blue
+
+    # 👇 NO CAMERA OFFSET HERE (IMPORTANT)
+    for p in platforms:
+        draw_platform(screen, grass_img, p)
+
+    for s in spawnpoints:
+        screen.blit(spawn_img, (s.x, s.y))
+
+    # 👇 DEBUG HITBOXES (VERY USEFUL)
+    for p in platforms:
+        pygame.draw.rect(screen, (0, 0, 255), p, 2)
+
+    for s in spawnpoints:
+        pygame.draw.rect(screen, (255, 255, 0), s, 2)
+
+    mx, my = pygame.mouse.get_pos()
+
+    pygame.draw.line(screen, (255, 255, 255), (mx - 10, my), (mx + 10, my), 1)
+    pygame.draw.line(screen, (255, 255, 255), (mx, my - 10), (mx, my + 10), 1)
+
+    coords = font.render(f"{mx},{my}", True, (255, 255, 255))
+    screen.blit(coords, (10, SCREEN_HEIGHT - 25))
+
+    for rect in saved_rects:
+        pygame.draw.rect(screen, (0, 255, 0), rect, 2)
+
+        # bottom-left coords
+        bl_x = rect.x
+        bl_y = rect.y + rect.height
+
+        info = f"{bl_x},{bl_y}  W:{rect.width} H:{rect.height}"
+        text = font.render(info, True, (0, 255, 0))
+
+        screen.blit(text, (rect.x, rect.y - 20))
+
+    if dragging:
+        x1, y1 = start_pos
+        x2, y2 = current_pos
+
+        preview_rect = pygame.Rect(
+            min(x1, x2),
+            min(y1, y2),
+            abs(x2 - x1),
+            abs(y2 - y1)
+        )
+
+        pygame.draw.rect(screen, (255, 255, 255), preview_rect, 1)
+
+    pygame.display.flip()
+
+pygame.quit()
