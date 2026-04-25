@@ -11,7 +11,7 @@ clicked_points = []
 
 # Settings
 GRAVITY = 0.8
-JUMP_STRENGTH = -17
+JUMP_STRENGTH = -10
 MOVE_SPEED = 5
 DIRT_COLOR = (1, 2, 5)  # #010205
 
@@ -247,6 +247,14 @@ def platformer_loop(screen, clock, show_hitboxes, level):
             pygame.Rect(200, 268, 86, 28),
             pygame.Rect(515, 214, 118, 41),
             pygame.Rect(578, 242, 75, 27),
+
+            pygame.Rect(833, 351, 139, 27),
+            pygame.Rect(1057, 314, 103, 26),
+            pygame.Rect(1170, 263, 80, 22),
+            pygame.Rect(1060, 206, 74, 20),
+            pygame.Rect(1178, 145, 89, 29),
+            pygame.Rect(1458, 329, 107, 24),
+            pygame.Rect(1650, 271, 127, 20),
         ]
 
         spawnpoints = [pygame.Rect(15, 286, 10, 3),
@@ -341,7 +349,7 @@ def platformer_loop(screen, clock, show_hitboxes, level):
             controls = [
                 "WASD / Arrows: Move",
                 "SPACE: Jump",
-                "F3 or `: Toggle Hitboxes",
+                "F3 + B or `: Toggle Hitboxes",
                 "H: Toggle Controls",
                 "ESC: Menu"
             ]
