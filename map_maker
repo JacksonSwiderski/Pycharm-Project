@@ -21,8 +21,8 @@ pygame.display.set_caption("Map Maker / Full Level View")
 clock = pygame.time.Clock()
 
 # load images (same as your main file)
-grass_img = pygame.image.load("GroundTop.png")
-grass_img = pygame.transform.scale(grass_img, (32, 32))
+grass_img = pygame.image.load("GroundTop2.png")
+grass_img = pygame.transform.scale(grass_img, (111, 120))
 
 spawn_img = pygame.image.load("SpawnPointBed.png")
 spawn_img = pygame.transform.scale(spawn_img, (32, 32))
