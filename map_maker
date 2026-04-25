@@ -31,16 +31,13 @@ spawn_img = pygame.transform.scale(spawn_img, (32, 32))
 def load_level(level):
     if level == 0:
         platforms = [
-            pygame.Rect(0, 550, 2000, 50),
-            pygame.Rect(143, 517, 65, 15),
-            pygame.Rect(44, 470, 65, 15),
-            pygame.Rect(143, 426, 75, 15),
-            pygame.Rect(285, 389, 75, 15),
-            pygame.Rect(410, 355, 57, 15),
-            pygame.Rect(355, 300, 40, 15),
-            pygame.Rect(218, 300, 30, 15),
-            pygame.Rect(87, 295, 30, 15),
-            pygame.Rect(5, 238, 25, 15)
+            pygame.Rect(0, 308, 135, 300),
+            pygame.Rect(135, 345, 53, 260),
+            pygame.Rect(187, 375, 269, 230),
+            pygame.Rect(544, 348, 145, 32),
+            pygame.Rect(689, 364, 53, 240),
+            pygame.Rect(171, 258, 45, 17),
+            pygame.Rect(216, 268, 66, 28),
         ]
 
         spawnpoints = [
