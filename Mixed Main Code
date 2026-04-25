@@ -1,1 +1,332 @@
+import pygame
+import sys
+import random
+import math
+from enum import Enum
 
+pygame.init()
+pygame.mixer.init()
+
+# ================= SCREEN =================
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Chrono Clash")
+
+clock = pygame.time.Clock()
+
+# ================= COLORS =================
+WHITE = (255, 255, 255)
+GRAY = (50, 50, 50)
+GREEN = (100, 200, 100)
+
+# ================= FONTS =================
+font = pygame.font.Font(None, 48)
+small_font = pygame.font.Font(None, 32)
+
+# ================= GAME STATES =================
+STATE_MENU = "menu"
+STATE_LEVEL_SELECT = "level_select"
+STATE_PLATFORMER = "platformer"
+STATE_COMBAT = "combat"
+
+current_state = STATE_MENU
+
+# ================= PLAYER POS =================
+player_x = 100
+player_y = 400
+
+# ================= ENEMY TRACKING =================
+current_enemy = None
+defeated_enemies = []
+
+# ================= LOGO =================
+logo = pygame.Surface((500, 300))
+logo.fill((100, 100, 200))
+
+# ================= BUTTON =================
+def draw_button(text, x, y, width, height, color, hover_color):
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+
+    rect = pygame.Rect(x, y, width, height)
+    is_hovered = rect.collidepoint(mouse)
+
+    pygame.draw.rect(screen, hover_color if is_hovered else color, rect, border_radius=8)
+    pygame.draw.rect(screen, WHITE, rect, 2, border_radius=8)
+
+    text_surface = small_font.render(text, True, WHITE)
+    text_rect = text_surface.get_rect(center=rect.center)
+    screen.blit(text_surface, text_rect)
+
+    return is_hovered and click[0]
+
+# ================= MENU =================
+def createTitle():
+    screen.blit(logo, (SCREEN_WIDTH // 2 - 250, 15))
+
+def main_menu():
+    global current_state
+
+    screen.fill(GRAY)
+    createTitle()
+
+    if draw_button("Play", 300, 250, 200, 50, GREEN, (120, 220, 120)):
+        pygame.time.delay(150)
+        current_state = STATE_LEVEL_SELECT
+
+    if draw_button("Testing", 300, 320, 200, 50, (65, 65, 65), (88, 88, 88)):
+        pygame.time.delay(150)
+        current_state = STATE_PLATFORMER
+
+    if draw_button("Quit", 300, 390, 200, 50, (150, 50, 50), (180, 80, 80)):
+        pygame.quit()
+        sys.exit()
+
+# ================= LEVEL SELECT =================
+def level_select():
+    global current_state
+
+    screen.fill(GRAY)
+
+    title = font.render("SELECT LEVEL", True, WHITE)
+    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
+
+    if draw_button("Start Level", 300, 250, 200, 60, GREEN, (120, 220, 120)):
+        pygame.time.delay(150)
+        current_state = STATE_PLATFORMER
+
+    if draw_button("Back", 20, 550, 100, 40, (100, 100, 100), (130, 130, 130)):
+        pygame.time.delay(150)
+        current_state = STATE_MENU
+
+# ================= PLATFORMER (TEMP STUB) =================
+class DummyEnemy:
+    def __init__(self):
+        self.name = "Blob"
+        self.hp = 40
+        self.moves = [
+            Move("Tackle", 10, "normal", 10),
+            Move("Bite", 15, "normal", 10)
+        ]
+        self.enemy_id = 1
+
+def platformer_loop(screen, clock, show_hitboxes, px, py, defeated):
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            return "menu", False, None, px, py
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                return "menu", False, None, px, py
+            if event.key == pygame.K_c:
+                return "combat", False, DummyEnemy(), px, py
+
+    screen.fill((30, 120, 60))
+    txt = small_font.render("Platformer (Press C to fight)", True, WHITE)
+    screen.blit(txt, (200, 300))
+
+    return None, False, None, px, py
+
+# ================= COMBAT =================
+class BattleState(Enum):
+    PLAYER_TURN = 1
+    ENEMY_ATTACK = 2
+    RESULT = 3
+    OUTCOME = 4
+
+class Move:
+    def __init__(self, name, power, element, points):
+        self.name = name
+        self.power = power
+        self.element = element
+        self.points = points
+
+class Unit:
+    def __init__(self, name, hp, moves):
+        self.name = name
+        self.hp = hp
+        self.max_hp = hp
+        self.moves = moves
+
+class MoveMenu:
+    def __init__(self, moves):
+        self.moves = moves
+        self.selected = 0
+
+    def update(self, events):
+        for e in events:
+            if e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_UP:
+                    self.selected = (self.selected - 1) % len(self.moves)
+                elif e.key == pygame.K_DOWN:
+                    self.selected = (self.selected + 1) % len(self.moves)
+                elif e.key == pygame.K_z:
+                    return self.moves[self.selected]
+        return None
+
+    def draw(self, screen):
+        for i, move in enumerate(self.moves):
+            color = (255, 255, 0) if i == self.selected else WHITE
+            text = small_font.render(move.name, True, color)
+            screen.blit(text, (50, 400 + i * 35))
+
+def apply_move(attacker, defender, move):
+    if move.power < 0:
+        attacker.hp = min(attacker.max_hp, attacker.hp - move.power)
+        return f'{attacker.name} healed!'
+    else:
+        defender.hp -= move.power
+        defender.hp = max(0, defender.hp)
+        return f'{attacker.name} used {move.name}.'
+
+def draw_hp_bar(screen, x, y, unit):
+    ratio = unit.hp / unit.max_hp
+    pygame.draw.rect(screen, (255, 0, 0), (x, y, 200, 20))
+    pygame.draw.rect(screen, (0, 255, 0), (x, y, 200 * ratio, 20))
+    pygame.draw.rect(screen, WHITE, (x, y, 200, 20), 2)
+
+class Battle:
+    def __init__(self, enemy_data):
+        self.player = Unit("Alien", 50, [
+            Move("Dash", 10, "normal", 10),
+            Move("Blast", 25, "energy", 5),
+            Move("Heal", -10, "normal", 1)
+        ])
+
+        self.enemy = Unit(enemy_data.name, enemy_data.hp, enemy_data.moves)
+
+        self.menu = MoveMenu(self.player.moves)
+        self.state = BattleState.PLAYER_TURN
+        self.message = ""
+        self.turn_locked = False
+        self.float_timer = 0
+
+        self.player_sprite = pygame.Surface((150, 170))
+        self.player_sprite.fill((200, 200, 255))
+
+    def update(self, events):
+        self.float_timer += 0.1
+
+        if self.state == BattleState.PLAYER_TURN:
+            move = self.menu.update(events)
+            if move:
+                self.message = apply_move(self.player, self.enemy, move)
+                self.state = BattleState.RESULT
+                self.turn_locked = True
+
+        elif self.state == BattleState.RESULT:
+            for e in events:
+                if e.type == pygame.KEYDOWN and e.key == pygame.K_z:
+                    if self.enemy.hp <= 0:
+                        self.message = "Enemy defeated!"
+                        self.state = BattleState.OUTCOME
+                    elif self.player.hp <= 0:
+                        self.message = "You lost..."
+                        self.state = BattleState.OUTCOME
+                    else:
+                        self.state = BattleState.ENEMY_ATTACK if self.turn_locked else BattleState.PLAYER_TURN
+
+        elif self.state == BattleState.ENEMY_ATTACK:
+            if self.turn_locked:
+                move = random.choice(self.enemy.moves)
+                self.message = apply_move(self.enemy, self.player, move)
+                self.turn_locked = False
+
+            for e in events:
+                if e.type == pygame.KEYDOWN and e.key == pygame.K_z:
+                    self.state = BattleState.RESULT
+
+        elif self.state == BattleState.OUTCOME:
+            for e in events:
+                if e.type == pygame.KEYDOWN and e.key == pygame.K_z:
+                    return "enemy_defeated" if self.enemy.hp <= 0 else "platformer"
+
+    def draw(self, screen):
+        screen.fill((30, 30, 40))
+
+        draw_hp_bar(screen, 50, 50, self.player)
+        draw_hp_bar(screen, 550, 50, self.enemy)
+
+        screen.blit(small_font.render(self.player.name, True, WHITE), (50, 20))
+        screen.blit(small_font.render(self.enemy.name, True, WHITE), (550, 20))
+
+        float_offset = math.sin(self.float_timer) * 8
+        screen.blit(self.player_sprite, (100, 280 + float_offset))
+
+        pygame.draw.rect(screen, WHITE, (0, 500, 800, 100), 2)
+
+        if self.state == BattleState.PLAYER_TURN:
+            self.menu.draw(screen)
+
+        screen.blit(small_font.render(self.message, True, WHITE), (20, 530))
+
+def combat_loop(screen, clock, enemy_data):
+    battle = Battle(enemy_data)
+
+    while True:
+        events = pygame.event.get()
+
+        for event in events:
+            if event.type == pygame.QUIT:
+                return "menu"
+
+        result = battle.update(events)
+        if result:
+            return result
+
+        battle.draw(screen)
+        pygame.display.flip()
+        clock.tick(60)
+
+# ================= STATE RUNNERS =================
+def run_platformer():
+    global current_state, current_enemy, player_x, player_y
+
+    result, _, enemy_data, player_x, player_y = platformer_loop(
+        screen, clock, False, player_x, player_y, defeated_enemies
+    )
+
+    if result == "menu":
+        current_state = STATE_MENU
+    elif result == "combat":
+        current_enemy = enemy_data
+        current_state = STATE_COMBAT
+
+def run_combat():
+    global current_state, current_enemy, defeated_enemies
+
+    result = combat_loop(screen, clock, current_enemy)
+
+    if result == "menu":
+        current_state = STATE_MENU
+    elif result == "platformer":
+        current_state = STATE_PLATFORMER
+    elif result == "enemy_defeated":
+        defeated_enemies.append(current_enemy.enemy_id)
+        current_state = STATE_PLATFORMER
+
+# ================= MAIN LOOP =================
+def main():
+    global current_state
+
+    running = True
+    while running:
+        screen.fill((0, 0, 0))
+
+        if current_state == STATE_MENU:
+            main_menu()
+        elif current_state == STATE_LEVEL_SELECT:
+            level_select()
+        elif current_state == STATE_PLATFORMER:
+            run_platformer()
+        elif current_state == STATE_COMBAT:
+            run_combat()
+
+        pygame.display.flip()
+        clock.tick(60)
+
+    pygame.quit()
+    sys.exit()
+
+if __name__ == "__main__":
+    main()
