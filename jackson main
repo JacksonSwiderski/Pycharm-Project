@@ -152,7 +152,6 @@ def run_combat():
         print(defeated_enemies)
         current_state = STATE_PLATFORMER
 
-
 def main():
     global current_state
 
