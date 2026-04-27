@@ -18,10 +18,25 @@ DIRT_COLOR = (1, 2, 5)  # #010205
 mousePixelToggle = True # to find pixels/ does not work rn
 
 # ground tiles
+bg_img = pygame.image.load("backgroundImage.png")
+bg_img = pygame.transform.scale(bg_img, (2000, 600))
 grass_img = pygame.image.load("GroundTop2.png")
 grass_img = pygame.transform.scale(grass_img, (111, 120))  # adjust if needed
 spawn_img = pygame.image.load("SpawnPointBed.png")
 spawn_img = pygame.transform.scale(spawn_img, (32, 32))  # adjust if needed
+
+# TILE (scaled once, used everywhere)
+bg_tile_original = pygame.image.load("backgroundTile.png")
+
+TILE_SCALE = 0.1  # keep texture size normal (IMPORTANT FIX)
+
+base_w = bg_tile_original.get_width()
+base_h = bg_tile_original.get_height()
+
+tile_w = int(base_w * TILE_SCALE)
+tile_h = int(base_h * TILE_SCALE)
+
+bg_tile_img = pygame.transform.scale(bg_tile_original, (tile_w, tile_h))
 
 def draw_platform(screen, image, rect):
     tile_w = image.get_width()
@@ -237,6 +252,21 @@ def platformer_loop(screen, clock, show_hitboxes, level):
     spawnpoints = []
 
     if level == 0:
+        background_rects = [
+            pygame.Rect(866, 168, 107, 58),
+            pygame.Rect(873, 225, 98, 13),
+            pygame.Rect(202, 281, 81, 111),
+            pygame.Rect(175, 269, 39, 110),
+            pygame.Rect(522, 245, 115, 44),
+            pygame.Rect(537, 287, 98, 28),
+            pygame.Rect(563, 313, 71, 48),
+            pygame.Rect(548, 305, 26, 26),
+            pygame.Rect(529, 279, 16, 20),
+            pygame.Rect(548, 342, 23, 19),
+            pygame.Rect(613, 253, 24, 106),
+            pygame.Rect(556, 323, 10, 25),
+        ]
+
         platforms = [
             pygame.Rect(0, 308, 135, 300),
             pygame.Rect(135, 345, 53, 260),
@@ -247,14 +277,14 @@ def platformer_loop(screen, clock, show_hitboxes, level):
             pygame.Rect(200, 268, 86, 28),
             pygame.Rect(515, 214, 118, 41),
             pygame.Rect(578, 242, 75, 27),
-
-            pygame.Rect(833, 351, 139, 27),
-            pygame.Rect(1057, 314, 103, 26),
-            pygame.Rect(1170, 263, 80, 22),
-            pygame.Rect(1060, 206, 74, 20),
-            pygame.Rect(1178, 145, 89, 29),
-            pygame.Rect(1458, 329, 107, 24),
-            pygame.Rect(1650, 271, 127, 20),
+            pygame.Rect(745, 242, 54, 31),
+            pygame.Rect(797, 267, 57, 6),
+            pygame.Rect(860, 153, 117, 30),
+            pygame.Rect(886, 229, 25, 15),
+            pygame.Rect(909, 219, 76, 25),
+            pygame.Rect(809, 395, 58, 246),
+            pygame.Rect(865, 365, 147, 255),
+            pygame.Rect(878, 307, 72, 7),
         ]
 
         spawnpoints = [pygame.Rect(15, 286, 10, 3),
@@ -269,7 +299,8 @@ def platformer_loop(screen, clock, show_hitboxes, level):
         ]
 
     enemies = [
-        Enemy(525, 190, 80, enemy_frames)
+        Enemy(525, 182, 80, enemy_frames),
+        Enemy(220, 235, 35, enemy_frames)
     ]
 
     font = pygame.font.Font(None, 24)
@@ -330,7 +361,33 @@ def platformer_loop(screen, clock, show_hitboxes, level):
             camera_x = min(camera_x, 2000 - SCREEN_WIDTH)
 
         # DRAW
-        screen.fill(BLUE)
+        # screen.fill(BLUE)
+        screen.blit(bg_img, (0, 0))
+
+        for rect in background_rects:
+            # Create a surface exactly the size of the rect
+            surf = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+
+            # Tile inside this surface (starts at 0,0 now)
+            for x in range(0, rect.width, tile_w):
+                for y in range(0, rect.height, tile_h):
+                    draw_w = min(tile_w, rect.width - x)
+                    draw_h = min(tile_h, rect.height - y)
+
+                    tile = bg_tile_img.subsurface((0, 0, draw_w, draw_h))
+                    surf.blit(tile, (x, y))
+
+            # 🔵 OPTIONAL: Rounded edges (crop corners)
+            radius = 6
+            mask = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+            pygame.draw.rect(mask, (255, 255, 255),
+                             (0, 0, rect.width, rect.height),
+                             border_radius=radius)
+
+            surf.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+
+            # Draw final result to screen
+            screen.blit(surf, (rect.x - camera_x, rect.y))
 
         for p in platforms:
             shifted = pygame.Rect(p.x - camera_x, p.y, p.width, p.height)
