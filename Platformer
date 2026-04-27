@@ -247,7 +247,7 @@ def platformer_loop(screen, clock, show_hitboxes, level):
         pygame.transform.scale(pygame.image.load("AlienSkinJump.png").convert_alpha(), (SPRITE_W, SPRITE_H)),
     ]
 
-    player = Player(22, 286, alienSkin)
+    player = Player(22, 270, alienSkin)
 
     spawnpoints = []
 
