@@ -13,8 +13,10 @@ RED = (200, 50, 50)
 
 # Sounds
 
-walking = pygame.mixer.Sound('walking.wav')
-walking.set_volume(0.3)
+jump = pygame.mixer.Sound('jump.wav')
+jump.set_volume(0.8)
+landing = pygame.mixer.Sound('landing.wav')
+landing.set_volume(0.8)
 
 # Settings
 GRAVITY = 0.8
@@ -29,6 +31,7 @@ class Player:
         self.vel_x = 0
         self.vel_y = 0
         self.on_ground = False
+        self.was_on_ground = False
         self.health = 100
 
         # animation
@@ -37,30 +40,24 @@ class Player:
         self.frame_index = 0
         self.frame_timer = 0
         self.facing_right = True
-
-        self.walk_channel = pygame.mixer.Channel(0)
-        self.walking = False
-
-        self.walking_timer = 0
         self.air_timer = 0
 
     def handle_input(self, keys):
         self.vel_x = 0
-        moving = False
 
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.vel_x = -MOVE_SPEED
             self.facing_right = False
-            moving = True
 
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.vel_x = MOVE_SPEED
             self.facing_right = True
-            moving = True
 
         if (keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]) and self.on_ground:
             self.vel_y = JUMP_STRENGTH
+            jump.play()
             self.on_ground = False
+            self.was_on_ground = False
 
     def apply_gravity(self):
         self.vel_y += GRAVITY
@@ -91,8 +88,13 @@ class Player:
 
         if self.on_ground:
             self.air_timer = 0
+            jump.stop()
         else:
             self.air_timer += 1
+
+        if not self.was_on_ground and self.on_ground and self.vel_y == 0:
+            landing.play()
+            self.was_on_ground = self.on_ground
 
     def update_animation(self, dt):
         if not self.chosenCharacter:
@@ -117,20 +119,6 @@ class Player:
             if self.frame_index > 1:
                 self.frame_index = 0
 
-    def update_sound(self, dt, moving):
-        if moving and self.on_ground:
-            self.walk_timer += dt
-
-            if self.walk_timer > 0.35:
-                self.walk_channel.play(walking)
-                self.walk_timer = 0
-                self.walking = True
-        else:
-            self.walk_timer = 0
-
-            if self.walking:
-                self.walk_channel.stop()
-                self.walking = False
 
     def draw(self, screen):
         if self.chosenCharacter:
@@ -229,8 +217,6 @@ def platformer_loop(screen, clock, show_hitboxes, player_x, player_y, defeated_e
         player.handle_input(keys)
         player.apply_gravity()
         player.move_and_collide(platforms)
-        moving = player.vel_x != 0
-        player.update_sound(dt, moving)
         player.update_animation(dt)
 
         for enemy in enemies:
