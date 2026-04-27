@@ -3,6 +3,18 @@ import pygame
 from enum import Enum
 import math
 
+pygame.mixer.init()
+
+current_music = None
+
+def play_music(path):
+    global current_music
+
+    if current_music != path:
+        pygame.mixer.music.load(path)
+        pygame.mixer.music.play(-1)
+        current_music = path
+
 class BattleState(Enum):
     BATTLE_START = 1
     PLAYER_TURN = 2
@@ -98,6 +110,9 @@ class Battle:
         self.state = BattleState.PLAYER_TURN
         self.message = ''
         self.font = pygame.font.Font(None, 32)
+
+        if enemy_data.enemy_data.name == 'slime':
+            play_music('basic_battle.mp3')
 
 
     def update(self, events):
