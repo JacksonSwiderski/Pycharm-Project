@@ -1,12 +1,10 @@
-import pygame
+from moves import tackle, bite, solidify
 
 class EnemyData:
     def __init__(self, name, hp, moves):
         self.name = name
         self.hp = hp
         self.moves = moves
-
-from test_cmbt import tackle, bite, solidify
 
 slime = EnemyData(
     name='Slime',
