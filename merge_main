@@ -1,0 +1,121 @@
+import pygame
+import sys
+from test_plat import platformer_loop
+from test_cmbt import combat_loop
+
+# Initialize Pygame
+pygame.mixer.pre_init(44100, -16, 2, 512)
+pygame.init()
+pygame.mixer.init()
+pygame.mixer.set_num_channels(16)
+
+# Screen settings
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Chrono Clash")
+
+# Images
+title = pygame.image.load('ChronoClashLogo.png').convert_alpha()
+title = pygame.transform.scale(title, (500, 300))
+
+# Sounds
+click = pygame.mixer.Sound('select.wav')
+click.set_volume(0.5)
+hover = pygame.mixer.Sound('hover_select.wav')
+hover.set_volume(0.5)
+
+# Colors & Fonts
+WHITE, GRAY, GREEN = (255, 255, 255), (50, 50, 50), (100, 200, 100)
+font = pygame.font.Font(None, 48)
+small_font = pygame.font.Font(None, 32)
+
+# Game states
+STATE_MENU, STATE_LEVEL_SELECT, STATE_PLATFORMER, STATE_COMBAT = "menu", "level_select", "platformer", "combat"
+
+# Global Variables
+current_state = STATE_MENU
+selected_level = 0
+player_x, player_y = 100, 400
+button_hovered = False
+defeated_enemies = []
+current_enemy = None
+show_hitboxes = False
+clock = pygame.time.Clock()
+
+def draw_title():
+    x_pos = (SCREEN_WIDTH // 2) - (title.get_width() // 2)
+    y_pos = 15
+    screen.blit(title, (x_pos, y_pos))
+
+def draw_button(text, x, y, width, height, color, hover_color):
+    global button_hovered
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+    rect = pygame.Rect(x, y, width, height)
+    is_hovered = rect.collidepoint(mouse)
+
+    if is_hovered:
+        if not button_hovered:
+            hover.play()
+            button_hovered = True
+
+    pygame.draw.rect(screen, hover_color if is_hovered else color, rect, border_radius=8)
+    text_surf = small_font.render(text, True, WHITE)
+    screen.blit(text_surf, text_surf.get_rect(center=rect.center))
+    return is_hovered and click[0]
+
+
+def main():
+    global current_state, selected_level, player_x, player_y, defeated_enemies, current_enemy, show_hitboxes, button_hovered
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        if current_state == STATE_MENU:
+            screen.fill(GRAY)
+            draw_title()
+            mouse_pos = pygame.mouse.get_pos()
+            if not (pygame.Rect(300, 250, 200, 50).collidepoint(mouse_pos)):
+                button_hovered = False
+            if draw_button("Play", 300, 250, 200, 50, GREEN, (120, 220, 120)):
+                pygame.time.delay(150)
+                click.play()
+                current_state = STATE_LEVEL_SELECT
+            pygame.display.flip()
+
+        elif current_state == STATE_LEVEL_SELECT:
+            screen.fill(GRAY)
+            mouse_pos = pygame.mouse.get_pos()
+            if not (pygame.Rect(300, 200, 200, 50).collidepoint(mouse_pos)):
+                button_hovered = False
+            if draw_button("Level 1", 300, 200, 200, 50, GREEN, (120, 220, 120)):
+                selected_level = 0
+                click.play()
+                current_state = STATE_PLATFORMER
+            pygame.display.flip()
+
+        elif current_state == STATE_PLATFORMER:
+            # The loop returns data when a collision happens or ESC is pressed
+            res, show_hitboxes, enemy, px, py = platformer_loop(screen, clock, show_hitboxes, player_x, player_y,
+                                                                defeated_enemies, selected_level)
+            player_x, player_y = px, py
+            if res == "combat":
+                current_enemy = enemy
+                current_state = STATE_COMBAT
+            else:
+                current_state = STATE_MENU
+
+        elif current_state == STATE_COMBAT:
+            res = combat_loop(screen, clock, current_enemy)
+            if res == 'enemy_defeated':
+                defeated_enemies.append(current_enemy.enemy_id)
+            current_state = STATE_PLATFORMER
+
+        clock.tick(60)
+
+
+if __name__ == "__main__":
+    main()
