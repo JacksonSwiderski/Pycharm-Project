@@ -1,1 +1,17 @@
-Move stuff goes here
+class Move:
+    def __init__(self, name, power, element, points):
+        self.name = name
+        self.power = power
+        self.element = element
+        self.points = points
+
+# Player Moves
+dash_attack = Move('Dash Attack', 10, 'normal', 10)
+ray_blast = Move('Ray Blast', 25, 'energy', 5)
+heal = Move('Heal', -10, 'normal', 1)
+
+# Enemy Moves
+# Slime
+tackle = Move('Tackle', 8, 'normal', 99)
+bite = Move('Bite', 12, 'normal', 99)
+solidify = Move('Solidify', -5, 'normal', 99)
