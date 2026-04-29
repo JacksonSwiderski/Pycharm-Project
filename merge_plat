@@ -1,4 +1,4 @@
-import pygame
+import pygame, random
 from enemy_data import slime
 
 pygame.mixer.init()
@@ -30,6 +30,20 @@ grass_img = pygame.transform.scale(grass_img, (111, 120))
 spawn_img = pygame.image.load("SpawnPointBed.png")
 spawn_img = pygame.transform.scale(spawn_img, (32, 32))
 
+cloud_images = [
+    pygame.image.load("Cloud1.png"),
+    pygame.image.load("Cloud2.png"),
+    pygame.image.load("Cloud3.png"),
+    pygame.image.load("Cloud4.png"),
+    pygame.image.load("Cloud5.png"),
+    pygame.image.load("Cloud6.png"),
+    pygame.image.load("Cloud7.png"),
+    pygame.image.load("Cloud8.png"),
+
+]
+
+clouds = []
+
 bg_tile_original = pygame.image.load("backgroundTile.png")
 TILE_SCALE = 0.1
 tile_w = int(bg_tile_original.get_width() * TILE_SCALE)
@@ -37,7 +51,7 @@ tile_h = int(bg_tile_original.get_height() * TILE_SCALE)
 bg_tile_img = pygame.transform.scale(bg_tile_original, (tile_w, tile_h))
 
 
-def draw_platform(screen, image, rect, camera_x):
+def draw_platform(screen, image, rect, camera_x=0):
     platform_surf = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
     t_w, t_h = image.get_width(), image.get_height()
     for x in range(0, rect.width, t_w):
@@ -65,6 +79,9 @@ class Player:
         self.frame_timer = 0
         self.facing_right = True
         self.air_timer = 0
+        self.spawn_x = 15
+        self.spawn_y = 250
+
 
     def handle_input(self, keys):
         self.vel_x = 0
@@ -144,11 +161,54 @@ class Enemy:
         if self.dir < 0: frame = pygame.transform.flip(frame, True, False)
         screen.blit(frame, (self.rect.x - camera_x, self.rect.y))
 
+def respawn(self):
+    self.rect.x = self.spawn_x
+    self.rect.y = self.spawn_y
+    self.vel_x = 0
+    self.vel_y = 0
+    self.on_ground = False
+
+
+def update_and_draw_clouds(screen, dt):
+    global clouds
+
+    # create timer once
+    if not hasattr(update_and_draw_clouds, "spawn_timer"):
+        update_and_draw_clouds.spawn_timer = 0
+
+    # count time
+    update_and_draw_clouds.spawn_timer += dt
+
+    # every few seconds spawn a new random cloud
+    if update_and_draw_clouds.spawn_timer >= random.uniform(2, 5):
+        update_and_draw_clouds.spawn_timer = 0
+
+        img = random.choice(cloud_images)
+
+        new_cloud = {
+            "image": img,
+            "x": -img.get_width(),  # start off-screen left
+            "y": random.randint(20, 120),  # random height
+            "speed": random.randint(20, 50)  # random slow speed
+        }
+
+        clouds.append(new_cloud)
+
+    # move + draw clouds
+    for cloud in clouds[:]:
+        cloud["x"] += cloud["speed"] * dt
+
+        screen.blit(cloud["image"], (cloud["x"], cloud["y"]))
+
+        # remove when fully off screen
+        if cloud["x"] > screen.get_width():
+            clouds.remove(cloud)
 
 def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, level):
     SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_width(), screen.get_height()
     ui_font = pygame.font.Font(None, 22)
     dev_mode, show_controls = False, True
+
 
     # Assets
     SCALE = 2
@@ -161,6 +221,13 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
                     range(1, 5)]
 
     player = Player(p_x, p_y, alienSkin)
+
+    # bounds
+    if player.rect.left < 0:
+        player.rect.left = 0
+
+    if player.rect.top > SCREEN_HEIGHT:
+        respawn(player)
 
     if level == 0:
         background_rects = [
@@ -207,12 +274,20 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
                 if event.key == pygame.K_TAB: dev_mode = not dev_mode
                 if event.key == pygame.K_h: show_controls = not show_controls
                 if event.key == pygame.K_F3 or event.key == pygame.K_BACKQUOTE: show_hitboxes = not show_hitboxes
+                if event.key == pygame.K_r: respawn(player)
 
         keys = pygame.key.get_pressed()
         player.handle_input(keys)
         player.apply_gravity()
         player.move_and_collide(platforms)
         player.update_animation(dt)
+
+        # bounds
+        if player.rect.left < 0:
+            player.rect.left = 0
+
+        if player.rect.top > SCREEN_HEIGHT:
+            respawn(player)
 
         camera_x = 0 if dev_mode else max(0, min(player.rect.x - SCREEN_WIDTH // 2, 2000 - SCREEN_WIDTH))
 
@@ -221,8 +296,10 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             if player.rect.colliderect(e.rect):
                 return "combat", show_hitboxes, e, player.rect.x, player.rect.y
 
+
         # Draw Sequence
         screen.blit(bg_img, (0, 0))
+        update_and_draw_clouds(screen, dt)
         for br in background_rects:
             draw_platform(screen, bg_tile_img, br, camera_x)
         for p in platforms:
@@ -232,8 +309,9 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         for e in enemies: e.draw(screen, camera_x)
         player.draw(screen, camera_x)
 
+
         if show_controls:
-            ctrls = ["WASD: Move", "SPACE: Jump", "TAB: Dev Mode", "H: Controls", "F3: Hitboxes"]
+            ctrls = ["WASD: Move", "SPACE: Jump", "TAB: Dev Mode", "H: Controls", "F3: Hitboxes", "R: Respawn"]
             for i, line in enumerate(ctrls):
                 screen.blit(ui_font.render(line, True, WHITE), (10, 10 + i * 18))
 
