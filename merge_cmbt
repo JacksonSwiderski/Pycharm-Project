@@ -5,18 +5,24 @@ import math
 
 pygame.mixer.init()
 
-current_music = None
+MUSIC_LOOP_EVENT = pygame.USEREVENT + 1
+current_music_loop = 0.0
 
+def start_battle_music(enemy_obj):
+    global current_music_loop
 
-def play_music(path):
-    global current_music
-    if current_music != path:
-        try:
-            pygame.mixer.music.load(path)
-            pygame.mixer.music.play(-1)
-            current_music = path
-        except:
-            print(f"Warning: Could not load music file {path}")
+    music_path = enemy_obj.enemy_data.music
+    current_music_loop = enemy_obj.enemy_data.music_loop
+
+    pygame.mixer.music.load(music_path)
+    pygame.mixer.music.set_endevent(MUSIC_LOOP_EVENT)
+    pygame.mixer.music.play(0, start=0.0)
+
+def handle_battle_music(event):
+    global current_music_loop
+    if event.type == MUSIC_LOOP_EVENT:
+        pygame.mixer.music.play(-1, start=current_music_loop)
+
 
 
 class BattleState(Enum):
@@ -87,7 +93,6 @@ def draw_hp_bar(screen, x, y, unit):
 
 class Battle:
     def __init__(self, enemy_data_obj):
-        global basic, special, stat
         from moves import dash_attack, ray_blast, heal
         self.turn_locked = False
 
@@ -112,9 +117,6 @@ class Battle:
             print("Warning: AlienBattle.png not found. Using placeholder.")
             self.player_sprite = pygame.Surface((150, 170))
             self.player_sprite.fill((0, 255, 0))
-
-        if data.name == 'slime':
-            play_music('basic_battle.mp3')
 
     def update(self, events):
         self.float_timer += 0.1
@@ -188,17 +190,22 @@ class Battle:
 
 def combat_loop(screen, clock, enemy_data):
     battle = Battle(enemy_data)
+    start_battle_music(enemy_data)
     while True:
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
+                pygame.mixer.music.stop()
                 return "menu"
+            handle_battle_music(event)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    pygame.mixer.music.stop()
                     return "menu"
 
         result = battle.update(events)
         if result:
+            pygame.mixer.music.fadeout(1000)
             return result
 
         battle.draw(screen)
