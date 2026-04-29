@@ -1,111 +1,99 @@
-import pygame
+import pygame, random
+from enemy_data import slime
 
-# Colors
+pygame.mixer.init()
+
+# Shared Colors & Settings
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (100, 200, 100)
 BROWN = (139, 90, 43)
 BLUE = (135, 206, 235)
 RED = (200, 50, 50)
-clicked_points = []
+DIRT_COLOR = (1, 2, 5)
 
-# Settings
 GRAVITY = 0.8
-JUMP_STRENGTH = -10
-MOVE_SPEED = 5
-DIRT_COLOR = (1, 2, 5)  # #010205
+JUMP_STRENGTH = -15
+MOVE_SPEED = 7
 
-mousePixelToggle = True # to find pixels/ does not work rn
+# Sounds (Your Version)
+jump = pygame.mixer.Sound('jump.wav')
+landing = pygame.mixer.Sound('landing.wav')
+jump.set_volume(0.8)
+landing.set_volume(0.8)
 
-# ground tiles
+# Load Friend's Assets
 bg_img = pygame.image.load("backgroundImage.png")
 bg_img = pygame.transform.scale(bg_img, (2000, 600))
 grass_img = pygame.image.load("GroundTop2.png")
-grass_img = pygame.transform.scale(grass_img, (111, 120))  # adjust if needed
+grass_img = pygame.transform.scale(grass_img, (111, 120))
 spawn_img = pygame.image.load("SpawnPointBed.png")
-spawn_img = pygame.transform.scale(spawn_img, (32, 32))  # adjust if needed
+spawn_img = pygame.transform.scale(spawn_img, (32, 32))
 
-# TILE (scaled once, used everywhere)
+cloud_images = [
+    pygame.image.load("Cloud1.png"),
+    pygame.image.load("Cloud2.png"),
+    pygame.image.load("Cloud3.png"),
+    pygame.image.load("Cloud4.png"),
+    pygame.image.load("Cloud5.png"),
+    pygame.image.load("Cloud6.png"),
+    pygame.image.load("Cloud7.png"),
+    pygame.image.load("Cloud8.png"),
+
+]
+
+clouds = []
+
 bg_tile_original = pygame.image.load("backgroundTile.png")
-
-TILE_SCALE = 0.1  # keep texture size normal (IMPORTANT FIX)
-
-base_w = bg_tile_original.get_width()
-base_h = bg_tile_original.get_height()
-
-tile_w = int(base_w * TILE_SCALE)
-tile_h = int(base_h * TILE_SCALE)
-
+TILE_SCALE = 0.1
+tile_w = int(bg_tile_original.get_width() * TILE_SCALE)
+tile_h = int(bg_tile_original.get_height() * TILE_SCALE)
 bg_tile_img = pygame.transform.scale(bg_tile_original, (tile_w, tile_h))
 
-def draw_platform(screen, image, rect):
-    tile_w = image.get_width()
-    tile_h = image.get_height()
 
-    # Create a transparent surface the size of the platform
+def draw_platform(screen, image, rect, camera_x):
     platform_surf = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
-
-    # --- TOP: tile grass ---
-    for x in range(0, rect.width, tile_w):
-        draw_w = min(tile_w, rect.width - x)
-        tile = image.subsurface((0, 0, draw_w, tile_h))
+    t_w, t_h = image.get_width(), image.get_height()
+    for x in range(0, rect.width, t_w):
+        draw_w = min(t_w, rect.width - x)
+        tile = image.subsurface((0, 0, draw_w, t_h))
         platform_surf.blit(tile, (x, 0))
+    if rect.height > t_h:
+        pygame.draw.rect(platform_surf, DIRT_COLOR, (0, t_h, rect.width, rect.height - t_h))
 
-    # --- BELOW: dirt fill ---
-    if rect.height > tile_h:
-        dirt_rect = pygame.Rect(0, tile_h, rect.width, rect.height - tile_h)
-        pygame.draw.rect(platform_surf, DIRT_COLOR, dirt_rect)
-
-    # --- CREATE ROUNDED MASK ---
-    radius = 5  # adjust for more/less roundness
-
+    # Apply Rounded Mask
     mask = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
-    pygame.draw.rect(mask, (255, 255, 255), (0, 0, rect.width, rect.height), border_radius=radius)
-
-    # Apply mask (this cuts corners)
+    pygame.draw.rect(mask, (255, 255, 255), (0, 0, rect.width, rect.height), border_radius=6)
     platform_surf.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
-    # Draw final result
-    screen.blit(platform_surf, (rect.x, rect.y))
+    screen.blit(platform_surf, (rect.x - camera_x, rect.y))
 
-##
 
 class Player:
-    def __init__(self, x, y, chosenCharacter=None, fps=10):
+    def __init__(self, x, y, chosenCharacter=None):
         self.rect = pygame.Rect(x, y, 22, 30)
-
-        self.vel_x = 0
-        self.vel_y = 0
+        self.vel_x = self.vel_y = 0
         self.on_ground = False
-        self.health = 100
-
-        self.chosenCharacter = chosenCharacter if chosenCharacter else []
-        self.fps = fps
+        self.chosenCharacter = chosenCharacter or []
         self.frame_index = 0
         self.frame_timer = 0
         self.facing_right = True
-
         self.air_timer = 0
 
     def handle_input(self, keys):
         self.vel_x = 0
-
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.vel_x = -MOVE_SPEED
-            self.facing_right = False
-
+            self.vel_x, self.facing_right = -MOVE_SPEED, False
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.vel_x = MOVE_SPEED
-            self.facing_right = True
-
-        if (keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]) and self.on_ground:
-            self.vel_y = JUMP_STRENGTH
-            self.on_ground = False
+            self.vel_x, self.facing_right = MOVE_SPEED, True
+        if (keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]):
+            if self.on_ground:
+                self.vel_y = JUMP_STRENGTH
+                jump.play()
+                self.on_ground = False
 
     def apply_gravity(self):
-        self.vel_y += GRAVITY
-        if self.vel_y > 15:
-            self.vel_y = 15
+        self.vel_y = min(15, self.vel_y + GRAVITY)
 
     def move_and_collide(self, platforms):
         self.rect.x += self.vel_x
@@ -115,352 +103,192 @@ class Player:
                     self.rect.right = p.left
                 elif self.vel_x < 0:
                     self.rect.left = p.right
-
+        was_in_air = not self.on_ground
         self.rect.y += self.vel_y
         self.on_ground = False
-
         for p in platforms:
             if self.rect.colliderect(p):
                 if self.vel_y > 0:
-                    self.rect.bottom = p.top
-                    self.vel_y = 0
-                    self.on_ground = True
+                    self.rect.bottom, self.vel_y, self.on_ground = p.top, 0, True
                 elif self.vel_y < 0:
-                    self.rect.top = p.bottom
-                    self.vel_y = 0
+                    self.rect.top, self.vel_y = p.bottom, 0
+
+                    if was_in_air:
+                        landing.play()
+                        was_in_air = False
 
         self.air_timer = 0 if self.on_ground else self.air_timer + 1
 
     def update_animation(self, dt):
-        if not self.chosenCharacter:
-            return
-
-        # AIR (jumping)
+        if not self.chosenCharacter: return
         if self.air_timer > 1:
             self.frame_index = 3
-            self.frame_timer = 0
-            return
-
-        # IDLE
-        if self.vel_x == 0:
+        elif self.vel_x == 0:
             self.frame_index = 2
-            self.frame_timer = 0
-            return
-
-        # WALKING
-        self.frame_timer += dt
-
-        if self.frame_timer >= 0.1:  # 👈 fixed speed (0.1 = fast, 0.2 = slower)
-            self.frame_timer = 0
-            self.frame_index += 1
-
-            # loop between frames 0 and 1
-            if self.frame_index > 1:
-                self.frame_index = 0
+        else:
+            self.frame_timer += dt
+            if self.frame_timer >= 0.1:
+                self.frame_timer, self.frame_index = 0, (self.frame_index + 1) % 2
 
     def draw(self, screen, camera_x):
         if self.chosenCharacter:
             frame = self.chosenCharacter[self.frame_index]
+            if not self.facing_right: frame = pygame.transform.flip(frame, True, False)
+            screen.blit(frame, (self.rect.x - camera_x, self.rect.y))
 
-            if not self.facing_right:
-                frame = pygame.transform.flip(frame, True, False)
-
-            draw_x = self.rect.x - camera_x + (self.rect.width - frame.get_width()) // 2
-            draw_y = self.rect.bottom - frame.get_height()
-
-            screen.blit(frame, (draw_x, draw_y))
-        else:
-            pygame.draw.rect(screen, GREEN, self.rect)
-
-def world_to_screen(rect, camera_x):
-    return pygame.Rect(rect.x - camera_x, rect.y, rect.width, rect.height)
 
 class Enemy:
-    def __init__(self, x, y, patrol_range=100, frames=None):
+    def __init__(self, x, y, patrol_range, enemy_data, enemy_id, frames):
         self.rect = pygame.Rect(x, y, 22, 30)
-        self.start_x = x
-        self.range = patrol_range
-        self.dir = 1
-        self.speed = 1
-
-        self.frames = frames if frames else []
-        self.frame_index = 0
-        self.frame_timer = 0
+        self.start_x, self.range = x, patrol_range
+        self.dir, self.speed = 1, 1
+        self.enemy_data, self.enemy_id = enemy_data, enemy_id
+        self.frames, self.frame_index, self.frame_timer = frames, 0, 0
 
     def update(self, dt):
-        # movement
         self.rect.x += self.speed * self.dir
-
-        if self.rect.x > self.start_x + self.range:
-            self.dir = -1
-        elif self.rect.x < self.start_x:
-            self.dir = 1
-
-        # animation
-        if self.frames:
-            self.frame_timer += dt
-
-            if self.frame_timer >= 0.25:  # speed of float animation
-                self.frame_timer = 0
-                self.frame_index += 1
-
-                if self.frame_index >= len(self.frames):
-                    self.frame_index = 0
+        if self.rect.x > self.start_x + self.range or self.rect.x < self.start_x:
+            self.dir *= -1
+        self.frame_timer += dt
+        if self.frame_timer >= 0.25:
+            self.frame_timer, self.frame_index = 0, (self.frame_index + 1) % len(self.frames)
 
     def draw(self, screen, camera_x):
-        draw_x = self.rect.x - camera_x
-
-        if self.frames:
-            frame = self.frames[self.frame_index]
-
-            # flip if moving left
-            if self.dir < 0:
-                frame = pygame.transform.flip(frame, True, False)
-
-            screen.blit(frame, (draw_x, self.rect.y))
-        else:
-            pygame.draw.rect(screen, RED, (draw_x, self.rect.y, self.rect.width, self.rect.height))
+        frame = self.frames[self.frame_index]
+        if self.dir < 0: frame = pygame.transform.flip(frame, True, False)
+        screen.blit(frame, (self.rect.x - camera_x, self.rect.y))
 
 
-def platformer_loop(screen, clock, show_hitboxes, level):
-    dev_mode = False
-    SCREEN_WIDTH = screen.get_width()
-    SCREEN_HEIGHT = screen.get_height()
+def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, level):
+    SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_width(), screen.get_height()
+    ui_font = pygame.font.Font(None, 22)
+    dev_mode, show_controls = False, True
 
-    show_controls = True
-
+    # Assets
     SCALE = 2
-    SPRITE_W = 11 * SCALE
-    SPRITE_H = 15 * SCALE
-
-    enemy_frames = [
-        pygame.transform.scale(pygame.image.load("RedEnemy1.png").convert_alpha(), (22, 30)),
-        pygame.transform.scale(pygame.image.load("RedEnemy2.png").convert_alpha(), (22, 30)),
-        pygame.transform.scale(pygame.image.load("RedEnemy3.png").convert_alpha(), (22, 30)),
-        pygame.transform.scale(pygame.image.load("RedEnemy4.png").convert_alpha(), (22, 30)),
-    ]
-
     alienSkin = [
-        pygame.transform.scale(pygame.image.load("AlienSkin1.png").convert_alpha(), (SPRITE_W, SPRITE_H)),
-        pygame.transform.scale(pygame.image.load("AlienSkin2.png").convert_alpha(), (SPRITE_W, SPRITE_H)),
-        pygame.transform.scale(pygame.image.load("AlienSkin3.png").convert_alpha(), (SPRITE_W, SPRITE_H)),
-        pygame.transform.scale(pygame.image.load("AlienSkinJump.png").convert_alpha(), (SPRITE_W, SPRITE_H)),
-    ]
+        pygame.transform.scale(pygame.image.load(f"AlienSkin{i}.png").convert_alpha(), (11 * SCALE, 15 * SCALE)) for i
+        in range(1, 4)]
+    alienSkin.append(
+        pygame.transform.scale(pygame.image.load("AlienSkinJump.png").convert_alpha(), (11 * SCALE, 15 * SCALE)))
+    enemy_frames = [pygame.transform.scale(pygame.image.load(f"RedEnemy{i}.png").convert_alpha(), (22, 30)) for i in
+                    range(1, 5)]
 
-    player = Player(22, 270, alienSkin)
-
-    spawnpoints = []
+    player = Player(p_x, p_y, alienSkin)
 
     if level == 0:
         background_rects = [
-            pygame.Rect(866, 168, 107, 58),
-            pygame.Rect(873, 225, 98, 13),
-            pygame.Rect(202, 281, 81, 111),
-            pygame.Rect(175, 269, 39, 110),
-            pygame.Rect(522, 245, 115, 44),
-            pygame.Rect(537, 287, 98, 28),
-            pygame.Rect(563, 313, 71, 48),
-            pygame.Rect(548, 305, 26, 26),
-            pygame.Rect(529, 279, 16, 20),
-            pygame.Rect(548, 342, 23, 19),
-            pygame.Rect(613, 253, 24, 106),
-            pygame.Rect(556, 323, 10, 25),
+            pygame.Rect(866, 168, 107, 58), pygame.Rect(873, 225, 98, 13),
+            pygame.Rect(202, 281, 81, 111), pygame.Rect(175, 269, 39, 110),
+            pygame.Rect(522, 245, 115, 44), pygame.Rect(537, 287, 98, 28),
+            pygame.Rect(563, 313, 71, 48), pygame.Rect(548, 305, 26, 26),
+            pygame.Rect(529, 279, 16, 20), pygame.Rect(548, 342, 23, 19),
+            pygame.Rect(613, 253, 24, 106), pygame.Rect(556, 323, 10, 25)
         ]
-
         platforms = [
-            pygame.Rect(0, 308, 135, 300),
-            pygame.Rect(135, 345, 53, 260),
-            pygame.Rect(187, 375, 269, 230),
-            pygame.Rect(544, 348, 145, 32),
-            pygame.Rect(689, 364, 53, 240),
-            pygame.Rect(171, 258, 45, 17),
-            pygame.Rect(200, 268, 86, 28),
-            pygame.Rect(515, 214, 118, 41),
-            pygame.Rect(578, 242, 75, 27),
-            pygame.Rect(745, 242, 54, 31),
-            pygame.Rect(797, 267, 57, 6),
-            pygame.Rect(860, 153, 117, 30),
-            pygame.Rect(886, 229, 25, 15),
-            pygame.Rect(909, 219, 76, 25),
-            pygame.Rect(809, 395, 58, 246),
-            pygame.Rect(865, 365, 147, 255),
-            pygame.Rect(878, 307, 72, 7),
+            pygame.Rect(0, 308, 135, 300), pygame.Rect(135, 345, 53, 260),
+            pygame.Rect(187, 375, 269, 230), pygame.Rect(544, 348, 145, 32),
+            pygame.Rect(689, 364, 53, 240), pygame.Rect(171, 258, 45, 17),
+            pygame.Rect(200, 268, 86, 28), pygame.Rect(515, 214, 118, 41),
+            pygame.Rect(578, 242, 75, 27), pygame.Rect(745, 242, 54, 31),
+            pygame.Rect(797, 267, 57, 6), pygame.Rect(860, 153, 117, 30),
+            pygame.Rect(886, 229, 25, 15), pygame.Rect(909, 219, 76, 25),
+            pygame.Rect(809, 395, 58, 246), pygame.Rect(865, 365, 147, 255),
+            pygame.Rect(878, 307, 72, 7)
         ]
-
-        spawnpoints = [pygame.Rect(15, 286, 10, 3),
-                       ]
-
+        spawnpoints = [pygame.Rect(15, 286, 10, 3)]
+        enemies = [
+            Enemy(525, 182, 80, slime, 'slime_1', enemy_frames),
+            Enemy(220, 235, 35, slime, 'slime_2', enemy_frames)
+        ]
     elif level == 1:
+        background_rects, spawnpoints = [], []
         platforms = [pygame.Rect(0, 500, 800, 100)]
+        enemies = []
     else:
-        platforms = [
-            pygame.Rect(0, 550, 800, 50),
-            pygame.Rect(200, 400, 100, 20)
-        ]
+        background_rects, spawnpoints = [], []
+        platforms = [pygame.Rect(0, 550, 800, 50), pygame.Rect(200, 400, 100, 20)]
+        enemies = []
 
-    enemies = [
-        Enemy(525, 182, 80, enemy_frames),
-        Enemy(220, 235, 35, enemy_frames)
-    ]
-
-    font = pygame.font.Font(None, 24)
-    ui_font = pygame.font.Font(None, 22)
+    enemies = [e for e in enemies if e.enemy_id not in defeated_enemies]
 
     while True:
         dt = clock.tick(60) / 1000
-
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return "menu", show_hitboxes
-
+            if event.type == pygame.QUIT: return "menu", show_hitboxes, None, player.rect.x, player.rect.y
             if event.type == pygame.KEYDOWN:
-
-                if event.key == pygame.K_ESCAPE:
-                    return "menu", show_hitboxes
-
-                if event.key == pygame.K_c:
-                    return "combat", show_hitboxes
-
-                keys = pygame.key.get_pressed()
-
-                if keys[pygame.K_F3] and keys[pygame.K_b] or keys[pygame.K_BACKQUOTE]:
-                    show_hitboxes = not show_hitboxes
-
-                if event.key == pygame.K_h:
-                    show_controls = not show_controls
-
-                if event.key == pygame.K_TAB:
-                    dev_mode = not dev_mode
+                if event.key == pygame.K_ESCAPE: return "menu", show_hitboxes, None, player.rect.x, player.rect.y
+                if event.key == pygame.K_TAB: dev_mode = not dev_mode
+                if event.key == pygame.K_h: show_controls = not show_controls
+                if event.key == pygame.K_F3 or event.key == pygame.K_BACKQUOTE: show_hitboxes = not show_hitboxes
 
         keys = pygame.key.get_pressed()
         player.handle_input(keys)
-
         player.apply_gravity()
         player.move_and_collide(platforms)
         player.update_animation(dt)
 
-        for enemy in enemies:
-            enemy.update(dt)
-            if player.rect.colliderect(enemy.rect):
-                return "combat", show_hitboxes
-
-        # bounds
-        if player.rect.left < 0:
-            player.rect.left = 0
-        if player.rect.top > SCREEN_HEIGHT:
-            player.rect.x = 100
-            player.rect.y = 400
-            player.vel_y = 0
-
-        # CAMERA
-        if dev_mode:
-            camera_x = 0
-        else:
-            camera_x = player.rect.x - SCREEN_WIDTH // 2
-            camera_x = max(0, camera_x)
-            camera_x = min(camera_x, 2000 - SCREEN_WIDTH)
-
-        # DRAW
-        # screen.fill(BLUE)
-        screen.blit(bg_img, (0, 0))
-
-        for rect in background_rects:
-            # Create a surface exactly the size of the rect
-            surf = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
-
-            # Tile inside this surface (starts at 0,0 now)
-            for x in range(0, rect.width, tile_w):
-                for y in range(0, rect.height, tile_h):
-                    draw_w = min(tile_w, rect.width - x)
-                    draw_h = min(tile_h, rect.height - y)
-
-                    tile = bg_tile_img.subsurface((0, 0, draw_w, draw_h))
-                    surf.blit(tile, (x, y))
-
-            # 🔵 OPTIONAL: Rounded edges (crop corners)
-            radius = 6
-            mask = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
-            pygame.draw.rect(mask, (255, 255, 255),
-                             (0, 0, rect.width, rect.height),
-                             border_radius=radius)
-
-            surf.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-
-            # Draw final result to screen
-            screen.blit(surf, (rect.x - camera_x, rect.y))
-
-        for p in platforms:
-            shifted = pygame.Rect(p.x - camera_x, p.y, p.width, p.height)
-            draw_platform(screen, grass_img, shifted)
-
-        for s in spawnpoints:
-            screen.blit(spawn_img, (s.x - camera_x, s.y))
+        camera_x = 0 if dev_mode else max(0, min(player.rect.x - SCREEN_WIDTH // 2, 2000 - SCREEN_WIDTH))
 
         for e in enemies:
-            e.draw(screen, camera_x)
+            e.update(dt)
+            if player.rect.colliderect(e.rect):
+                return "combat", show_hitboxes, e, player.rect.x, player.rect.y
 
+        def update_and_draw_clouds(screen, dt):
+            global clouds
+
+            # create timer once
+            if not hasattr(update_and_draw_clouds, "spawn_timer"):
+                update_and_draw_clouds.spawn_timer = 0
+
+            # count time
+            update_and_draw_clouds.spawn_timer += dt
+
+            # every few seconds spawn a new random cloud
+            if update_and_draw_clouds.spawn_timer >= random.uniform(2, 5):
+                update_and_draw_clouds.spawn_timer = 0
+
+                img = random.choice(cloud_images)
+
+                new_cloud = {
+                    "image": img,
+                    "x": -img.get_width(),  # start off-screen left
+                    "y": random.randint(20, 120),  # random height
+                    "speed": random.randint(20, 50)  # random slow speed
+                }
+
+                clouds.append(new_cloud)
+
+            # move + draw clouds
+            for cloud in clouds[:]:
+                cloud["x"] += cloud["speed"] * dt
+
+                screen.blit(cloud["image"], (cloud["x"], cloud["y"]))
+
+                # remove when fully off screen
+                if cloud["x"] > screen.get_width():
+                    clouds.remove(cloud)
+        # Draw Sequence
+        update_and_draw_clouds(screen, 1.5)
+        screen.blit(bg_img, (0, 0))
+        for br in background_rects:
+            draw_platform(screen, bg_tile_img, br, camera_x)
+        for p in platforms:
+            draw_platform(screen, grass_img, p, camera_x)
+        for s in spawnpoints:
+            screen.blit(spawn_img, (s.x - camera_x, s.y))
+        for e in enemies: e.draw(screen, camera_x)
         player.draw(screen, camera_x)
 
-        # CONTROLS
         if show_controls:
-            controls = [
-                "WASD / Arrows: Move",
-                "SPACE: Jump",
-                "F3 + B or `: Toggle Hitboxes",
-                "H: Toggle Controls",
-                "ESC: Menu"
-            ]
+            ctrls = ["WASD: Move", "SPACE: Jump", "TAB: Dev Mode", "H: Controls", "F3: Hitboxes"]
+            for i, line in enumerate(ctrls):
+                screen.blit(ui_font.render(line, True, WHITE), (10, 10 + i * 18))
 
-            for i, line in enumerate(controls):
-                txt = ui_font.render(line, True, WHITE)
-                screen.blit(txt, (10, 10 + i * 18))
-
-        # HITBOXES
         if show_hitboxes:
-
-            # PLAYER (screen space)
-            pygame.draw.rect(
-                screen,
-                (255, 255, 0),
-                (player.rect.x - camera_x, player.rect.y, player.rect.width, player.rect.height),
-                2
-            )
-
-            # ENEMIES (screen space)
-            for e in enemies:
-                pygame.draw.rect(
-                    screen,
-                    (0, 255, 0),
-                    (e.rect.x - camera_x, e.rect.y, e.rect.width, e.rect.height),
-                    2
-                )
-
-            # PLATFORMS (screen space)
-            for p in platforms:
-                pygame.draw.rect(
-                    screen,
-                    (0, 0, 255),
-                    (p.x - camera_x, p.y, p.width, p.height),
-                    2
-                )
-
-        # 🔥 LIVE MOUSE PIXELS (FIXED)
-        mx, my = pygame.mouse.get_pos()
-
-        coords_text = ui_font.render(f"{mx}, {my}", True, WHITE)
-        screen.blit(coords_text, (10, SCREEN_HEIGHT - 25))
-
-        pygame.draw.line(screen, WHITE, (mx - 10, my), (mx + 10, my), 1)
-        pygame.draw.line(screen, WHITE, (mx, my - 10), (mx, my + 10), 1)
-
-        for pos in clicked_points:
-            x, y = pos
-
-            # draw dot
-            pygame.draw.circle(screen, WHITE, (x, y), 3)
-
-            # draw text above
-            coords_text = ui_font.render(f"{x}, {y}", True, WHITE)
-            screen.blit(coords_text, (x - 20, y - 20))
+            pygame.draw.rect(screen, (255, 255, 0), (player.rect.x - camera_x, player.rect.y, 22, 30), 1)
+            for e in enemies: pygame.draw.rect(screen, (0, 255, 0), (e.rect.x - camera_x, e.rect.y, 22, 30), 1)
+            for p in platforms: pygame.draw.rect(screen, (0, 0, 255), (p.x - camera_x, p.y, p.width, p.height), 1)
 
         pygame.display.flip()
