@@ -1,13 +1,17 @@
 from moves import tackle, bite, solidify
 
 class EnemyData:
-    def __init__(self, name, hp, moves):
+    def __init__(self, name, hp, moves, music, music_loop):
         self.name = name
         self.hp = hp
         self.moves = moves
+        self.music = music
+        self.music_loop = music_loop
 
 slime = EnemyData(
     name='Slime',
     hp=30,
-    moves=[tackle, bite, solidify]
+    moves=[tackle, bite, solidify],
+    music='battle.mp3',
+    music_loop=11.294
 )
