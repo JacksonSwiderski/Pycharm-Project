@@ -64,10 +64,18 @@ def draw_button(text, x, y, width, height, color, hover_color):
     screen.blit(text_surf, text_surf.get_rect(center=rect.center))
     return is_hovered and click[0]
 
+def play_menu_music():
+    try:
+        pygame.mixer.music.load('title_theme.mp3')
+        pygame.mixer.music.play(-1)
+    except:
+        print('File not found.')
+
+
 
 def main():
     global current_state, selected_level, player_x, player_y, defeated_enemies, current_enemy, show_hitboxes, button_hovered
-
+    play_menu_music()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -81,6 +89,7 @@ def main():
             if not (pygame.Rect(300, 250, 200, 50).collidepoint(mouse_pos)):
                 button_hovered = False
             if draw_button("Play", 300, 250, 200, 50, GREEN, (120, 220, 120)):
+                pygame.mixer.music.fadeout(1000)
                 pygame.time.delay(150)
                 click.play()
                 current_state = STATE_LEVEL_SELECT
@@ -107,6 +116,7 @@ def main():
                 current_state = STATE_COMBAT
             else:
                 current_state = STATE_MENU
+                play_menu_music()
 
         elif current_state == STATE_COMBAT:
             res = combat_loop(screen, clock, current_enemy)
