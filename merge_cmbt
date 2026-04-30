@@ -63,9 +63,13 @@ class MoveMenu:
     def draw(self, screen):
         font = pygame.font.Font(None, 32)
         for i, move in enumerate(self.moves):
-            color = (255, 255, 0) if i == self.selected else (255, 255, 255)
-            text = font.render(move.name, True, color)
-            screen.blit(text, (50, 400 + i * 35))
+            text_color = (255, 255, 0) if i == self.selected else (255, 255, 255)
+            bg_color = (0, 0, 0)
+            text = font.render(move.name, True, text_color, bg_color)
+            text_rect = text.get_rect(topleft=(50, 400 + i * 35))
+            pygame.draw.rect(screen, (0, 0, 0), text_rect.inflate(10, 5))
+
+            screen.blit(text, text_rect)
 
 
 ############### DAMAGE ###############
@@ -118,6 +122,28 @@ class Battle:
             self.player_sprite = pygame.Surface((150, 170))
             self.player_sprite.fill((0, 255, 0))
 
+        try:
+            raw_sprite = pygame.image.load(data.sprite).convert_alpha()
+            flipped = pygame.transform.flip(raw_sprite, True, False)
+            orig_w, orig_h = flipped.get_size()
+            new_w = int(orig_w * data.scale)
+            new_h = int(orig_h * data.scale)
+            self.enemy_sprite = pygame.transform.smoothscale(flipped, (new_w, new_h))
+        except:
+            print('Failed to load enemy sprite.')
+            self.enemy_sprite = pygame.Surface((150, 150))
+            self.enemy_sprite.fill((255, 0, 0))
+
+        bg_path = enemy_data_obj.enemy_data.bg
+
+        try:
+            self.background = pygame.image.load(bg_path).convert()
+            self.background = pygame.transform.scale(self.background, (800, 600))
+        except:
+            print('Failed to load background')
+            self.background = pygame.Surface((800, 600))
+            self.background.fill((30, 30, 40))
+
     def update(self, events):
         self.float_timer += 0.1
         if self.state == BattleState.PLAYER_TURN:
@@ -164,10 +190,10 @@ class Battle:
         return None
 
     def draw(self, screen):
-        screen.fill((30, 30, 40))
-
-        # Enemy Visual Placeholder
-        pygame.draw.rect(screen, (255, 100, 100), (600, 200, 80, 80))
+        screen.blit(self.background, (0, 0))
+        overlay = pygame.Surface((800, 600), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 80))
+        screen.blit(overlay, (0, 0))
 
         draw_hp_bar(screen, 50, 50, self.player)
         draw_hp_bar(screen, 550, 50, self.enemy)
@@ -176,16 +202,22 @@ class Battle:
         screen.blit(self.font.render(self.enemy.name, True, (255, 255, 255)), (550, 20))
 
         float_offset = math.sin(self.float_timer) * 8
+        enemy_float_offset = math.sin(self.float_timer) * 10
         screen.blit(self.player_sprite, (100, 280 + float_offset))
+        screen.blit(self.enemy_sprite, (550, 250 + enemy_float_offset))
 
         # Text/UI Box
+        pygame.draw.rect(screen, (0, 0, 0), (0, 500, 800, 100))
         pygame.draw.rect(screen, (255, 255, 255), (0, 500, 800, 100), 2)
 
         if self.state == BattleState.PLAYER_TURN:
             self.menu.draw(screen)
 
-        text_surface = self.font.render(self.message, True, (255, 255, 255))
+        text_surface = self.font.render(self.message, True, (255, 255, 255), (0, 0, 0))
         screen.blit(text_surface, (20, 530))
+
+
+
 
 
 def combat_loop(screen, clock, enemy_data):
