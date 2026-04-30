@@ -11,6 +11,7 @@ BROWN = (139, 90, 43)
 BLUE = (135, 206, 235)
 RED = (200, 50, 50)
 DIRT_COLOR = (1, 2, 5)
+ranonce = 0
 
 GRAVITY = 0.8
 JUMP_STRENGTH = -12
@@ -21,6 +22,9 @@ jump = pygame.mixer.Sound('jump.wav')
 landing = pygame.mixer.Sound('landing.wav')
 jump.set_volume(0.8)
 landing.set_volume(0.8)
+
+p1 = 45
+p2 = 35
 
 # Load Image Assets
 bg_img = pygame.image.load("backgroundImage.png")
@@ -35,6 +39,16 @@ fencef_img = pygame.image.load("FenceFloor.png")
 fencef_img = pygame.transform.scale(fencef_img, (32, 16))
 tree1_img = pygame.image.load("Tree1.png")
 tree1_img = pygame.transform.scale(tree1_img, (93, 115))
+tree2_img = pygame.image.load("Tree2.png")
+tree2_img = pygame.transform.scale(tree2_img, (99, 118))
+tree3_img = pygame.image.load("Tree3.png")
+tree3_img = pygame.transform.scale(tree3_img, (115, 100))
+bush1img = pygame.image.load("Bush1.png")
+bush1img = pygame.transform.scale(bush1img, (p1, p2))
+bush2img = pygame.image.load("Bush2.png")
+bush2img = pygame.transform.scale(bush2img, (p1, p2))
+bush3img = pygame.image.load("Bush3.png")
+bush3img = pygame.transform.scale(bush3img, (p1, p2))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -47,6 +61,14 @@ cloud_images = [
     pygame.image.load("Cloud8.png"),
 
 ]
+
+bush_images = [
+    bush1img,
+    bush2img,
+    bush3img,
+]
+
+bush = []
 
 clouds = []
 
@@ -297,9 +319,96 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.Rect(878, 307-3, 72-8, 7),
         ]
 
-        trees = [
+        tree1 = [
             pygame.Rect(200, 240-85, 93, 115)
         ]
+        tree2 = [
+            pygame.Rect(521, 97+3, 100, 118),
+        ]
+        tree3 = [
+            pygame.Rect(866, 59-3, 103, 96+3),
+        ]
+
+        def generate_random_positions(min_x, max_x, min_y, max_y, min_distance, amount):
+            generated_bushes = []
+
+            used_x_positions = []
+
+            for _ in range(amount):
+                x = random.randint(min_x, max_x)
+                y = random.randint(min_y, max_y)
+
+                while any(abs(x - used_x) <= min_distance for used_x in used_x_positions):
+                    x = random.randint(min_x, max_x)
+
+                used_x_positions.append(x)
+
+                generated_bushes.append({
+                    "rect": pygame.Rect(x, y, 40, 21),
+                    "img": random.choice(bush_images)
+                })
+
+            return generated_bushes
+
+        bushes = []
+
+        # platform 1 bushes
+        bushes += generate_random_positions(
+            187,
+            455 - 40,
+            353,
+            354,
+            40,
+            3
+        )
+
+        # platform 2 bushes
+        bushes += generate_random_positions(
+            173,
+            175,
+            240,
+            240,
+            40,
+            1
+        )
+
+        # platform 3 bushes
+        bushes += generate_random_positions(
+            582,
+            652-40,
+            222,
+            222,
+            40,
+            1
+        )
+
+        bushes += generate_random_positions(
+            545,
+            686 - 40,
+            326,
+            326,
+            40,
+            1
+        )
+
+        bushes += generate_random_positions(
+            867,
+            1011 - 40,
+            343,
+            343,
+            55,
+            2
+        )
+
+        bushes += generate_random_positions(
+            912,
+            983 - 40,
+            197,
+            197,
+            40,
+            1
+        )
+
         spawnpoints = [pygame.Rect(15, 286, 10, 3)]
         enemies = [
             Enemy(525, 182, 80, slime, 'slime_1', enemy_frames),
@@ -347,7 +456,6 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             if player.rect.colliderect(e.rect):
                 return "combat", show_hitboxes, e, player.rect.x, player.rect.y
 
-
         # Draw Sequence
         screen.blit(bg_img, (0, 0))
         update_and_draw_clouds(screen, dt)
@@ -355,12 +463,18 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             draw_platform(screen, bg_tile_img, br, camera_x)
         for p in platforms:
             draw_platform(screen, grass_img, p, camera_x)
-        for t in trees:
-            draw_platform(screen, tree1_img, t, camera_x)
+        for t1 in tree1:
+            draw_platform(screen, tree1_img, t1, camera_x)
+        for t2 in tree2:
+            draw_platform(screen, tree2_img, t2, camera_x)
+        for t3 in tree3:
+            draw_platform(screen, tree3_img, t3, camera_x)
         for s in spawnpoints:
             screen.blit(spawn_img, (s.x - camera_x, s.y))
         for f in fences:
             screen.blit(fence1_img, (f.x - camera_x, f.y))
+        for b in bushes:
+            draw_platform(screen, b["img"], b["rect"], camera_x)
         for fh in fenceHBox:
             draw_platform(screen, fencef_img, fh, camera_x)
         for e in enemies: e.draw(screen, camera_x)
