@@ -1,17 +1,23 @@
 from moves import tackle, bite, solidify
 
 class EnemyData:
-    def __init__(self, name, hp, moves, music, music_loop):
+    def __init__(self, name, hp, moves, music, music_loop, bg, sprite, scale):
         self.name = name
         self.hp = hp
         self.moves = moves
         self.music = music
         self.music_loop = music_loop
+        self.bg = bg
+        self.sprite = sprite
+        self.scale = scale
 
 slime = EnemyData(
-    name='Slime',
+    name='Gloob',
     hp=30,
     moves=[tackle, bite, solidify],
     music='battle.mp3',
-    music_loop=11.294
+    music_loop=11.294,
+    bg='grass_battle_bg.png',
+    sprite='RedEnemy1.png',
+    scale=1.0
 )
