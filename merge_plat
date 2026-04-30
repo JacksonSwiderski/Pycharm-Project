@@ -296,6 +296,10 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.Rect(797, 267, 57, 6),
             pygame.Rect(878, 307-3, 72-8, 7),
         ]
+
+        trees = [
+            pygame.Rect(200, 240-85, 93, 115)
+        ]
         spawnpoints = [pygame.Rect(15, 286, 10, 3)]
         enemies = [
             Enemy(525, 182, 80, slime, 'slime_1', enemy_frames),
@@ -351,7 +355,8 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             draw_platform(screen, bg_tile_img, br, camera_x)
         for p in platforms:
             draw_platform(screen, grass_img, p, camera_x)
-        screen.blit(tree1_img, (200, 240-85))
+        for t in trees:
+            draw_platform(screen, tree1_img, t, camera_x)
         for s in spawnpoints:
             screen.blit(spawn_img, (s.x - camera_x, s.y))
         for f in fences:
