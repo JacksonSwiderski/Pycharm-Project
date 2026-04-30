@@ -22,7 +22,7 @@ landing = pygame.mixer.Sound('landing.wav')
 jump.set_volume(0.8)
 landing.set_volume(0.8)
 
-# Load Friend's Assets
+# Load Image Assets
 bg_img = pygame.image.load("backgroundImage.png")
 bg_img = pygame.transform.scale(bg_img, (2000, 600))
 grass_img = pygame.image.load("GroundTop2.png")
@@ -33,6 +33,8 @@ fence1_img = pygame.image.load("Fence2.png")
 fence1_img = pygame.transform.scale(fence1_img, (32, 32))
 fencef_img = pygame.image.load("FenceFloor.png")
 fencef_img = pygame.transform.scale(fencef_img, (32, 16))
+tree1_img = pygame.image.load("Tree1.png")
+tree1_img = pygame.transform.scale(tree1_img, (93, 115))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -349,6 +351,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             draw_platform(screen, bg_tile_img, br, camera_x)
         for p in platforms:
             draw_platform(screen, grass_img, p, camera_x)
+        screen.blit(tree1_img, (200, 240-85))
         for s in spawnpoints:
             screen.blit(spawn_img, (s.x - camera_x, s.y))
         for f in fences:
