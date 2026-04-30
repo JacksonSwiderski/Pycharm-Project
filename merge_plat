@@ -13,8 +13,8 @@ RED = (200, 50, 50)
 DIRT_COLOR = (1, 2, 5)
 
 GRAVITY = 0.8
-JUMP_STRENGTH = -15
-MOVE_SPEED = 7
+JUMP_STRENGTH = -12
+MOVE_SPEED = 5
 
 # Sounds (Your Version)
 jump = pygame.mixer.Sound('jump.wav')
@@ -29,6 +29,10 @@ grass_img = pygame.image.load("GroundTop2.png")
 grass_img = pygame.transform.scale(grass_img, (111, 120))
 spawn_img = pygame.image.load("SpawnPointBed.png")
 spawn_img = pygame.transform.scale(spawn_img, (32, 32))
+fence1_img = pygame.image.load("Fence2.png")
+fence1_img = pygame.transform.scale(fence1_img, (32, 32))
+fencef_img = pygame.image.load("FenceFloor.png")
+fencef_img = pygame.transform.scale(fencef_img, (32, 16))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -98,7 +102,7 @@ class Player:
     def apply_gravity(self):
         self.vel_y = min(15, self.vel_y + GRAVITY)
 
-    def move_and_collide(self, platforms):
+    def move_and_collide(self, platforms, fenceHBox):
         self.rect.x += self.vel_x
         for p in platforms:
             if self.rect.colliderect(p):
@@ -106,6 +110,12 @@ class Player:
                     self.rect.right = p.left
                 elif self.vel_x < 0:
                     self.rect.left = p.right
+        for fh in fenceHBox:
+            if self.rect.colliderect(fh):
+                if self.vel_x > 0:
+                    self.rect.right = fh.left
+                elif self.vel_x < 0:
+                    self.rect.left = fh.right
         was_in_air = not self.on_ground
         self.rect.y += self.vel_y
         self.on_ground = False
@@ -115,6 +125,16 @@ class Player:
                     self.rect.bottom, self.vel_y, self.on_ground = p.top, 0, True
                 elif self.vel_y < 0:
                     self.rect.top, self.vel_y = p.bottom, 0
+
+                    if was_in_air:
+                        landing.play()
+                        was_in_air = False
+        for fh in fenceHBox:
+            if self.rect.colliderect(fh):
+                if self.vel_y > 0:
+                    self.rect.bottom, self.vel_y, self.on_ground = fh.top, 0, True
+                elif self.vel_y < 0:
+                    self.rect.top, self.vel_y = fh.bottom, 0
 
                     if was_in_air:
                         landing.play()
@@ -239,15 +259,40 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.Rect(613, 253, 24, 106), pygame.Rect(556, 323, 10, 25)
         ]
         platforms = [
-            pygame.Rect(0, 308, 135, 300), pygame.Rect(135, 345, 53, 260),
-            pygame.Rect(187, 375, 269, 230), pygame.Rect(544, 348, 145, 32),
-            pygame.Rect(689, 364, 53, 240), pygame.Rect(171, 258, 45, 17),
-            pygame.Rect(200, 268, 86, 28), pygame.Rect(515, 214, 118, 41),
-            pygame.Rect(578, 242, 75, 27), pygame.Rect(745, 242, 54, 31),
-            pygame.Rect(797, 267, 57, 6), pygame.Rect(860, 153, 117, 30),
-            pygame.Rect(886, 229, 25, 15), pygame.Rect(909, 219, 76, 25),
-            pygame.Rect(809, 395, 58, 246), pygame.Rect(865, 365, 147, 255),
-            pygame.Rect(878, 307, 72, 7)
+            pygame.Rect(0, 308, 135, 300),
+            pygame.Rect(135, 345, 53, 260),
+            pygame.Rect(187, 375, 269, 230),
+            pygame.Rect(544, 348, 145, 32),
+            pygame.Rect(689, 364, 53, 240),
+            pygame.Rect(171, 258, 45, 17),
+            pygame.Rect(200, 268, 86, 28),
+            pygame.Rect(515, 214, 118, 41),
+            pygame.Rect(578, 242, 75, 27),
+            pygame.Rect(745, 242, 54, 31),
+            pygame.Rect(860, 153, 117, 30),
+            pygame.Rect(886, 229, 25, 15),
+            pygame.Rect(909, 219, 76, 25),
+            pygame.Rect(809, 395, 58, 246),
+            pygame.Rect(865, 365, 147, 255),
+        ]
+        fences = [
+            pygame.Rect(878, 307 - 32, 73, 8),
+            pygame.Rect(794, 267 - 30, 57, 6),
+            pygame.Rect(878+32, 307 - 32, 73, 8),
+            pygame.Rect(797+26, 267 - 30, 57, 6),
+            pygame.Rect(285, 258, 45, 17),
+            pygame.Rect(285+32, 258, 45, 17),
+
+            pygame.Rect(408, 258-26, 45, 17),
+            pygame.Rect(408+32, 258-26, 45, 17),
+
+        ]
+        fenceHBox = [
+            pygame.Rect(285, 287, 66, 6),
+            pygame.Rect(406, 283-21, 68, 9),
+
+            pygame.Rect(797, 267, 57, 6),
+            pygame.Rect(878, 307-3, 72-8, 7),
         ]
         spawnpoints = [pygame.Rect(15, 286, 10, 3)]
         enemies = [
@@ -279,7 +324,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         keys = pygame.key.get_pressed()
         player.handle_input(keys)
         player.apply_gravity()
-        player.move_and_collide(platforms)
+        player.move_and_collide(platforms, fenceHBox)
         player.update_animation(dt)
 
         # bounds
@@ -306,6 +351,10 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             draw_platform(screen, grass_img, p, camera_x)
         for s in spawnpoints:
             screen.blit(spawn_img, (s.x - camera_x, s.y))
+        for f in fences:
+            screen.blit(fence1_img, (f.x - camera_x, f.y))
+        for fh in fenceHBox:
+            draw_platform(screen, fencef_img, fh, camera_x)
         for e in enemies: e.draw(screen, camera_x)
         player.draw(screen, camera_x)
 
