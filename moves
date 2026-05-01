@@ -15,3 +15,9 @@ heal = Move('Heal', -10, 'normal', 1)
 tackle = Move('Tackle', 8, 'normal', 99)
 bite = Move('Bite', 12, 'normal', 99)
 solidify = Move('Solidify', -5, 'normal', 99)
+fireball = Move('Fireball', 20, 'fire', 99)
+heal_potion = Move('a Healing Potion', -20, 'magic', 99)
+
+# FISH
+splash = Move('Splash', 0, 'normal', 99)
+divine = Move('Divine Judgement', 999, 'divinity', 99)
