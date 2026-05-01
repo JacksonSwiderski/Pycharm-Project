@@ -122,6 +122,7 @@ def load_level(level):
         ]
         underground = [
             pygame.Rect(455-18, 438, 236+30, 181),
+            pygame.Rect(741-7, 438, 70+15, 239),
         ]
         platforms = [
             pygame.Rect(0, 308, 135, 300),
