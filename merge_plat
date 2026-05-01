@@ -409,7 +409,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             1
         )
 
-        spawnpoints = [pygame.Rect(15, 286, 10, 3)]
+        spawnpoints = [pygame.Rect(15, 286+2, 10, 3)]
         enemies = [
             Enemy(525, 182, 80, slime, 'slime_1', enemy_frames),
             Enemy(220, 235, 35, slime, 'slime_2', enemy_frames)
