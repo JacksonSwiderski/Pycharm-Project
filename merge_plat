@@ -482,7 +482,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
 
         if show_controls:
-            ctrls = ["WASD: Move", "SPACE: Jump", "TAB: Dev Mode", "H: Controls", "F3: Hitboxes", "R: Respawn"]
+            ctrls = ["WASD: Move", "SPACE: Jump", "TAB: Disable Cam Follow", "H: Controls", "F3: Hitboxes", "R: Respawn"]
             for i, line in enumerate(ctrls):
                 screen.blit(ui_font.render(line, True, WHITE), (10, 10 + i * 18))
 
