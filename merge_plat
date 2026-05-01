@@ -49,6 +49,8 @@ bush2img = pygame.image.load("Bush2.png")
 bush2img = pygame.transform.scale(bush2img, (p1, p2))
 bush3img = pygame.image.load("Bush3.png")
 bush3img = pygame.transform.scale(bush3img, (p1, p2))
+Ground3_img = pygame.image.load("Ground3.png")
+Ground3_img = pygame.transform.scale(Ground3_img, (111, 65))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -275,12 +277,16 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
     if level == 0:
         background_rects = [
-            pygame.Rect(866, 168, 107, 58), pygame.Rect(873, 225, 98, 13), pygame.Rect(202, 281, 60, 111), pygame.Rect(257, 290, 27, 32),
+            pygame.Rect(866, 168, 107, 58),pygame.Rect(873, 225, 98, 13), pygame.Rect(202, 281, 60, 111), pygame.Rect(257, 290, 27, 32),
             pygame.Rect(252, 313, 18, 39), pygame.Rect(262, 344, 18, 20), pygame.Rect(258, 358, 34, 25), pygame.Rect(176, 271, 30, 32),
             pygame.Rect(185, 300, 25, 24), pygame.Rect(194, 319, 16, 24), pygame.Rect(183, 355, 29, 28), pygame.Rect(199, 340, 12, 26),
             pygame.Rect(193, 346, 15, 21), pygame.Rect(522, 245, 115, 44), pygame.Rect(537, 287, 98, 28), pygame.Rect(563, 313, 71, 48),
             pygame.Rect(548, 305, 26, 26), pygame.Rect(529, 279, 16, 20), pygame.Rect(548, 342, 23, 19), pygame.Rect(626, 264, 23, 26),
             pygame.Rect(613, 282, 27, 32), pygame.Rect(618, 310, 28, 26), pygame.Rect(629, 329, 31, 22), pygame.Rect(556, 323, 10, 25),
+            pygame.Rect(872, 216, 10, 15),
+        ]
+        underground = [
+            pygame.Rect(455 - 18, 438, 236 + 30, 181),
         ]
         platforms = [
             pygame.Rect(0, 308, 135, 300),
@@ -290,7 +296,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.Rect(689, 364, 53, 240),
             pygame.Rect(171, 258, 45, 17),
             pygame.Rect(200, 268, 86, 28),
-            pygame.Rect(515, 214, 118, 41),
+            pygame.Rect(515, 214, 103, 41),
             pygame.Rect(578, 242, 75, 27),
             pygame.Rect(745, 242, 54, 31),
             pygame.Rect(860, 153, 117, 30),
@@ -298,25 +304,40 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.Rect(909, 219, 76, 25),
             pygame.Rect(809, 395, 58, 246),
             pygame.Rect(865, 365, 147, 255),
+
+            # past half
+            pygame.Rect(999, 417, 34, 243),
+            pygame.Rect(1000, 435, 262, 250),
+            pygame.Rect(1247, 410, 62, 237),
+            pygame.Rect(1284, 380, 69, 242),
+            pygame.Rect(1016, 292, 28, 17),
+            pygame.Rect(1043, 259, 28, 13),
+            pygame.Rect(1040, 235, 97, 50),
+            pygame.Rect(1035, 258, 41, 21),
+            pygame.Rect(1122, 262, 38, 40),
         ]
         fences = [
             pygame.Rect(878, 307 - 32, 73, 8),
             pygame.Rect(794, 267 - 30, 57, 6),
-            pygame.Rect(878+32, 307 - 32, 73, 8),
-            pygame.Rect(797+26, 267 - 30, 57, 6),
+            pygame.Rect(878 + 32, 307 - 32, 73, 8),
+            pygame.Rect(797 + 26, 267 - 30, 57, 6),
             pygame.Rect(285, 258, 45, 17),
-            pygame.Rect(285+32, 258, 45, 17),
+            pygame.Rect(285 + 32, 258, 45, 17),
 
-            pygame.Rect(408, 258-26, 45, 17),
-            pygame.Rect(408+32, 258-26, 45, 17),
+            pygame.Rect(408, 258 - 26, 45, 17),
+            pygame.Rect(408 + 32, 258 - 26, 45, 17),
 
+            pygame.Rect(1138, 275 - 7, 38, 21),
+            pygame.Rect(1138 + 25, 275 - 7, 38, 21),
         ]
         fenceHBox = [
             pygame.Rect(285, 287, 66, 6),
-            pygame.Rect(406, 283-21, 68, 9),
+            pygame.Rect(406, 283 - 21, 68, 9),
 
             pygame.Rect(797, 267, 57, 6),
-            pygame.Rect(878, 307-3, 72-8, 7),
+            pygame.Rect(878, 307 - 3, 72 - 8, 7),
+
+            pygame.Rect(1134 + 5, 296, 80 - 24, 6),
         ]
 
         tree1 = [
@@ -461,6 +482,8 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         update_and_draw_clouds(screen, dt)
         for br in background_rects:
             draw_platform(screen, bg_tile_img, br, camera_x)
+        for u in underground:
+            draw_platform(screen, Ground3_img, u, camera_x)
         for p in platforms:
             draw_platform(screen, grass_img, p, camera_x)
         for t1 in tree1:
