@@ -275,12 +275,12 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
     if level == 0:
         background_rects = [
-            pygame.Rect(866, 168, 107, 58), pygame.Rect(873, 225, 98, 13),
-            pygame.Rect(202, 281, 81, 111), pygame.Rect(175, 269, 39, 110),
-            pygame.Rect(522, 245, 115, 44), pygame.Rect(537, 287, 98, 28),
-            pygame.Rect(563, 313, 71, 48), pygame.Rect(548, 305, 26, 26),
-            pygame.Rect(529, 279, 16, 20), pygame.Rect(548, 342, 23, 19),
-            pygame.Rect(613, 253, 24, 106), pygame.Rect(556, 323, 10, 25)
+            pygame.Rect(866, 168, 107, 58), pygame.Rect(873, 225, 98, 13), pygame.Rect(202, 281, 60, 111), pygame.Rect(257, 290, 27, 32),
+            pygame.Rect(252, 313, 18, 39), pygame.Rect(262, 344, 18, 20), pygame.Rect(258, 358, 34, 25), pygame.Rect(176, 271, 30, 32),
+            pygame.Rect(185, 300, 25, 24), pygame.Rect(194, 319, 16, 24), pygame.Rect(183, 355, 29, 28), pygame.Rect(199, 340, 12, 26),
+            pygame.Rect(193, 346, 15, 21), pygame.Rect(522, 245, 115, 44), pygame.Rect(537, 287, 98, 28), pygame.Rect(563, 313, 71, 48),
+            pygame.Rect(548, 305, 26, 26), pygame.Rect(529, 279, 16, 20), pygame.Rect(548, 342, 23, 19), pygame.Rect(626, 264, 23, 26),
+            pygame.Rect(613, 282, 27, 32), pygame.Rect(618, 310, 28, 26), pygame.Rect(629, 329, 31, 22), pygame.Rect(556, 323, 10, 25),
         ]
         platforms = [
             pygame.Rect(0, 308, 135, 300),
