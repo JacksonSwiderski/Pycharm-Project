@@ -51,6 +51,8 @@ bush3img = pygame.image.load("Bush3.png")
 bush3img = pygame.transform.scale(bush3img, (p1, p2))
 Ground3_img = pygame.image.load("Ground3.png")
 Ground3_img = pygame.transform.scale(Ground3_img, (111, 65))
+grassoverlay_img = pygame.image.load("GrassOverlay.png")
+grassoverlay_img = pygame.transform.scale(grassoverlay_img, (45, 20))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -82,18 +84,29 @@ bg_tile_img = pygame.transform.scale(bg_tile_original, (tile_w, tile_h))
 
 
 def draw_platform(screen, image, rect, camera_x=0):
+
+    # ✅ FIX: unwrap tuple if needed
+    if isinstance(rect, tuple):
+        rect = rect[0]
+
     platform_surf = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+
     t_w, t_h = image.get_width(), image.get_height()
+
     for x in range(0, rect.width, t_w):
         draw_w = min(t_w, rect.width - x)
         tile = image.subsurface((0, 0, draw_w, t_h))
         platform_surf.blit(tile, (x, 0))
-    if rect.height > t_h:
-        pygame.draw.rect(platform_surf, DIRT_COLOR, (0, t_h, rect.width, rect.height - t_h))
 
-    # Apply Rounded Mask
+    if rect.height > t_h:
+        pygame.draw.rect(platform_surf, DIRT_COLOR,
+                         (0, t_h, rect.width, rect.height - t_h))
+
     mask = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
-    pygame.draw.rect(mask, (255, 255, 255), (0, 0, rect.width, rect.height), border_radius=6)
+    pygame.draw.rect(mask, (255, 255, 255),
+                     (0, 0, rect.width, rect.height),
+                     border_radius=6)
+
     platform_surf.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
     screen.blit(platform_surf, (rect.x - camera_x, rect.y))
@@ -130,37 +143,58 @@ class Player:
 
     def move_and_collide(self, platforms, fenceHBox):
         self.rect.x += self.vel_x
+
+        # horizontal collision (platforms)
         for p in platforms:
-            if self.rect.colliderect(p):
+            rect = p[0] if isinstance(p, tuple) else p
+            if self.rect.colliderect(rect):
                 if self.vel_x > 0:
-                    self.rect.right = p.left
+                    self.rect.right = rect.left
                 elif self.vel_x < 0:
-                    self.rect.left = p.right
+                    self.rect.left = rect.right
+
+        # horizontal collision (fences)
         for fh in fenceHBox:
-            if self.rect.colliderect(fh):
+            rect = fh[0] if isinstance(fh, tuple) else fh
+            if self.rect.colliderect(rect):
                 if self.vel_x > 0:
-                    self.rect.right = fh.left
+                    self.rect.right = rect.left
                 elif self.vel_x < 0:
-                    self.rect.left = fh.right
+                    self.rect.left = rect.right
+
         was_in_air = not self.on_ground
         self.rect.y += self.vel_y
         self.on_ground = False
+
+        # vertical collision (platforms)
         for p in platforms:
-            if self.rect.colliderect(p):
+            rect = p[0] if isinstance(p, tuple) else p
+
+            if self.rect.colliderect(rect):
                 if self.vel_y > 0:
-                    self.rect.bottom, self.vel_y, self.on_ground = p.top, 0, True
+                    self.rect.bottom = rect.top
+                    self.vel_y = 0
+                    self.on_ground = True
                 elif self.vel_y < 0:
-                    self.rect.top, self.vel_y = p.bottom, 0
+                    self.rect.top = rect.bottom
+                    self.vel_y = 0
 
                     if was_in_air:
                         landing.play()
                         was_in_air = False
+
+        # vertical collision (fences)
         for fh in fenceHBox:
-            if self.rect.colliderect(fh):
+            rect = fh[0] if isinstance(fh, tuple) else fh
+
+            if self.rect.colliderect(rect):
                 if self.vel_y > 0:
-                    self.rect.bottom, self.vel_y, self.on_ground = fh.top, 0, True
+                    self.rect.bottom = rect.top
+                    self.vel_y = 0
+                    self.on_ground = True
                 elif self.vel_y < 0:
-                    self.rect.top, self.vel_y = fh.bottom, 0
+                    self.rect.top = rect.bottom
+                    self.vel_y = 0
 
                     if was_in_air:
                         landing.play()
@@ -277,46 +311,73 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
     if level == 0:
         background_rects = [
-            pygame.Rect(866, 168, 107, 58),pygame.Rect(873, 225, 98, 13), pygame.Rect(202, 281, 60, 111), pygame.Rect(257, 290, 27, 32),
-            pygame.Rect(252, 313, 18, 39), pygame.Rect(262, 344, 18, 20), pygame.Rect(258, 358, 34, 25), pygame.Rect(176, 271, 30, 32),
-            pygame.Rect(185, 300, 25, 24), pygame.Rect(194, 319, 16, 24), pygame.Rect(183, 355, 29, 28), pygame.Rect(199, 340, 12, 26),
-            pygame.Rect(193, 346, 15, 21), pygame.Rect(522, 245, 115, 44), pygame.Rect(537, 287, 98, 28), pygame.Rect(563, 313, 71, 48),
-            pygame.Rect(548, 305, 26, 26), pygame.Rect(529, 279, 16, 20), pygame.Rect(548, 342, 23, 19), pygame.Rect(626, 264, 23, 26),
-            pygame.Rect(613, 282, 27, 32), pygame.Rect(618, 310, 28, 26), pygame.Rect(629, 329, 31, 22), pygame.Rect(556, 323, 10, 25),
+            pygame.Rect(866, 168, 107, 58), pygame.Rect(873, 225, 98, 13), pygame.Rect(202, 281, 60, 111),
+            pygame.Rect(257, 290, 27, 32),
+            pygame.Rect(252, 313, 18, 39), pygame.Rect(262, 344, 18, 20), pygame.Rect(258, 358, 34, 25),
+            pygame.Rect(176, 271, 30, 32),
+            pygame.Rect(185, 300, 25, 24), pygame.Rect(194, 319, 16, 24), pygame.Rect(183, 355, 29, 28),
+            pygame.Rect(199, 340, 12, 26),
+            pygame.Rect(193, 346, 15, 21), pygame.Rect(522, 245, 115, 44), pygame.Rect(537, 287, 98, 28),
+            pygame.Rect(563, 313, 71, 48),
+            pygame.Rect(548, 305, 26, 26), pygame.Rect(529, 279, 16, 20), pygame.Rect(548, 342, 23, 19),
+            pygame.Rect(626, 264, 23, 26),
+            pygame.Rect(613, 282, 27, 32), pygame.Rect(618, 310, 28, 26), pygame.Rect(629, 329, 31, 22),
+            pygame.Rect(556, 323, 10, 25),
             pygame.Rect(872, 216, 10, 15),
+
+            pygame.Rect(1055, 273, 86, 73),
+            pygame.Rect(1046, 278, 21, 39),
+            pygame.Rect(1021, 295, 42, 23),
+            pygame.Rect(1034, 310, 29, 26),
+            pygame.Rect(1051, 326, 31, 41),
+            pygame.Rect(1041, 363, 47, 31),
+            pygame.Rect(1010, 385, 104, 59),
+            pygame.Rect(1077, 324, 77, 140),
+            pygame.Rect(1120, 291, 34, 24),
+            pygame.Rect(1142, 395, 42, 51),
+            pygame.Rect(1169, 416, 41, 28),
+            pygame.Rect(1141, 383, 23, 25),
+            pygame.Rect(1023, 376, 32, 16),
+            pygame.Rect(1036, 276, 28, 29),
+            pygame.Rect(1047, 325, 12, 23),
         ]
         underground = [
             pygame.Rect(455 - 18, 438, 236 + 30, 181),
             pygame.Rect(741 - 7, 438, 70 + 15, 239),
         ]
         platforms = [
-            pygame.Rect(0, 308, 135, 300),
-            pygame.Rect(135, 345, 53, 260),
-            pygame.Rect(187, 375, 269, 230),
-            pygame.Rect(544, 348, 145, 32),
-            pygame.Rect(689, 364, 53, 240),
-            pygame.Rect(171, 258, 45, 17),
-            pygame.Rect(200, 268, 86, 28),
-            pygame.Rect(515, 214, 103, 41),
-            pygame.Rect(578, 242, 75, 27),
-            pygame.Rect(745, 242, 54, 31),
-            pygame.Rect(860, 153, 117, 30),
-            pygame.Rect(886, 229, 25, 15),
-            pygame.Rect(909, 219, 76, 25),
-            pygame.Rect(809, 395, 58, 246),
-            pygame.Rect(865, 365, 147, 255),
+            (pygame.Rect(0, 308, 135, 300), {}),
+            (pygame.Rect(135, 345, 53, 260), {}),
+            (pygame.Rect(187, 375, 269, 230), {}),
+            (pygame.Rect(544, 348, 145, 32), {}),
+            (pygame.Rect(689, 364, 53, 240), {}),
+            (pygame.Rect(171, 258, 45, 17), {}),
+            (pygame.Rect(200, 268, 86, 28), {}),
+            (pygame.Rect(515, 214, 103, 41), {}),
+            (pygame.Rect(578, 242, 75, 27), {}),
+            (pygame.Rect(745, 242, 54, 31), {}),
+            (pygame.Rect(860, 153, 117, 30), {}),
+            (pygame.Rect(886, 229, 25, 15), {}),
+            (pygame.Rect(909, 219, 76, 25), {}),
+            (pygame.Rect(809, 395, 58, 246), {}),
+            (pygame.Rect(865, 365, 147, 255), {}),
 
             # past half
-            pygame.Rect(999, 417, 34, 243),
-            pygame.Rect(1000, 435, 262, 250),
-            pygame.Rect(1247, 410, 62, 237),
-            pygame.Rect(1284, 380, 69, 242),
-            pygame.Rect(1016, 292, 28, 17),
-            pygame.Rect(1043, 259, 28, 13),
-            pygame.Rect(1040, 235, 97, 50),
-            pygame.Rect(1035, 258, 41, 21),
-            pygame.Rect(1122, 262, 38, 40),
+            (pygame.Rect(999, 417, 34, 243), {}),
+            (pygame.Rect(1000, 435, 262, 250), {}),
+            (pygame.Rect(1247 + 4, 410, 36, 237), {}),
+            (pygame.Rect(1284, 380, 69, 242), {}),
+            (pygame.Rect(1016, 292, 28, 17), {}),
+            (pygame.Rect(1043, 259, 28, 13), {}),
+            (pygame.Rect(1040, 235, 97, 50), {}),
+            (pygame.Rect(1035, 258, 41, 21), {}),
+            (pygame.Rect(1122, 262, 38, 40), {}),
+            (pygame.Rect(1165, 178, 135, 37), {}),
+
+            # EXCLUDED FROM GRASS OVERLAY
+            (pygame.Rect(1321, 245, 86, 32), {"grass": False}),
         ]
+
         fences = [
             pygame.Rect(878, 307 - 32, 73, 8),
             pygame.Rect(794, 267 - 30, 57, 6),
@@ -339,17 +400,65 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.Rect(878, 307 - 3, 72 - 8, 7),
 
             pygame.Rect(1134 + 5, 296, 80 - 24, 6),
+            pygame.Rect(1317, 245, 94, 15),
         ]
 
         tree1 = [
-            pygame.Rect(200, 240-85, 93, 115)
+            pygame.Rect(200, 240 - 85, 93, 115)
         ]
         tree2 = [
-            pygame.Rect(521, 97+3, 100, 118),
+            pygame.Rect(521, 97 + 3, 100, 118),
         ]
         tree3 = [
-            pygame.Rect(866, 59-3, 103, 96+3),
+            pygame.Rect(866, 59 - 3, 103, 96 + 3),
         ]
+
+        def grassoverlayrepeat(x, y, platform_width, img):
+            overlays = []
+
+            start_x = x - 5
+            end_x = x + platform_width + 5
+            start_y = y - 1
+
+            img_width = img.get_width()
+            img_height = img.get_height()
+
+            current_x = start_x
+
+            while current_x < end_x:
+                remaining = end_x - current_x
+
+                # width we actually want to draw
+                draw_width = min(img_width, remaining)
+
+                # crop the image if needed
+                cropped_img = img.subsurface((0, 0, draw_width, img_height))
+
+                overlays.append((cropped_img, (current_x, start_y)))
+
+                current_x += img_width
+
+            return overlays
+
+        xg = 134
+        yg = 14
+
+        excluded_indices = {29}
+
+        grassoverlay = []
+
+        for item in platforms:
+            rect, flags = item
+
+            if not flags.get("grass", True):
+                continue
+
+            grassoverlay += grassoverlayrepeat(
+                rect.x,
+                rect.y,
+                rect.width,
+                grassoverlay_img
+            )
 
         def generate_random_positions(min_x, max_x, min_y, max_y, min_distance, amount):
             generated_bushes = []
@@ -487,6 +596,8 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             draw_platform(screen, Ground3_img, u, camera_x)
         for p in platforms:
             draw_platform(screen, grass_img, p, camera_x)
+        for p in platforms:
+            draw_platform(screen, grass_img, p, camera_x)
         for t1 in tree1:
             draw_platform(screen, tree1_img, t1, camera_x)
         for t2 in tree2:
@@ -503,6 +614,8 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             draw_platform(screen, fencef_img, fh, camera_x)
         for e in enemies: e.draw(screen, camera_x)
         player.draw(screen, camera_x)
+        for img, pos in grassoverlay:
+            screen.blit(img, (pos[0] - camera_x, pos[1]))
 
 
         if show_controls:
