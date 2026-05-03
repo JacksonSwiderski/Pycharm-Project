@@ -50,6 +50,8 @@ Ground3_img = pygame.image.load("Ground3.png")
 Ground3_img = pygame.transform.scale(Ground3_img, (111, 65))
 enemy_frames = [pygame.transform.scale(pygame.image.load(f"RedEnemy{i}.png").convert_alpha(), (22, 30)) for i in
                     range(1, 5)]
+grassoverlay_img = pygame.image.load("GrassOverlay.png")
+grassoverlay_img = pygame.transform.scale(grassoverlay_img, (45, 20))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -125,33 +127,38 @@ def load_level(level):
             pygame.Rect(741-7, 438, 70+15, 239),
         ]
         platforms = [
-            pygame.Rect(0, 308, 135, 300),
-            pygame.Rect(135, 345, 53, 260),
-            pygame.Rect(187, 375, 269, 230),
-            pygame.Rect(544, 348, 145, 32),
-            pygame.Rect(689, 364, 53, 240),
-            pygame.Rect(171, 258, 45, 17),
-            pygame.Rect(200, 268, 86, 28),
-            pygame.Rect(515, 214, 103, 41),
-            pygame.Rect(578, 242, 75, 27),
-            pygame.Rect(745, 242, 54, 31),
-            pygame.Rect(860, 153, 117, 30),
-            pygame.Rect(886, 229, 25, 15),
-            pygame.Rect(909, 219, 76, 25),
-            pygame.Rect(809, 395, 58, 246),
-            pygame.Rect(865, 365, 147, 255),
+            (pygame.Rect(0, 308, 135, 300), {}),
+            (pygame.Rect(135, 345, 53, 260), {}),
+            (pygame.Rect(187, 375, 269, 230), {}),
+            (pygame.Rect(544, 348, 145, 32), {}),
+            (pygame.Rect(689, 364, 53, 240), {}),
+            (pygame.Rect(171, 258, 45, 17), {}),
+            (pygame.Rect(200, 268, 86, 28), {}),
+            (pygame.Rect(515, 214, 103, 41), {}),
+            (pygame.Rect(578, 242, 75, 27), {}),
+            (pygame.Rect(745, 242, 54, 31), {}),
+            (pygame.Rect(860, 153, 117, 30), {}),
+            (pygame.Rect(886, 229, 25, 15), {}),
+            (pygame.Rect(909, 219, 76, 25), {}),
+            (pygame.Rect(809, 395, 58, 246), {}),
+            (pygame.Rect(865, 365, 147, 255), {}),
 
             # past half
-            pygame.Rect(999, 417, 34, 243),
-            pygame.Rect(1000, 435, 262, 250),
-            pygame.Rect(1247, 410, 62, 237),
-            pygame.Rect(1284, 380, 69, 242),
-            pygame.Rect(1016, 292, 28, 17),
-            pygame.Rect(1043, 259, 28, 13),
-            pygame.Rect(1040, 235, 97, 50),
-            pygame.Rect(1035, 258, 41, 21),
-            pygame.Rect(1122, 262, 38, 40),
+            (pygame.Rect(999, 417, 34, 243), {}),
+            (pygame.Rect(1000, 435, 262, 250), {}),
+            (pygame.Rect(1247+4, 410, 36, 237), {}),
+            (pygame.Rect(1284, 380, 69, 242), {}),
+            (pygame.Rect(1016, 292, 28, 17), {}),
+            (pygame.Rect(1043, 259, 28, 13), {}),
+            (pygame.Rect(1040, 235, 97, 50), {}),
+            (pygame.Rect(1035, 258, 41, 21), {}),
+            (pygame.Rect(1122, 262, 38, 40), {}),
+            (pygame.Rect(1165, 178, 135, 37), {}),
+
+            # EXCLUDED FROM GRASS OVERLAY
+            (pygame.Rect(1321, 245, 86, 32), {"grass": False}),
         ]
+
         fences = [
             pygame.Rect(878, 307 - 32, 73, 8),
             pygame.Rect(794, 267 - 30, 57, 6),
@@ -174,6 +181,7 @@ def load_level(level):
             pygame.Rect(878, 307 - 3, 72 - 8, 7),
 
             pygame.Rect(1134+5, 296, 80-24, 6),
+            pygame.Rect(1317, 245, 94, 15),
         ]
 
         tree1 = [
@@ -185,6 +193,53 @@ def load_level(level):
         tree3 = [
             pygame.Rect(866, 59 - 3, 103, 96 + 3),
         ]
+
+        def grassoverlayrepeat(x, y, platform_width, img):
+            overlays = []
+
+            start_x = x - 5
+            end_x = x + platform_width + 5
+            start_y = y - 1
+
+            img_width = img.get_width()
+            img_height = img.get_height()
+
+            current_x = start_x
+
+            while current_x < end_x:
+                remaining = end_x - current_x
+
+                # width we actually want to draw
+                draw_width = min(img_width, remaining)
+
+                # crop the image if needed
+                cropped_img = img.subsurface((0, 0, draw_width, img_height))
+
+                overlays.append((cropped_img, (current_x, start_y)))
+
+                current_x += img_width
+
+            return overlays
+
+        xg = 134
+        yg = 14
+
+        excluded_indices = {29}
+
+        grassoverlay = []
+
+        for item in platforms:
+            rect, flags = item
+
+            if not flags.get("grass", True):
+                continue
+
+            grassoverlay += grassoverlayrepeat(
+                rect.x,
+                rect.y,
+                rect.width,
+                grassoverlay_img
+            )
 
         enemies = [
             Enemy(525, 182, 80, slime, 'slime_1', enemy_frames),
@@ -306,12 +361,13 @@ def load_level(level):
         fences,
         fenceHBox,
         enemies,
-        underground
+        underground,
+        grassoverlay
     ) # fences
 
 
 LEVEL = 0
-platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, enemies, underground = load_level(LEVEL) #fences
+platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, enemies, underground, grassoverlay = load_level(LEVEL) #fences
 
 
 # -----------------------------
@@ -391,8 +447,9 @@ while running:
         draw_platform(screen, bg_tile_img, br)
     for u in underground:
         draw_platform(screen, Ground3_img, u)
-    for p in platforms:
-        draw_platform(screen, grass_img, p)
+    for item in platforms:
+        rect, flags = item
+        draw_platform(screen, grass_img, rect)
     for t1 in tree1:
         draw_platform(screen, tree1_img, t1)
     for t2 in tree2:
@@ -408,6 +465,8 @@ while running:
     for fh in fenceHBox:
         draw_platform(screen, fencef_img, fh)
     for e in enemies: e.draw(screen, 0)
+    for img, pos in grassoverlay:
+        screen.blit(img, pos)
 
     # -----------------------------
     # UI / DEBUG
