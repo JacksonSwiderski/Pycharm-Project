@@ -53,6 +53,8 @@ Ground3_img = pygame.image.load("Ground3.png")
 Ground3_img = pygame.transform.scale(Ground3_img, (111, 65))
 grassoverlay_img = pygame.image.load("GrassOverlay.png")
 grassoverlay_img = pygame.transform.scale(grassoverlay_img, (45, 20))
+waterimg = pygame.image.load("TiledWater.png")
+waterimg = pygame.transform.scale(waterimg, (32, 65))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -141,7 +143,7 @@ class Player:
     def apply_gravity(self):
         self.vel_y = min(15, self.vel_y + GRAVITY)
 
-    def move_and_collide(self, platforms, fenceHBox):
+    def move_and_collide(self, platforms, fenceHBox, underground):
         self.rect.x += self.vel_x
 
         # horizontal collision (platforms)
@@ -162,6 +164,14 @@ class Player:
                 elif self.vel_x < 0:
                     self.rect.left = rect.right
 
+        # horizontal collision (underground design)
+        for fh in fenceHBox:
+            rect = fh[0] if isinstance(fh, tuple) else fh
+            if self.rect.colliderect(rect):
+                if self.vel_x > 0:
+                    self.rect.right = rect.left
+                elif self.vel_x < 0:
+                    self.rect.left = rect.right
         was_in_air = not self.on_ground
         self.rect.y += self.vel_y
         self.on_ground = False
@@ -200,6 +210,22 @@ class Player:
                         landing.play()
                         was_in_air = False
 
+        # vertical collision (underground design)
+        for u in underground:
+            rect = u[0] if isinstance(u, tuple) else u
+
+            if self.rect.colliderect(rect):
+                if self.vel_y > 0:
+                    self.rect.bottom = rect.top
+                    self.vel_y = 0
+                    self.on_ground = True
+                elif self.vel_y < 0:
+                    self.rect.top = rect.bottom
+                    self.vel_y = 0
+
+                    if was_in_air:
+                        landing.play()
+                        was_in_air = False
         self.air_timer = 0 if self.on_ground else self.air_timer + 1
 
     def update_animation(self, dt):
@@ -340,16 +366,39 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.Rect(1023, 376, 32, 16),
             pygame.Rect(1036, 276, 28, 29),
             pygame.Rect(1047, 325, 12, 23),
+            pygame.Rect(1595, 389, 24, 33),
+            pygame.Rect(1645, 395, 49, 24),
+            pygame.Rect(1658, 379, 32, 28),
+            pygame.Rect(1669, 360, 13, 27),
+            pygame.Rect(1855, 312, 51, 113),
+            pygame.Rect(1892, 390, 37, 36),
+            pygame.Rect(1896, 306, 16, 25),
+            pygame.Rect(1823, 383, 42, 46),
+            pygame.Rect(1838, 360, 26, 27),
+            pygame.Rect(1847, 346, 19, 25),
+            pygame.Rect(1852, 305, 9, 18),
+            pygame.Rect(1894, 377, 21, 25),
+            pygame.Rect(1922, 404, 28, 19),
         ]
         underground = [
             pygame.Rect(455 - 18, 438, 236 + 30, 181),
             pygame.Rect(741 - 7, 438, 70 + 15, 239),
+            pygame.Rect(446, 416, 34, 41),
+            pygame.Rect(472, 426, 33, 34),
+            pygame.Rect(646, 436, 52, 27),
+            pygame.Rect(668, 418, 38, 29),
+            pygame.Rect(441, 401, 24, 23),
+            pygame.Rect(682, 405, 24, 25),
+            pygame.Rect(730, 424, 28, 25),
+            pygame.Rect(785, 430, 44, 20),
+            pygame.Rect(799, 410, 33, 26),
+
         ]
         platforms = [
             (pygame.Rect(0, 308, 135, 300), {}),
             (pygame.Rect(135, 345, 53, 260), {}),
             (pygame.Rect(187, 375, 269, 230), {}),
-            (pygame.Rect(544, 348, 145, 32), {}),
+            (pygame.Rect(544-5, 348, 120, 32), {}),
             (pygame.Rect(689, 364, 53, 240), {}),
             (pygame.Rect(171, 258, 45, 17), {}),
             (pygame.Rect(200, 268, 86, 28), {}),
@@ -376,6 +425,23 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
             # EXCLUDED FROM GRASS OVERLAY
             (pygame.Rect(1321, 245, 86, 32), {"grass": False}),
+            (pygame.Rect(1615, 146, 83, 28), {"grass": False}),
+
+            ( pygame.Rect(1675, 311, 72, 293), {}),
+            (pygame.Rect(1746, 345, 36, 304), {}),
+            (pygame.Rect(1782, 378, 53, 234), {}),
+            (pygame.Rect(1850, 284, 66, 29), {}),
+            (pygame.Rect(1944, 239, 57, 393), {}),
+            (pygame.Rect(1835, 411, 112, 219), {}),
+            (pygame.Rect(1454, 196, 71, 25), {}),
+            (pygame.Rect(1347, 407, 342, 239), {}),
+            (pygame.Rect(1549, 374, 54, 34), {}),
+        ]
+
+        water = [
+            pygame.Rect(454, 380, 234, 65),
+            pygame.Rect(726, 407, 90, 40),
+            pygame.Rect(1832, 383, 115, 37),
         ]
 
         fences = [
@@ -401,6 +467,8 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
             pygame.Rect(1134 + 5, 296, 80 - 24, 6),
             pygame.Rect(1317, 245, 94, 15),
+
+            pygame.Rect(1615-4, 146, 83+8, 28-12)
         ]
 
         tree1 = [
@@ -512,10 +580,10 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             40,
             1
         )
-
+        # 544-5, 348, 120
         bushes += generate_random_positions(
             545,
-            686 - 40,
+            539+120 - 40,
             326,
             326,
             40,
@@ -570,7 +638,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         keys = pygame.key.get_pressed()
         player.handle_input(keys)
         player.apply_gravity()
-        player.move_and_collide(platforms, fenceHBox)
+        player.move_and_collide(platforms, fenceHBox, underground)
         player.update_animation(dt)
 
         # bounds
@@ -590,12 +658,12 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         # Draw Sequence
         screen.blit(bg_img, (0, 0))
         update_and_draw_clouds(screen, dt)
+        for w in water:
+            draw_platform(screen, waterimg, w, camera_x)
         for br in background_rects:
             draw_platform(screen, bg_tile_img, br, camera_x)
         for u in underground:
             draw_platform(screen, Ground3_img, u, camera_x)
-        for p in platforms:
-            draw_platform(screen, grass_img, p, camera_x)
         for p in platforms:
             draw_platform(screen, grass_img, p, camera_x)
         for t1 in tree1:
