@@ -25,7 +25,8 @@ landing.set_volume(0.8)
 
 p1 = 45
 p2 = 35
-
+f1 = 32
+f2 = 32
 # Load Image Assets
 bg_img = pygame.image.load("backgroundImage.png")
 bg_img = pygame.transform.scale(bg_img, (2000, 600))
@@ -55,6 +56,16 @@ grassoverlay_img = pygame.image.load("GrassOverlay.png")
 grassoverlay_img = pygame.transform.scale(grassoverlay_img, (45, 20))
 waterimg = pygame.image.load("TiledWater.png")
 waterimg = pygame.transform.scale(waterimg, (32, 65))
+flower1img = pygame.image.load("Flower1.png")
+flower1img = pygame.transform.scale(flower1img, (f1, f2))
+flower2img = pygame.image.load("Flower2.png")
+flower2img = pygame.transform.scale(flower2img, (f1, f2))
+flower3img = pygame.image.load("Flower3.png")
+flower3img = pygame.transform.scale(flower3img, (f1, f2))
+flower4img = pygame.image.load("Flower4.png")
+flower4img = pygame.transform.scale(flower4img, (f1, f2))
+flower5img = pygame.image.load("Flower5.png")
+flower5img = pygame.transform.scale(flower5img, (f1, f2))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -72,6 +83,14 @@ bush_images = [
     bush1img,
     bush2img,
     bush3img,
+]
+
+flower_images = [
+    flower1img,
+    flower2img,
+    flower3img,
+    flower4img,
+    flower5img,
 ]
 
 bush = []
@@ -392,13 +411,13 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.Rect(730, 424, 28, 25),
             pygame.Rect(785, 430, 44, 20),
             pygame.Rect(799, 410, 33, 26),
-
+            pygame.Rect(1835, 405, 112, 205)
         ]
         platforms = [
             (pygame.Rect(0, 308, 135, 300), {}),
             (pygame.Rect(135, 345, 53, 260), {}),
             (pygame.Rect(187, 375, 269, 230), {}),
-            (pygame.Rect(544-5, 348, 120, 32), {}),
+            (pygame.Rect(544 - 5, 348, 120, 32), {}),
             (pygame.Rect(689, 364, 53, 240), {}),
             (pygame.Rect(171, 258, 45, 17), {}),
             (pygame.Rect(200, 268, 86, 28), {}),
@@ -427,12 +446,11 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             (pygame.Rect(1321, 245, 86, 32), {"grass": False}),
             (pygame.Rect(1615, 146, 83, 28), {"grass": False}),
 
-            ( pygame.Rect(1675, 311, 72, 293), {}),
+            (pygame.Rect(1675, 311, 72, 293), {}),
             (pygame.Rect(1746, 345, 36, 304), {}),
             (pygame.Rect(1782, 378, 53, 234), {}),
             (pygame.Rect(1850, 284, 66, 29), {}),
             (pygame.Rect(1944, 239, 57, 393), {}),
-            (pygame.Rect(1835, 411, 112, 219), {}),
             (pygame.Rect(1454, 196, 71, 25), {}),
             (pygame.Rect(1347, 407, 342, 239), {}),
             (pygame.Rect(1549, 374, 54, 34), {}),
@@ -442,6 +460,8 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.Rect(454, 380, 234, 65),
             pygame.Rect(726, 407, 90, 40),
             pygame.Rect(1832, 383, 115, 37),
+            pygame.Rect(1913, 372, 40, 21),
+            pygame.Rect(1836, 379, 16, 12),
         ]
 
         fences = [
@@ -468,7 +488,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.Rect(1134 + 5, 296, 80 - 24, 6),
             pygame.Rect(1317, 245, 94, 15),
 
-            pygame.Rect(1615-4, 146, 83+8, 28-12)
+            pygame.Rect(1615 - 4, 146, 83 + 8, 28 - 12)
         ]
 
         tree1 = [
@@ -549,6 +569,29 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
             return generated_bushes
 
+        def generate_random_flower_positions(min_x, max_x, min_y, max_y, min_distance, amount):
+            generated_flowers = []
+
+            used_x_positions = []
+
+            for _ in range(amount):
+                x = random.randint(min_x, max_x)
+                y = random.randint(min_y, max_y)
+
+                while any(abs(x - used_x) <= min_distance for used_x in used_x_positions):
+                    x = random.randint(min_x, max_x)
+
+                used_x_positions.append(x)
+
+                generated_flowers.append({
+                    "rect": pygame.Rect(x, y, 40, 21),
+                    "img": random.choice(flower_images)
+                })
+
+            return generated_flowers
+
+        flowers = []
+
         bushes = []
 
         # platform 1 bushes
@@ -608,6 +651,159 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             1
         )
 
+        bushes += generate_random_positions(
+            1040,
+            1040 + 208 - 40,
+            405 + 31 - 21,
+            405 + 31 - 21,
+            40,
+            2
+        )
+
+        bushes += generate_random_positions(
+            1164,
+            1164+135 - 40,
+            162 + 18 - 21,
+            162 + 18 - 21,
+            40,
+            1
+        )
+
+        bushes += generate_random_positions(
+            1359,
+            1359 + 192 - 40,
+            371 + 36 - 21,
+            371 + 36 - 21,
+            40,
+            2
+        )
+
+        bushes += generate_random_positions(
+            1845,
+            1845 + 74 - 40,
+            261 + 25 - 21,
+            261 + 25 - 21,
+            40,
+            1
+        )
+
+        flowers += generate_random_flower_positions(
+            1282,
+            1282 + 73 - 40,
+            365 + 18 - 21,
+            365 + 18 - 21,
+            40,
+            1
+        )
+
+        flowers += generate_random_flower_positions(
+            1040,
+            1040 + 98 - 40,
+            213 + 22 - 21,
+            213 + 22 - 21,
+            40,
+            1
+        )
+
+        flowers += generate_random_flower_positions(
+            1118,
+            1118 + 43 - 40,
+            248 + 16 - 21,
+            248 + 16 - 21,
+            40,
+            1
+        )
+
+        flowers += generate_random_flower_positions(
+            1451,
+            1451 + 74 - 40,
+            175 + 22 - 21,
+            175 + 22 - 21,
+            40,
+            1
+        )
+
+        flowers += generate_random_flower_positions(
+            1607,
+            1607 + 2 - 40,
+            386 + 2 - 21,
+            386 + 2 - 21,
+            40,
+            1
+        )
+
+        flowers += generate_random_flower_positions(
+            1607,
+            1607 + 67 - 40,
+            386 + 22 - 21,
+            386 + 22 - 21,
+            40,
+            1
+        )
+
+        flowers += generate_random_flower_positions(
+            1675,
+            1675 + 74 - 40,
+            286 + 26 - 21,
+            286 + 26 - 21,
+            40,
+            1
+        )
+
+        flowers += generate_random_flower_positions(
+            811,
+            811 + 56 - 40,
+            373 + 25 - 21,
+            373 + 25 - 21,
+            40,
+            1
+        )
+
+        flowers += generate_random_flower_positions(
+            689,
+            689 + 59 - 40,
+            342 + 24 - 21,
+            342 + 24 - 21,
+            40,
+            1
+        )
+
+        flowers += generate_random_flower_positions(
+            741,
+            741 + 55 - 40,
+            223 + 22 - 21,
+            223 + 22 - 21,
+            40,
+            1
+        )
+
+        flowers += generate_random_flower_positions(
+            882,
+            882 + 26 - 40,
+            213 + 16 - 21,
+            213 + 16 - 21,
+            40,
+            1
+        )
+
+        flowers += generate_random_flower_positions(
+            134,
+            134 + 58 - 40,
+            327 + 23 - 21,
+            327 + 23 - 21,
+            40,
+            1
+        )
+
+        flowers += generate_random_flower_positions(
+            46,
+            46 + 86 - 40,
+            284 + 25 - 21,
+            284 + 25 - 21,
+            40,
+            1
+        )
+
         spawnpoints = [pygame.Rect(15, 286+2, 10, 3)]
         enemies = [
             Enemy(525, 182, 80, slime, 'slime_1', enemy_frames),
@@ -658,10 +854,10 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         # Draw Sequence
         screen.blit(bg_img, (0, 0))
         update_and_draw_clouds(screen, dt)
-        for w in water:
-            draw_platform(screen, waterimg, w, camera_x)
         for br in background_rects:
             draw_platform(screen, bg_tile_img, br, camera_x)
+        for w in water:
+            draw_platform(screen, waterimg, w, camera_x)
         for u in underground:
             draw_platform(screen, Ground3_img, u, camera_x)
         for p in platforms:
