@@ -52,6 +52,8 @@ enemy_frames = [pygame.transform.scale(pygame.image.load(f"RedEnemy{i}.png").con
                     range(1, 5)]
 grassoverlay_img = pygame.image.load("GrassOverlay.png")
 grassoverlay_img = pygame.transform.scale(grassoverlay_img, (45, 20))
+waterimg = pygame.image.load("TiledWater.png")
+waterimg = pygame.transform.scale(waterimg, (32, 32))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -121,16 +123,39 @@ def load_level(level):
             pygame.Rect(1023, 376, 32, 16),
             pygame.Rect(1036, 276, 28, 29),
             pygame.Rect(1047, 325, 12, 23),
+            pygame.Rect(1595, 389, 24, 33),
+            pygame.Rect(1645, 395, 49, 24),
+            pygame.Rect(1658, 379, 32, 28),
+            pygame.Rect(1669, 360, 13, 27),
+            pygame.Rect(1855, 312, 51, 113),
+            pygame.Rect(1892, 390, 37, 36),
+            pygame.Rect(1896, 306, 16, 25),
+            pygame.Rect(1823, 383, 42, 46),
+            pygame.Rect(1838, 360, 26, 27),
+            pygame.Rect(1847, 346, 19, 25),
+            pygame.Rect(1852, 305, 9, 18),
+            pygame.Rect(1894, 377, 21, 25),
+            pygame.Rect(1922, 404, 28, 19),
         ]
         underground = [
-            pygame.Rect(455-18, 438, 236+30, 181),
-            pygame.Rect(741-7, 438, 70+15, 239),
+            pygame.Rect(455 - 18, 438, 236 + 30, 181),
+            pygame.Rect(741 - 7, 438, 70 + 15, 239),
+            pygame.Rect(446, 416, 34, 41),
+            pygame.Rect(472, 426, 33, 34),
+            pygame.Rect(646, 436, 52, 27),
+            pygame.Rect(668, 418, 38, 29),
+            pygame.Rect(441, 401, 24, 23),
+            pygame.Rect(682, 405, 24, 25),
+            pygame.Rect(730, 424, 28, 25),
+            pygame.Rect(785, 430, 44, 20),
+            pygame.Rect(799, 410, 33, 26),
+
         ]
         platforms = [
             (pygame.Rect(0, 308, 135, 300), {}),
             (pygame.Rect(135, 345, 53, 260), {}),
             (pygame.Rect(187, 375, 269, 230), {}),
-            (pygame.Rect(544, 348, 145, 32), {}),
+            (pygame.Rect(544 - 5, 348, 120, 32), {}),
             (pygame.Rect(689, 364, 53, 240), {}),
             (pygame.Rect(171, 258, 45, 17), {}),
             (pygame.Rect(200, 268, 86, 28), {}),
@@ -146,7 +171,7 @@ def load_level(level):
             # past half
             (pygame.Rect(999, 417, 34, 243), {}),
             (pygame.Rect(1000, 435, 262, 250), {}),
-            (pygame.Rect(1247+4, 410, 36, 237), {}),
+            (pygame.Rect(1247 + 4, 410, 36, 237), {}),
             (pygame.Rect(1284, 380, 69, 242), {}),
             (pygame.Rect(1016, 292, 28, 17), {}),
             (pygame.Rect(1043, 259, 28, 13), {}),
@@ -157,6 +182,23 @@ def load_level(level):
 
             # EXCLUDED FROM GRASS OVERLAY
             (pygame.Rect(1321, 245, 86, 32), {"grass": False}),
+            (pygame.Rect(1615, 146, 83, 28), {"grass": False}),
+
+            (pygame.Rect(1675, 311, 72, 293), {}),
+            (pygame.Rect(1746, 345, 36, 304), {}),
+            (pygame.Rect(1782, 378, 53, 234), {}),
+            (pygame.Rect(1850, 284, 66, 29), {}),
+            (pygame.Rect(1944, 239, 57, 393), {}),
+            (pygame.Rect(1835, 411, 112, 219), {}),
+            (pygame.Rect(1454, 196, 71, 25), {}),
+            (pygame.Rect(1347, 407, 342, 239), {}),
+            (pygame.Rect(1549, 374, 54, 34), {}),
+        ]
+
+        water = [
+            pygame.Rect(454, 380, 234, 65),
+            pygame.Rect(726, 407, 90, 40),
+            pygame.Rect(1832, 383, 115, 37),
         ]
 
         fences = [
@@ -170,8 +212,8 @@ def load_level(level):
             pygame.Rect(408, 258 - 26, 45, 17),
             pygame.Rect(408 + 32, 258 - 26, 45, 17),
 
-            pygame.Rect(1138, 275-7, 38, 21),
-            pygame.Rect(1138+25, 275 - 7, 38, 21),
+            pygame.Rect(1138, 275 - 7, 38, 21),
+            pygame.Rect(1138 + 25, 275 - 7, 38, 21),
         ]
         fenceHBox = [
             pygame.Rect(285, 287, 66, 6),
@@ -180,8 +222,10 @@ def load_level(level):
             pygame.Rect(797, 267, 57, 6),
             pygame.Rect(878, 307 - 3, 72 - 8, 7),
 
-            pygame.Rect(1134+5, 296, 80-24, 6),
+            pygame.Rect(1134 + 5, 296, 80 - 24, 6),
             pygame.Rect(1317, 245, 94, 15),
+
+            pygame.Rect(1615 - 4, 146, 83 + 8, 28 - 12)
         ]
 
         tree1 = [
@@ -362,12 +406,13 @@ def load_level(level):
         fenceHBox,
         enemies,
         underground,
-        grassoverlay
+        grassoverlay,
+        water
     ) # fences
 
 
 LEVEL = 0
-platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, enemies, underground, grassoverlay = load_level(LEVEL) #fences
+platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, enemies, underground, grassoverlay, water = load_level(LEVEL) #fences
 
 
 # -----------------------------
@@ -447,6 +492,8 @@ while running:
         draw_platform(screen, bg_tile_img, br)
     for u in underground:
         draw_platform(screen, Ground3_img, u)
+    for w in water:
+        draw_platform(screen, waterimg, w)
     for item in platforms:
         rect, flags = item
         draw_platform(screen, grass_img, rect)
