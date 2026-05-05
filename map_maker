@@ -486,15 +486,6 @@ def load_level(level):
 
         flowers += generate_random_flower_positions(
             1607,
-            1607 + 2 - 40,
-            386 + 2 - 21,
-            386 + 2 - 21,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            1607,
             1607 + 67 - 40,
             386 + 22 - 21,
             386 + 22 - 21,
@@ -534,15 +525,6 @@ def load_level(level):
             741 + 55 - 40,
             223 + 22 - 21,
             223 + 22 - 21,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            882,
-            882 + 26 - 40,
-            213 + 16 - 21,
-            213 + 16 - 21,
             40,
             1
         )
