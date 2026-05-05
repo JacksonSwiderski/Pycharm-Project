@@ -7,7 +7,6 @@ pygame.mixer.init()
 
 coin_font = pygame.font.Font(None, 28)
 
-coins = []
 coin_count = 0
 coins_generated = False
 
@@ -28,8 +27,10 @@ MOVE_SPEED = 5
 # Sounds (Your Version)
 jump = pygame.mixer.Sound('jump.wav')
 landing = pygame.mixer.Sound('landing.wav')
+coin_get = pygame.mixer.Sound("coin_get.wav")
 jump.set_volume(0.8)
 landing.set_volume(0.8)
+coin_get.set_volume(0.8)
 
 p1 = 45
 p2 = 35
@@ -76,6 +77,10 @@ flower5img = pygame.image.load("Flower5.png")
 flower5img = pygame.transform.scale(flower5img, (f1, f2))
 coin_img = pygame.image.load("GoldCoin.png")
 coin_img = pygame.transform.scale(coin_img, (18, 20))
+rock_pile = pygame.image.load("RockPile.png")
+rock_pile = pygame.transform.scale(rock_pile, (150, 20))
+door_img = pygame.image.load('boss_door.png')
+door_img = pygame.transform.scale(door_img, (50, 50))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -101,6 +106,24 @@ flower_images = [
     flower3img,
     flower4img,
     flower5img,
+]
+
+coins = [
+    # Manual coins (always spawn here)
+    {"rect": pygame.Rect(1797, 70, 20, 20), "img": coin_img, "base_y": 70, "offset": 0},
+    {"rect": pygame.Rect(1834, 102, 20, 20), "img": coin_img, "base_y": 102, "offset": 1},
+    {"rect": pygame.Rect(1853, 159, 20, 20), "img": coin_img, "base_y": 159, "offset": 2},
+    {"rect": pygame.Rect(1688, 110, 20, 20), "img": coin_img, "base_y": 110, "offset": 3},
+    {"rect": pygame.Rect(1719, 77, 20, 20), "img": coin_img, "base_y": 77, "offset": 4},
+    {"rect": pygame.Rect(1765, 59, 20, 20), "img": coin_img, "base_y": 59, "offset": 5},
+    {"rect": pygame.Rect(1865, 206, 20, 20), "img": coin_img, "base_y": 206, "offset": 6},
+
+    {"rect": pygame.Rect(473, 405, 20, 20), "img": coin_img, "base_y": 405, "offset": 0},
+    {"rect": pygame.Rect(508, 411, 20, 20), "img": coin_img, "base_y": 411, "offset": 0},
+    {"rect": pygame.Rect(545, 417, 20, 20), "img": coin_img, "base_y": 417, "offset": 0},
+    {"rect": pygame.Rect(591, 412, 20, 20), "img": coin_img, "base_y": 412, "offset": 0},
+    {"rect": pygame.Rect(625, 414, 20, 20), "img": coin_img, "base_y": 414, "offset": 0},
+    {"rect": pygame.Rect(659, 400, 20, 20), "img": coin_img, "base_y": 400, "offset": 0},
 ]
 
 bush = []
@@ -161,7 +184,7 @@ def generate_coins_on_platforms(platforms, amount):
         # check spacing
         too_close = False
         for c in coins:
-            if abs(c["rect"].x - x) < 75:
+            if abs(c["rect"].x - x) < 55:
                 too_close = True
                 break
 
@@ -442,7 +465,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.Rect(446, 416, 34, 41),
             pygame.Rect(472, 426, 33, 34),
             pygame.Rect(646, 436, 52, 27),
-            pygame.Rect(668, 418, 38, 29),
+            pygame.Rect(668, 418, 38, 25),
             pygame.Rect(441, 401, 24, 23),
             pygame.Rect(682, 405, 24, 25),
             pygame.Rect(730, 424, 28, 25),
@@ -490,7 +513,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             (pygame.Rect(1944, 239, 57, 393), {}),
             (pygame.Rect(1454, 196, 71, 25), {}),
             (pygame.Rect(1347, 407, 342, 239), {}),
-            (pygame.Rect(1549, 374, 54, 34), {}),
+            (pygame.Rect(1549, 374+6, 54, 28), {}),
         ]
 
         water = [
@@ -537,9 +560,24 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         tree3 = [
             pygame.Rect(866, 59 - 3, 103, 96 + 3),
         ]
+        rockpile = [
+            pygame.Rect(499 - 27, 424+5, 158, 11),
+            pygame.Rect(499 + 47, 424+5, 158, 11),
+        ]
+        boss_door = [
+            pygame.Rect(1950, 195, 50, 50)
+        ]
 
         if not coins_generated:
-            coins = generate_coins_on_platforms(platforms, 40)
+            # keep your manually placed coins
+            manual_coins = coins.copy()
+
+            # generate random coins too
+            random_coins = generate_coins_on_platforms(platforms, 40)
+
+            # combine both
+            coins = manual_coins + random_coins
+
             coins_generated = True
 
         def grassoverlayrepeat(x, y, platform_width, img):
@@ -830,7 +868,11 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         spawnpoints = [pygame.Rect(15, 286+2, 10, 3)]
         enemies = [
             Enemy(525, 182, 80, slime, 'slime_1', enemy_frames),
-            Enemy(220, 235, 35, slime, 'slime_2', enemy_frames)
+            Enemy(220, 235, 35, slime, 'slime_2', enemy_frames),
+
+            Enemy(1056+20, 375+25, 100, slime, 'slime_3', enemy_frames),
+            Enemy(1172+12, 140+5, 85, slime, 'slime_4', enemy_frames),
+            Enemy(1375+13, 365+7, 120, slime, 'slime_5', enemy_frames),
         ]
     elif level == 1:
         background_rects, spawnpoints = [], []
@@ -863,6 +905,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             if player.rect.colliderect(coin["rect"]):
                 coins.remove(coin)
                 coin_count += 1
+                coin_get.play()
         player.update_animation(dt)
 
         # bounds
@@ -880,10 +923,14 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         # Draw Sequence
         screen.blit(bg_img, (0, 0))
         update_and_draw_clouds(screen, dt)
+        for d in boss_door:
+            draw_platform(screen, door_img, d, camera_x)
         for br in background_rects:
             draw_platform(screen, bg_tile_img, br, camera_x)
         for w in water:
             draw_platform(screen, waterimg, w, camera_x)
+        for r in rockpile: #rockpile
+            draw_platform(screen, rock_pile, r, camera_x)
         for u in underground:
             draw_platform(screen, Ground3_img, u, camera_x)
         for p in platforms:
@@ -894,6 +941,8 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             draw_platform(screen, tree2_img, t2, camera_x)
         for t3 in tree3:
             draw_platform(screen, tree3_img, t3, camera_x)
+        for r in rockpile: #rockpile
+            draw_platform(screen, rock_pile, r, camera_x)
         for s in spawnpoints:
             screen.blit(spawn_img, (s.x - camera_x, s.y))
         player.draw(screen, camera_x)
@@ -924,9 +973,43 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
                 screen.blit(ui_font.render(line, True, WHITE), (10, 10 + i * 18))
 
         if show_hitboxes:
-            pygame.draw.rect(screen, (255, 255, 0), (player.rect.x - camera_x, player.rect.y, 22, 30), 1)
-            for e in enemies: pygame.draw.rect(screen, (0, 255, 0), (e.rect.x - camera_x, e.rect.y, 22, 30), 1)
-            for p in platforms: pygame.draw.rect(screen, (0, 0, 255), (p.x - camera_x, p.y, p.width, p.height), 1)
+            pygame.draw.rect(screen, (255, 255, 0),
+                             (player.rect.x - camera_x, player.rect.y, 22, 30), 1)
+
+            for e in enemies:
+                pygame.draw.rect(screen, (0, 255, 0),
+                                 (e.rect.x - camera_x, e.rect.y, 22, 30), 1)
+
+            for p in platforms:
+                rect = p[0] if isinstance(p, tuple) else p
+                pygame.draw.rect(screen, (0, 0, 255),
+                                 (rect.x - camera_x, rect.y, rect.width, rect.height), 1)
+
+            # COIN HITBOXES
+            for coin in coins:
+                pygame.draw.rect(screen, (255, 165, 0),
+                                 (coin["rect"].x - camera_x,
+                                  coin["rect"].y,
+                                  coin["rect"].width,
+                                  coin["rect"].height), 1)
+            for u in underground:
+                rect = u[0] if isinstance(u, tuple) else u
+                pygame.draw.rect(
+                    screen,
+                    (0, 0, 255),
+                    (rect.x - camera_x, rect.y, rect.width, rect.height),
+                    1
+                )
+
+            for fh in fenceHBox:
+                rect = fh[0] if isinstance(fh, tuple) else fh
+                pygame.draw.rect(
+                    screen,
+                    (0, 0, 255),  # purple so it's easy to see
+                    (rect.x - camera_x, rect.y, rect.width, rect.height),
+                    1
+                )
+
         # ===== COIN UI (MUST BE LAST) =====
         screen_width = screen.get_width()
 
