@@ -66,6 +66,8 @@ flower4img = pygame.image.load("Flower4.png")
 flower4img = pygame.transform.scale(flower4img, (f1, f2))
 flower5img = pygame.image.load("Flower5.png")
 flower5img = pygame.transform.scale(flower5img, (f1, f2))
+rock_pile = pygame.image.load("RockPile.png")
+rock_pile = pygame.transform.scale(rock_pile, (150, 15))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -257,6 +259,11 @@ def load_level(level):
         ]
         tree3 = [
             pygame.Rect(866, 59 - 3, 103, 96 + 3),
+        ]
+
+        rockpile = [
+            pygame.Rect(499-50, 424, 158, 11),
+            pygame.Rect(499+50, 424, 158, 11),
         ]
 
         def grassoverlayrepeat(x, y, platform_width, img):
@@ -583,12 +590,13 @@ def load_level(level):
         enemies,
         underground,
         grassoverlay,
-        water
+        water,
+        rockpile
     ) # fences
 
 
 LEVEL = 0
-platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, enemies, underground, grassoverlay, water = load_level(LEVEL) #fences
+platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, enemies, underground, grassoverlay, water, rockpile = load_level(LEVEL) #fences
 
 
 # -----------------------------
@@ -679,6 +687,8 @@ while running:
         draw_platform(screen, tree2_img, t2)
     for t3 in tree3:
         draw_platform(screen, tree3_img, t3)
+    for r in rockpile:  # rockpile
+        draw_platform(screen, rock_pile, r)
     for s in spawnpoints:
         screen.blit(spawn_img, (s.x, s.y))
     for f in fences:
