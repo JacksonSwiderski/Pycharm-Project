@@ -1,7 +1,15 @@
-import pygame, random
+import pygame, random, math
 from enemy_data import slime
 
+pygame.init()
+pygame.font.init()
 pygame.mixer.init()
+
+coin_font = pygame.font.Font(None, 28)
+
+coins = []
+coin_count = 0
+coins_generated = False
 
 # Shared Colors & Settings
 WHITE = (255, 255, 255)
@@ -25,8 +33,8 @@ landing.set_volume(0.8)
 
 p1 = 45
 p2 = 35
-f1 = 32
-f2 = 32
+f1 = 22
+f2 = 26
 # Load Image Assets
 bg_img = pygame.image.load("backgroundImage.png")
 bg_img = pygame.transform.scale(bg_img, (2000, 600))
@@ -66,6 +74,8 @@ flower4img = pygame.image.load("Flower4.png")
 flower4img = pygame.transform.scale(flower4img, (f1, f2))
 flower5img = pygame.image.load("Flower5.png")
 flower5img = pygame.transform.scale(flower5img, (f1, f2))
+coin_img = pygame.image.load("GoldCoin.png")
+coin_img = pygame.transform.scale(coin_img, (18, 20))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -132,6 +142,40 @@ def draw_platform(screen, image, rect, camera_x=0):
 
     screen.blit(platform_surf, (rect.x - camera_x, rect.y))
 
+def generate_coins_on_platforms(platforms, amount):
+    coins = []
+    valid_platforms = [p[0] if isinstance(p, tuple) else p for p in platforms]
+
+    attempts = 0
+
+    while len(coins) < amount and attempts < amount * 20:
+        attempts += 1
+
+        plat = random.choice(valid_platforms)
+
+        x = random.randint(plat.x, plat.x + plat.width - 20)
+        y = plat.y - 30
+
+        new_pos = pygame.Rect(x, y, 20, 20)
+
+        # check spacing
+        too_close = False
+        for c in coins:
+            if abs(c["rect"].x - x) < 75:
+                too_close = True
+                break
+
+        if too_close:
+            continue
+
+        coins.append({
+            "rect": new_pos,
+            "img": coin_img,
+            "base_y": y,
+            "offset": random.uniform(0, 6.28)
+        })
+
+    return coins
 
 class Player:
     def __init__(self, x, y, chosenCharacter=None):
@@ -145,7 +189,6 @@ class Player:
         self.air_timer = 0
         self.spawn_x = 15
         self.spawn_y = 250
-
 
     def handle_input(self, keys):
         self.vel_x = 0
@@ -183,14 +226,6 @@ class Player:
                 elif self.vel_x < 0:
                     self.rect.left = rect.right
 
-        # horizontal collision (underground design)
-        for fh in fenceHBox:
-            rect = fh[0] if isinstance(fh, tuple) else fh
-            if self.rect.colliderect(rect):
-                if self.vel_x > 0:
-                    self.rect.right = rect.left
-                elif self.vel_x < 0:
-                    self.rect.left = rect.right
         was_in_air = not self.on_ground
         self.rect.y += self.vel_y
         self.on_ground = False
@@ -245,6 +280,7 @@ class Player:
                     if was_in_air:
                         landing.play()
                         was_in_air = False
+
         self.air_timer = 0 if self.on_ground else self.air_timer + 1
 
     def update_animation(self, dt):
@@ -333,7 +369,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
     SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_width(), screen.get_height()
     ui_font = pygame.font.Font(None, 22)
     dev_mode, show_controls = False, True
-
+    global coins, coin_count, coins_generated
 
     # Assets
     SCALE = 2
@@ -399,6 +435,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.Rect(1894, 377, 21, 25),
             pygame.Rect(1922, 404, 28, 19),
         ]
+
         underground = [
             pygame.Rect(455 - 18, 438, 236 + 30, 181),
             pygame.Rect(741 - 7, 438, 70 + 15, 239),
@@ -500,6 +537,10 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         tree3 = [
             pygame.Rect(866, 59 - 3, 103, 96 + 3),
         ]
+
+        if not coins_generated:
+            coins = generate_coins_on_platforms(platforms, 40)
+            coins_generated = True
 
         def grassoverlayrepeat(x, y, platform_width, img):
             overlays = []
@@ -689,117 +730,99 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
         flowers += generate_random_flower_positions(
             1282,
-            1282 + 73 - 40,
-            365 + 18 - 21,
-            365 + 18 - 21,
+            1282 + 73 - 23,
+            365 + 18 - 28,
+            365 + 18 - 28,
             40,
             1
         )
 
         flowers += generate_random_flower_positions(
             1040,
-            1040 + 98 - 40,
-            213 + 22 - 21,
-            213 + 22 - 21,
+            1040 + 98 - 23,
+            213 + 22 - 28,
+            213 + 22 - 28,
             40,
             1
         )
 
         flowers += generate_random_flower_positions(
             1118,
-            1118 + 43 - 40,
-            248 + 16 - 21,
-            248 + 16 - 21,
+            1118 + 43 - 23,
+            248 + 16 - 28,
+            248 + 16 - 28,
             40,
             1
         )
 
         flowers += generate_random_flower_positions(
             1451,
-            1451 + 74 - 40,
-            175 + 22 - 21,
-            175 + 22 - 21,
+            1451 + 74 - 23,
+            175 + 22 - 28,
+            175 + 22 - 28,
             40,
             1
         )
 
         flowers += generate_random_flower_positions(
             1607,
-            1607 + 2 - 40,
-            386 + 2 - 21,
-            386 + 2 - 21,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            1607,
-            1607 + 67 - 40,
-            386 + 22 - 21,
-            386 + 22 - 21,
+            1607 + 67 - 23,
+            386 + 22 - 28,
+            386 + 22 - 28,
             40,
             1
         )
 
         flowers += generate_random_flower_positions(
             1675,
-            1675 + 74 - 40,
-            286 + 26 - 21,
-            286 + 26 - 21,
+            1675 + 74 - 23,
+            286 + 26 - 28,
+            286 + 26 - 28,
             40,
             1
         )
 
         flowers += generate_random_flower_positions(
             811,
-            811 + 56 - 40,
-            373 + 25 - 21,
-            373 + 25 - 21,
+            811 + 56 - 23,
+            373 + 25 - 28,
+            373 + 25 - 28,
             40,
             1
         )
 
         flowers += generate_random_flower_positions(
             689,
-            689 + 59 - 40,
-            342 + 24 - 21,
-            342 + 24 - 21,
+            689 + 59 - 23,
+            342 + 24 - 28,
+            342 + 24 - 28,
             40,
             1
         )
 
         flowers += generate_random_flower_positions(
             741,
-            741 + 55 - 40,
-            223 + 22 - 21,
-            223 + 22 - 21,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            882,
-            882 + 26 - 40,
-            213 + 16 - 21,
-            213 + 16 - 21,
+            741 + 55 - 23,
+            223 + 22 - 28,
+            223 + 22 - 28,
             40,
             1
         )
 
         flowers += generate_random_flower_positions(
             134,
-            134 + 58 - 40,
-            327 + 23 - 21,
-            327 + 23 - 21,
+            134 + 58 - 23,
+            327 + 23 - 28,
+            327 + 23 - 28,
             40,
             1
         )
 
         flowers += generate_random_flower_positions(
             46,
-            46 + 86 - 40,
-            284 + 25 - 21,
-            284 + 25 - 21,
+            46 + 86 - 23,
+            284 + 25 - 28,
+            284 + 25 - 28,
             40,
             1
         )
@@ -835,6 +858,11 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         player.handle_input(keys)
         player.apply_gravity()
         player.move_and_collide(platforms, fenceHBox, underground)
+        camera_x = 0 if dev_mode else max(0, min(player.rect.x - SCREEN_WIDTH // 2, 2000 - SCREEN_WIDTH))
+        for coin in coins[:]:
+            if player.rect.colliderect(coin["rect"]):
+                coins.remove(coin)
+                coin_count += 1
         player.update_animation(dt)
 
         # bounds
@@ -843,8 +871,6 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
         if player.rect.top > SCREEN_HEIGHT:
             respawn(player)
-
-        camera_x = 0 if dev_mode else max(0, min(player.rect.x - SCREEN_WIDTH // 2, 2000 - SCREEN_WIDTH))
 
         for e in enemies:
             e.update(dt)
@@ -870,17 +896,27 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             draw_platform(screen, tree3_img, t3, camera_x)
         for s in spawnpoints:
             screen.blit(spawn_img, (s.x - camera_x, s.y))
+        player.draw(screen, camera_x)
+        for img, pos in grassoverlay:
+            screen.blit(img, (pos[0] - camera_x, pos[1]))
         for f in fences:
             screen.blit(fence1_img, (f.x - camera_x, f.y))
         for b in bushes:
             draw_platform(screen, b["img"], b["rect"], camera_x)
+        for fl in flowers:
+            screen.blit(fl["img"], (fl["rect"].x - camera_x, fl["rect"].y))
         for fh in fenceHBox:
             draw_platform(screen, fencef_img, fh, camera_x)
         for e in enemies: e.draw(screen, camera_x)
-        player.draw(screen, camera_x)
-        for img, pos in grassoverlay:
-            screen.blit(img, (pos[0] - camera_x, pos[1]))
+        for coin in coins:
+            coin["offset"] += dt * 4
 
+            float_y = coin["base_y"] + math.sin(coin["offset"]) * 5
+
+            screen.blit(
+                coin["img"],
+                (coin["rect"].x - camera_x, float_y)
+            )
 
         if show_controls:
             ctrls = ["WASD: Move", "SPACE: Jump", "TAB: Disable Cam Follow", "H: Controls", "F3: Hitboxes", "R: Respawn"]
@@ -891,5 +927,22 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.draw.rect(screen, (255, 255, 0), (player.rect.x - camera_x, player.rect.y, 22, 30), 1)
             for e in enemies: pygame.draw.rect(screen, (0, 255, 0), (e.rect.x - camera_x, e.rect.y, 22, 30), 1)
             for p in platforms: pygame.draw.rect(screen, (0, 0, 255), (p.x - camera_x, p.y, p.width, p.height), 1)
+        # ===== COIN UI (MUST BE LAST) =====
+        screen_width = screen.get_width()
 
+        padding = 10
+        box_size = 34
+
+        box_x = screen_width - box_size - padding
+        box_y = padding
+
+        box = pygame.Rect(box_x, box_y, box_size, box_size)
+
+        pygame.draw.rect(screen, (0, 0, 0), box, border_radius=8)
+        pygame.draw.rect(screen, (255, 215, 0), box, 2, border_radius=8)
+
+        screen.blit(coin_img, (box_x + 6, box_y + 6))
+
+        text = coin_font.render(str(coin_count), True, (255, 255, 255))
+        screen.blit(text, (box_x - 25, box_y + 8))
         pygame.display.flip()
