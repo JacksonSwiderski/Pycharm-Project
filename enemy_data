@@ -12,7 +12,7 @@ class EnemyData:
         self.scale = scale
 
 slime = EnemyData(
-    name='Gloob',
+    name='Wrath',
     hp=30,
     moves=[tackle, bite, solidify],
     music='battle.mp3',
