@@ -20,6 +20,9 @@ RED = (200, 50, 50)
 DIRT_COLOR = (1, 2, 5)
 ranonce = 0
 
+required_coins = 40
+required_fights = 5
+
 GRAVITY = 0.8
 JUMP_STRENGTH = -12
 MOVE_SPEED = 5
@@ -31,6 +34,7 @@ coin_get = pygame.mixer.Sound("coin_get.wav")
 jump.set_volume(0.8)
 landing.set_volume(0.8)
 coin_get.set_volume(0.8)
+defeated_enemies = []
 
 p1 = 45
 p2 = 35
@@ -124,6 +128,11 @@ coins = [
     {"rect": pygame.Rect(591, 412, 20, 20), "img": coin_img, "base_y": 412, "offset": 0},
     {"rect": pygame.Rect(625, 414, 20, 20), "img": coin_img, "base_y": 414, "offset": 0},
     {"rect": pygame.Rect(659, 400, 20, 20), "img": coin_img, "base_y": 400, "offset": 0},
+
+    {"rect": pygame.Rect(941, 131, 20, 20), "img": coin_img, "base_y": 131, "offset": 0},
+    {"rect": pygame.Rect(1856, 384, 20, 20), "img": coin_img, "base_y": 384, "offset": 0},
+    {"rect": pygame.Rect(1912, 323, 20, 20), "img": coin_img, "base_y": 323, "offset": 0},
+    {"rect": pygame.Rect(872, 129, 20, 20), "img": coin_img, "base_y": 129, "offset": 0},
 ]
 
 bush = []
@@ -410,6 +419,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
     if player.rect.left < 0:
         player.rect.left = 0
 
+
     if player.rect.top > SCREEN_HEIGHT:
         respawn(player)
 
@@ -465,9 +475,9 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.Rect(446, 416, 34, 41),
             pygame.Rect(472, 426, 33, 34),
             pygame.Rect(646, 436, 52, 27),
-            pygame.Rect(668, 418, 38, 25),
+            pygame.Rect(668, 418+9, 38, 25),
             pygame.Rect(441, 401, 24, 23),
-            pygame.Rect(682, 405, 24, 25),
+            pygame.Rect(682, 405+7, 24, 25),
             pygame.Rect(730, 424, 28, 25),
             pygame.Rect(785, 430, 44, 20),
             pygame.Rect(799, 410, 33, 26),
@@ -514,8 +524,8 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             (pygame.Rect(1454, 196, 71, 25), {}),
             (pygame.Rect(1347, 407, 342, 239), {}),
             (pygame.Rect(1549, 374+6, 54, 28), {}),
+            (pygame.Rect(2000, 0, 50, 600), {}),
         ]
-
         water = [
             pygame.Rect(454, 380, 234, 65),
             pygame.Rect(726, 407, 90, 40),
@@ -564,9 +574,8 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             pygame.Rect(499 - 27, 424+5, 158, 11),
             pygame.Rect(499 + 47, 424+5, 158, 11),
         ]
-        boss_door = [
-            pygame.Rect(1950, 195, 50, 50)
-        ]
+        door_pos = pygame.Rect(1950, 195, 50, 50)  # for drawing
+        door_hitbox = pygame.Rect(1950 + 25, 195, 50, 50)  # for collision only
 
         if not coins_generated:
             # keep your manually placed coins
@@ -900,6 +909,8 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         player.handle_input(keys)
         player.apply_gravity()
         player.move_and_collide(platforms, fenceHBox, underground)
+        if player.rect.colliderect(door_hitbox):
+            print("Touching door")
         camera_x = 0 if dev_mode else max(0, min(player.rect.x - SCREEN_WIDTH // 2, 2000 - SCREEN_WIDTH))
         for coin in coins[:]:
             if player.rect.colliderect(coin["rect"]):
@@ -920,11 +931,24 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             if player.rect.colliderect(e.rect):
                 return "combat", show_hitboxes, e, player.rect.x, player.rect.y
 
+        # ===== BOSS DOOR CHECK =====
+        if player.rect.colliderect(door_hitbox):
+
+                if coin_count >= required_coins and len(defeated_enemies) >= required_fights:
+                    print("Entering boss fight...")
+
+                    # TEMPORARY BOSS PLACEHOLDER
+                    pygame.time.delay(1000)
+
+                    return "boss", show_hitboxes, None, player.rect.x, player.rect.y
+
+                else:
+                    print("You need more coins or fights!")
+
         # Draw Sequence
         screen.blit(bg_img, (0, 0))
         update_and_draw_clouds(screen, dt)
-        for d in boss_door:
-            draw_platform(screen, door_img, d, camera_x)
+        draw_platform(screen, door_img, door_pos, camera_x)
         for br in background_rects:
             draw_platform(screen, bg_tile_img, br, camera_x)
         for w in water:
@@ -1028,4 +1052,33 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
         text = coin_font.render(str(coin_count), True, (255, 255, 255))
         screen.blit(text, (box_x - 25, box_y + 8))
+
+        # ===== OBJECTIVE UI (CENTER TOP) =====
+        objective_text = ui_font.render(
+            f"Objective: Collect {required_coins} coins and defeat {required_fights} enemies",
+            True,
+            (255, 255, 255)
+        )
+
+        text_width = objective_text.get_width()
+        text_height = objective_text.get_height()
+
+        screen_width = screen.get_width()
+
+        x = (screen_width - text_width) // 2
+        y = 10  # top padding
+
+        # background box
+        bg_rect = pygame.Rect(
+            x - 10,
+            y - 5,
+            text_width + 20,
+            text_height + 10
+        )
+
+        pygame.draw.rect(screen, (0, 0, 0), bg_rect, border_radius=6)
+        pygame.draw.rect(screen, (255, 255, 255), bg_rect, 2, border_radius=6)
+
+        screen.blit(objective_text, (x, y))
+
         pygame.display.flip()
