@@ -1,5 +1,5 @@
-import pygame, random
-from test_plat import draw_platform, Enemy
+import pygame, random, math
+from test_plat import draw_platform, draw_platform1
 from enemy_data import slime
 
 pygame.init()
@@ -20,12 +20,31 @@ pygame.display.set_caption("Map Maker / Full Level View")
 
 clock = pygame.time.Clock()
 
-# -----------------------------
-# Load Image Assets
+DIRT_COLOR = (1, 2, 5)
+GROUND_COLOR = (23, 22, 22)
+ranonce = 0
+
+required_coins = 40
+required_fights = 5
+
+GRAVITY = 0.8
+JUMP_STRENGTH = -12
+MOVE_SPEED = 5
+
+# Sounds (Your Version)
+jump = pygame.mixer.Sound('jump.wav')
+landing = pygame.mixer.Sound('landing.wav')
+coin_get = pygame.mixer.Sound("coin_get.wav")
+jump.set_volume(0.8)
+landing.set_volume(0.8)
+coin_get.set_volume(0.8)
+defeated_enemies = []
+
 p1 = 45
 p2 = 35
-f1 = 32
-f2 = 32
+f1 = 22
+f2 = 26
+# Load Image Assets
 bg_img = pygame.image.load("backgroundImage.png")
 bg_img = pygame.transform.scale(bg_img, (2000, 600))
 grass_img = pygame.image.load("GroundTop2.png")
@@ -50,12 +69,10 @@ bush3img = pygame.image.load("Bush3.png")
 bush3img = pygame.transform.scale(bush3img, (p1, p2))
 Ground3_img = pygame.image.load("Ground3.png")
 Ground3_img = pygame.transform.scale(Ground3_img, (111, 65))
-enemy_frames = [pygame.transform.scale(pygame.image.load(f"RedEnemy{i}.png").convert_alpha(), (22, 30)) for i in
-                    range(1, 5)]
 grassoverlay_img = pygame.image.load("GrassOverlay.png")
 grassoverlay_img = pygame.transform.scale(grassoverlay_img, (45, 20))
 waterimg = pygame.image.load("TiledWater.png")
-waterimg = pygame.transform.scale(waterimg, (32, 32))
+waterimg = pygame.transform.scale(waterimg, (32, 65))
 flower1img = pygame.image.load("Flower1.png")
 flower1img = pygame.transform.scale(flower1img, (f1, f2))
 flower2img = pygame.image.load("Flower2.png")
@@ -66,8 +83,22 @@ flower4img = pygame.image.load("Flower4.png")
 flower4img = pygame.transform.scale(flower4img, (f1, f2))
 flower5img = pygame.image.load("Flower5.png")
 flower5img = pygame.transform.scale(flower5img, (f1, f2))
+coin_img = pygame.image.load("GoldCoin.png")
+coin_img = pygame.transform.scale(coin_img, (18, 20))
 rock_pile = pygame.image.load("RockPile.png")
-rock_pile = pygame.transform.scale(rock_pile, (150, 15))
+rock_pile = pygame.transform.scale(rock_pile, (150, 20))
+door_img = pygame.image.load('boss_door.png')
+door_img = pygame.transform.scale(door_img, (50, 50))
+
+#volcano
+groundoverlay_img = pygame.image.load("volcano_overlay.png")
+groundoverlay_img = pygame.transform.scale(groundoverlay_img, (45, 20))
+bg_img1 = pygame.image.load("volcano_bg.png")
+bg_img1 = pygame.transform.scale(bg_img1, (2000, 600))
+ground_img = pygame.image.load("volcano_ground.png")
+ground_img = pygame.transform.scale(ground_img, (64, 64))
+underground1 = pygame.image.load("volcano_underground.png")
+underground1 = pygame.transform.scale(underground1, (111, 65))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -95,6 +126,40 @@ flower_images = [
     flower5img,
 ]
 
+coins = [
+    # Manual coins (always spawn here)
+    {"rect": pygame.Rect(1797, 70, 20, 20), "img": coin_img, "base_y": 70, "offset": 0},
+    {"rect": pygame.Rect(1834, 102, 20, 20), "img": coin_img, "base_y": 102, "offset": 1},
+    {"rect": pygame.Rect(1853, 159, 20, 20), "img": coin_img, "base_y": 159, "offset": 2},
+    {"rect": pygame.Rect(1688, 110, 20, 20), "img": coin_img, "base_y": 110, "offset": 3},
+    {"rect": pygame.Rect(1719, 77, 20, 20), "img": coin_img, "base_y": 77, "offset": 4},
+    {"rect": pygame.Rect(1765, 59, 20, 20), "img": coin_img, "base_y": 59, "offset": 5},
+    {"rect": pygame.Rect(1865, 206, 20, 20), "img": coin_img, "base_y": 206, "offset": 6},
+
+    {"rect": pygame.Rect(473, 405, 20, 20), "img": coin_img, "base_y": 405, "offset": 0},
+    {"rect": pygame.Rect(508, 411, 20, 20), "img": coin_img, "base_y": 411, "offset": 0},
+    {"rect": pygame.Rect(545, 417, 20, 20), "img": coin_img, "base_y": 417, "offset": 0},
+    {"rect": pygame.Rect(591, 412, 20, 20), "img": coin_img, "base_y": 412, "offset": 0},
+    {"rect": pygame.Rect(625, 414, 20, 20), "img": coin_img, "base_y": 414, "offset": 0},
+    {"rect": pygame.Rect(659, 400, 20, 20), "img": coin_img, "base_y": 400, "offset": 0},
+
+    {"rect": pygame.Rect(941, 131, 20, 20), "img": coin_img, "base_y": 131, "offset": 0},
+    {"rect": pygame.Rect(1856, 384, 20, 20), "img": coin_img, "base_y": 384, "offset": 0},
+    {"rect": pygame.Rect(1912, 323, 20, 20), "img": coin_img, "base_y": 323, "offset": 0},
+    {"rect": pygame.Rect(872, 129, 20, 20), "img": coin_img, "base_y": 129, "offset": 0},
+]
+
+coins1 = [
+    # Manual coins (always spawn here)
+    {"rect": pygame.Rect(1797, 70, 20, 20), "img": coin_img, "base_y": 70, "offset": 0},
+
+]
+
+coins2 = [
+    # Manual coins (always spawn here)
+    {"rect": pygame.Rect(1797, 70, 20, 20), "img": coin_img, "base_y": 70, "offset": 0},
+]
+
 bush = []
 
 clouds = []
@@ -114,6 +179,8 @@ bg_tile_img = pygame.transform.scale(bg_tile_original, (tile_w, tile_h))
 
 
 def load_level(level):
+    grassoverlay = []
+    groundoverlay1 = []
     if level == 0:
         background_rects = [
             pygame.Rect(866, 168, 107, 58), pygame.Rect(873, 225, 98, 13), pygame.Rect(202, 281, 60, 111),
@@ -266,6 +333,9 @@ def load_level(level):
             pygame.Rect(499+50, 424, 158, 11),
         ]
 
+        door_pos = pygame.Rect(1950, 195, 50, 50)  # for drawing
+        door_hitbox = pygame.Rect(1950 + 25, 195, 50, 50)  # for collision only
+
         def grassoverlayrepeat(x, y, platform_width, img):
             overlays = []
 
@@ -298,6 +368,8 @@ def load_level(level):
 
         excluded_indices = {29}
 
+
+
         grassoverlay = []
 
         for item in platforms:
@@ -312,11 +384,6 @@ def load_level(level):
                 rect.width,
                 grassoverlay_img
             )
-
-        enemies = [
-            Enemy(525, 182, 80, slime, 'slime_1', enemy_frames),
-            Enemy(220, 235, 35, slime, 'slime_2', enemy_frames)
-        ]
 
         def generate_random_positions(min_x, max_x, min_y, max_y, min_distance, amount):
             generated_bushes = []
@@ -611,8 +678,11 @@ def load_level(level):
             pygame.Rect(499 - 50, 424, 158, 11),
         ]
 
-        def grassoverlayrepeat(x, y, platform_width, img):
-            overlays = []
+        door_pos = pygame.Rect(1950, 195, 50, 50)  # for drawing
+        door_hitbox = pygame.Rect(1950 + 25, 195, 50, 50)  # for collision only
+
+        def groundoverlayrepeat(x, y, platform_width, img):
+            groundoverlay = []
 
             start_x = x - 5
             end_x = x + platform_width + 5
@@ -632,18 +702,18 @@ def load_level(level):
                 # crop the image if needed
                 cropped_img = img.subsurface((0, 0, draw_width, img_height))
 
-                overlays.append((cropped_img, (current_x, start_y)))
+                groundoverlay.append((cropped_img, (current_x, start_y)))
 
                 current_x += img_width
 
-            return overlays
+            return groundoverlay
 
         xg = 134
         yg = 14
 
         excluded_indices = {29}
 
-        grassoverlay = []
+        groundoverlay1 = []
 
         for item in platforms:
             rect, flags = item
@@ -651,16 +721,12 @@ def load_level(level):
             if not flags.get("grass", True):
                 continue
 
-            grassoverlay += grassoverlayrepeat(
+            groundoverlay1 += groundoverlayrepeat(
                 rect.x,
                 rect.y,
                 rect.width,
-                grassoverlay_img
+                groundoverlay_img
             )
-
-        enemies = [
-            Enemy(525, 182, 80, slime, 'slime_1', enemy_frames),
-        ]
 
         def generate_random_positions(min_x, max_x, min_y, max_y, min_distance, amount):
             generated_bushes = []
@@ -726,7 +792,7 @@ def load_level(level):
 
         # generate_random_flower_positions
         spawnpoints = [pygame.Rect(15, 286 + 2, 10, 3)]
-
+        grassoverlay = []
     return (
         platforms,
         spawnpoints,
@@ -737,23 +803,25 @@ def load_level(level):
         bushes,
         fences,
         fenceHBox,
-        enemies,
         underground,
         grassoverlay,
         water,
-        rockpile
-    ) # fences
+        rockpile,
+        door_pos,
+        door_hitbox,
+        groundoverlay1
+    )
 
 
-LEVEL = 0
-platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, enemies, underground, grassoverlay, water, rockpile = load_level(LEVEL) #fences
-
+LEVEL = 1
+platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, underground, grassoverlay, water, rockpile, door_pos, door_hitbox, groundoverlay1 = load_level(LEVEL)
 
 # -----------------------------
 # MAIN LOOP
 # -----------------------------
 running = True
 while running:
+    dt = clock.tick(60) / 1000
     clock.tick(60)
 
     for event in pygame.event.get():
@@ -821,35 +889,79 @@ while running:
 
     # -----------------------------
     # PLATFORMS
-    # -----------------------------
-    for br in background_rects:
-        draw_platform(screen, bg_tile_img, br)
-    for u in underground:
-        draw_platform(screen, Ground3_img, u)
-    for w in water:
-        draw_platform(screen, waterimg, w)
-    for item in platforms:
-        rect, flags = item
-        draw_platform(screen, grass_img, rect)
-    for t1 in tree1:
-        draw_platform(screen, tree1_img, t1)
-    for t2 in tree2:
-        draw_platform(screen, tree2_img, t2)
-    for t3 in tree3:
-        draw_platform(screen, tree3_img, t3)
-    for r in rockpile:  # rockpile
-        draw_platform(screen, rock_pile, r)
-    for s in spawnpoints:
-        screen.blit(spawn_img, (s.x, s.y))
-    for f in fences:
-        screen.blit(fence1_img, (f.x, f.y))
-    for b in bushes:
-        draw_platform(screen, b["img"], b["rect"])
-    for fh in fenceHBox:
-        draw_platform(screen, fencef_img, fh)
-    for e in enemies: e.draw(screen, 0)
-    for img, pos in grassoverlay:
-        screen.blit(img, pos)
+# -----------------------------
+    # Draw Sequence
+    if LEVEL == 0:
+        for br in background_rects:
+            draw_platform(screen, bg_tile_img, br)
+        for u in underground:
+            draw_platform(screen, Ground3_img, u)
+        for w in water:
+            draw_platform(screen, waterimg, w)
+        for item in platforms:
+            rect, flags = item
+            draw_platform(screen, grass_img, rect)
+        for t1 in tree1:
+            draw_platform(screen, tree1_img, t1)
+        for t2 in tree2:
+            draw_platform(screen, tree2_img, t2)
+        for t3 in tree3:
+            draw_platform(screen, tree3_img, t3)
+        for r in rockpile:  # rockpile
+            draw_platform(screen, rock_pile, r)
+        for s in spawnpoints:
+            screen.blit(spawn_img, (s.x, s.y))
+        for f in fences:
+            screen.blit(fence1_img, (f.x, f.y))
+        for b in bushes:
+            draw_platform(screen, b["img"], b["rect"])
+        for fh in fenceHBox:
+            draw_platform(screen, fencef_img, fh)
+        # for e in enemies: e.draw(screen, 0)
+        for img, pos in grassoverlay:
+            screen.blit(img, pos)
+    elif LEVEL == 1:
+        screen.fill(GROUND_COLOR)
+        screen.blit(bg_img1, (0, 0))
+        # update_and_draw_clouds(screen, dt)
+        draw_platform1(screen, door_img, door_pos)
+        for br in background_rects:
+            draw_platform1(screen, bg_tile_img, br)
+        # for w in water:
+        #     draw_platform1(screen, waterimg, w, camera_x)
+        for u in underground:
+            draw_platform1(screen, underground1, u)
+        for p in platforms:
+            draw_platform1(screen, ground_img, p)
+        # for t1 in tree1:
+        #     draw_platform1(screen, tree1_img, t1, camera_x)
+        # for t2 in tree2:
+        #     draw_platform1(screen, tree2_img, t2, camera_x)
+        # for t3 in tree3:
+        #     draw_platform1(screen, tree3_img, t3, camera_x)
+        # for r in rockpile:  # rockpile
+        #     draw_platform1(screen, rock_pile, r, camera_x)
+        for s in spawnpoints:
+            screen.blit(spawn_img, (s.x , s.y))
+        for img, pos in groundoverlay1:
+            screen.blit(img, (pos[0], pos[1]))
+        for f in fences:
+            screen.blit(fence1_img, (f.x, f.y))
+        for b in bushes:
+            draw_platform1(screen, b["img"], b["rect"])
+        # for fl in flowers:
+        #     screen.blit(fl["img"], (fl["rect"].x, fl["rect"].y))
+        # for fh in fenceHBox:
+        #     draw_platform1(screen, fencef_img, fh, camera_x)
+        for coin in coins1:
+            coin["offset"] += dt * 4
+
+            float_y = coin["base_y"] + math.sin(coin["offset"]) * 5
+
+            screen.blit(
+                coin["img"],
+                (coin["rect"].x, float_y)
+            )
 
     # -----------------------------
     # UI / DEBUG
