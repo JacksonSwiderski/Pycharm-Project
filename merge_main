@@ -1,7 +1,8 @@
 import pygame
 import sys
-from test_plat import platformer_loop
+from test_plat import platformer_loop, Enemy, enemy_frames
 from test_cmbt import combat_loop
+from enemy_data import wrath_king
 
 # Initialize Pygame
 pygame.mixer.pre_init(44100, -16, 2, 512)
@@ -147,7 +148,8 @@ def main():
                     "name": "Emerald Meadows",
                     "level": 0,
                     "x": 60,
-                    "image": grass_preview
+                    "image": grass_preview,
+                    'boss': wrath_king
                 },
                 {
                     "name": "Ember Peak",
@@ -198,6 +200,7 @@ def main():
                     reset_level_state()  # 🔥 important
 
                     selected_level = level["level"]
+                    current_level_assets = level
                     click.play()
                     current_state = STATE_PLATFORMER
             pygame.display.flip()
@@ -221,13 +224,16 @@ def main():
                 current_state = STATE_COMBAT
 
             elif res == "boss":
-                print("Boss fight would start here!")
-                current_state = STATE_MENU
+                print(f"DEBUG: current_enemy type is {type(current_enemy)}")
+                boss_data = current_level_assets['boss']
+                current_enemy = Enemy(0, 0, 0, boss_data, boss_data, enemy_frames)
+                current_state = STATE_COMBAT
 
             elif res == "menu":
                 current_state = STATE_MENU
 
         elif current_state == STATE_COMBAT:
+            print("Main: current_enemy is", type(current_enemy))
             res = combat_loop(screen, clock, current_enemy)
 
             if res == 'enemy_defeated':
