@@ -108,15 +108,18 @@ def main():
 
         elif current_state == STATE_PLATFORMER:
             # The loop returns data when a collision happens or ESC is pressed
-            res, show_hitboxes, enemy, px, py = platformer_loop(screen, clock, show_hitboxes, player_x, player_y,
-                                                                defeated_enemies, selected_level)
+            res, show_hitboxes, enemy, px, py = platformer_loop(
+                screen, clock, show_hitboxes, player_x, player_y,
+                defeated_enemies, selected_level
+            )
             player_x, player_y = px, py
             if res == "combat":
                 current_enemy = enemy
                 current_state = STATE_COMBAT
-            else:
-                current_state = STATE_MENU
-                play_menu_music()
+
+            elif res == "boss":
+                print("Boss fight would start here!")
+                current_state = STATE_MENU  # temporary fallback
 
         elif current_state == STATE_COMBAT:
             res = combat_loop(screen, clock, current_enemy)
