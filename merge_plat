@@ -594,6 +594,29 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         ]
         if not coins_generated[level]:
             level_coins[level] = generate_coins_on_platforms(platforms, 40)
+            add_manual_coin(1797, 70, level)
+            add_manual_coin(1834, 102, level)
+            add_manual_coin(1853, 159, level)
+            add_manual_coin(1688, 110, level)
+            add_manual_coin(1719, 77, level)
+            add_manual_coin(1765, 59, level)
+            add_manual_coin(1865, 206, level)
+
+            add_manual_coin(473, 405, level)
+            add_manual_coin(508, 411, level)
+            add_manual_coin(545, 417, level)
+            add_manual_coin(591, 412, level)
+            add_manual_coin(625, 414, level)
+            add_manual_coin(659, 400, level)
+
+            add_manual_coin(941, 131, level)
+            add_manual_coin(1856, 384, level)
+            add_manual_coin(1912, 323, level)
+            add_manual_coin(872, 129, level)
+
+            add_manual_coin(421 + 12, 234 + 3, level)
+            add_manual_coin(902, 276 + 3, level)
+            add_manual_coin(686, 152, level)
             coins_generated[level] = True
         water = [
             pygame.Rect(454, 380, 234, 65),
@@ -645,30 +668,6 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         ]
         door_pos = pygame.Rect(1950, 195, 50, 50)  # for drawing
         door_hitbox = pygame.Rect(1950 + 25, 195, 50, 50)  # for collision only
-
-        add_manual_coin(1797, 70, level)
-        add_manual_coin(1834, 102, level)
-        add_manual_coin(1853, 159, level)
-        add_manual_coin(1688, 110, level)
-        add_manual_coin(1719, 77, level)
-        add_manual_coin(1765, 59, level)
-        add_manual_coin(1865, 206, level)
-
-        add_manual_coin(473, 405, level)
-        add_manual_coin(508, 411, level)
-        add_manual_coin(545, 417, level)
-        add_manual_coin(591, 412, level)
-        add_manual_coin(625, 414, level)
-        add_manual_coin(659, 400, level)
-
-        add_manual_coin(941, 131, level)
-        add_manual_coin(1856, 384, level)
-        add_manual_coin(1912, 323, level)
-        add_manual_coin(872, 129, level)
-
-        add_manual_coin(421+12, 234+3, level)
-        add_manual_coin(902, 276+3, level)
-        add_manual_coin(686, 152, level)
 
         def grassoverlayrepeat(x, y, platform_width, img):
             overlays = []
