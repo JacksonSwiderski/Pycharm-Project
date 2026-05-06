@@ -813,7 +813,7 @@ def load_level(level):
     )
 
 
-LEVEL = 1
+LEVEL = 0
 platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, underground, grassoverlay, water, rockpile, door_pos, door_hitbox, groundoverlay1 = load_level(LEVEL)
 
 # -----------------------------
