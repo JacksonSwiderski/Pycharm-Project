@@ -572,10 +572,160 @@ def load_level(level):
         #generate_random_flower_positions
         spawnpoints = [pygame.Rect(15, 286+2, 10, 3)]
 
-    else:
-        background_rects = []
-        platforms = []
-        spawnpoints = []
+    elif level == 1:
+        background_rects = [
+            pygame.Rect(866, 168, 107, 58),
+        ]
+        underground = [
+            pygame.Rect(455 - 18, 438, 236 + 30, 181),
+        ]
+        platforms = [
+            (pygame.Rect(0, 308, 135, 300), {}),
+
+            # EXCLUDED FROM GRASS OVERLAY
+            (pygame.Rect(1321, 245, 86, 32), {"grass": False})
+        ]
+
+        water = [
+            pygame.Rect(454, 380, 234, 65),
+        ]
+
+        fences = [
+            pygame.Rect(878, 307 - 32, 73, 8),
+        ]
+        fenceHBox = [
+            pygame.Rect(285, 287, 66, 6),
+        ]
+
+        tree1 = [
+            pygame.Rect(200, 240 - 85, 93, 115)
+        ]
+        tree2 = [
+            pygame.Rect(521, 97 + 3, 100, 118),
+        ]
+        tree3 = [
+            pygame.Rect(866, 59 - 3, 103, 96 + 3),
+        ]
+
+        rockpile = [
+            pygame.Rect(499 - 50, 424, 158, 11),
+        ]
+
+        def grassoverlayrepeat(x, y, platform_width, img):
+            overlays = []
+
+            start_x = x - 5
+            end_x = x + platform_width + 5
+            start_y = y - 1
+
+            img_width = img.get_width()
+            img_height = img.get_height()
+
+            current_x = start_x
+
+            while current_x < end_x:
+                remaining = end_x - current_x
+
+                # width we actually want to draw
+                draw_width = min(img_width, remaining)
+
+                # crop the image if needed
+                cropped_img = img.subsurface((0, 0, draw_width, img_height))
+
+                overlays.append((cropped_img, (current_x, start_y)))
+
+                current_x += img_width
+
+            return overlays
+
+        xg = 134
+        yg = 14
+
+        excluded_indices = {29}
+
+        grassoverlay = []
+
+        for item in platforms:
+            rect, flags = item
+
+            if not flags.get("grass", True):
+                continue
+
+            grassoverlay += grassoverlayrepeat(
+                rect.x,
+                rect.y,
+                rect.width,
+                grassoverlay_img
+            )
+
+        enemies = [
+            Enemy(525, 182, 80, slime, 'slime_1', enemy_frames),
+        ]
+
+        def generate_random_positions(min_x, max_x, min_y, max_y, min_distance, amount):
+            generated_bushes = []
+
+            used_x_positions = []
+
+            for _ in range(amount):
+                x = random.randint(min_x, max_x)
+                y = random.randint(min_y, max_y)
+
+                while any(abs(x - used_x) <= min_distance for used_x in used_x_positions):
+                    x = random.randint(min_x, max_x)
+
+                used_x_positions.append(x)
+
+                generated_bushes.append({
+                    "rect": pygame.Rect(x, y, 40, 21),
+                    "img": random.choice(bush_images)
+                })
+
+            return generated_bushes
+
+        def generate_random_flower_positions(min_x, max_x, min_y, max_y, min_distance, amount):
+            generated_flowers = []
+
+            used_x_positions = []
+
+            for _ in range(amount):
+                x = random.randint(min_x, max_x)
+                y = random.randint(min_y, max_y)
+
+                while any(abs(x - used_x) <= min_distance for used_x in used_x_positions):
+                    x = random.randint(min_x, max_x)
+
+                used_x_positions.append(x)
+
+                generated_flowers.append({
+                    "rect": pygame.Rect(x, y, 40, 21),
+                    "img": random.choice(flower_images)
+                })
+
+            return generated_flowers
+
+        bushes = []
+        flowers = []
+
+        bushes += generate_random_positions(
+            1845,
+            1845 + 74 - 40,
+            261 + 25 - 21,
+            261 + 25 - 21,
+            40,
+            1
+        )
+        flowers += generate_random_flower_positions(
+            1282,
+            1282 + 73 - 40,
+            365 + 18 - 21,
+            365 + 18 - 21,
+            40,
+            1
+        )
+
+        # generate_random_flower_positions
+        spawnpoints = [pygame.Rect(15, 286 + 2, 10, 3)]
 
     return (
         platforms,
