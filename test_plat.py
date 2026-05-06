@@ -8,6 +8,7 @@ pygame.mixer.init()
 coin_font = pygame.font.Font(None, 28)
 
 coin_count = 0
+enemy_kill_count = 0
 coins_generated = False
 
 # Shared Colors & Settings
@@ -401,7 +402,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
     SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_width(), screen.get_height()
     ui_font = pygame.font.Font(None, 22)
     dev_mode, show_controls = False, True
-    global coins, coin_count, coins_generated
+    global coins, coin_count, coins_generated, enemy_kill_count
 
     # Assets
     SCALE = 2
@@ -928,7 +929,11 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
         for e in enemies:
             e.update(dt)
+
             if player.rect.colliderect(e.rect):
+                enemy_kill_count += 1
+                defeated_enemies.append(e.enemy_id)
+
                 return "combat", show_hitboxes, e, player.rect.x, player.rect.y
 
         # ===== BOSS DOOR CHECK =====
@@ -1080,5 +1085,21 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         pygame.draw.rect(screen, (255, 255, 255), bg_rect, 2, border_radius=6)
 
         screen.blit(objective_text, (x, y))
+
+        # ===== ENEMY UI (UNDER COIN UI) =====
+        enemy_box_y = box_y + box_size + 8  # under coin box
+
+        enemy_box = pygame.Rect(box_x, enemy_box_y, box_size, box_size)
+
+        pygame.draw.rect(screen, (0, 0, 0), enemy_box, border_radius=8)
+        pygame.draw.rect(screen, (200, 50, 50), enemy_box, 2, border_radius=8)
+
+        # enemy icon (use sprite)
+        enemy_icon = pygame.transform.scale(enemy_frames[0], (20, 20))
+        screen.blit(enemy_icon, (box_x + 6, enemy_box_y + 6))
+
+        # enemy counter text
+        enemy_text = coin_font.render(f"{enemy_kill_count}/{required_fights}", True, (255, 255, 255))
+        screen.blit(enemy_text, (box_x - 40, enemy_box_y + 8))
 
         pygame.display.flip()
