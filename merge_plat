@@ -212,7 +212,7 @@ def draw_platform1(screen, image, rect, camera_x=0):
 
     # ✅ ADD THIS AFTER MASK
     if rect.height > t_h:
-        pygame.draw.rect(platform_surf, DIRT_COLOR,
+        pygame.draw.rect(platform_surf, GROUND_COLOR,
                          (0, t_h, rect.width, rect.height - t_h))
 
     mask = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
