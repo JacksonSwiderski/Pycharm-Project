@@ -1,167 +1,241 @@
 import pygame
 import sys
+from test_plat import platformer_loop
+from test_cmbt import combat_loop
 
 # Initialize Pygame
+pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
+pygame.mixer.init()
+pygame.mixer.set_num_channels(16)
 
 # Screen settings
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Chrono Clash")
 
-# Colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GREEN = (100, 200, 100)
-BLUE = (100, 100, 200)
-GRAY = (50, 50, 50)
+# Images
+title = pygame.image.load('ChronoClashLogo.png').convert_alpha()
+title = pygame.transform.scale(title, (500, 300))
 
-# Fonts
+# Sounds
+click = pygame.mixer.Sound('select.wav')
+click.set_volume(0.5)
+hover = pygame.mixer.Sound('hover_select.wav')
+hover.set_volume(0.5)
+
+# Colors & Fonts
+WHITE, GRAY, GREEN = (255, 255, 255), (50, 50, 50), (100, 200, 100)
 font = pygame.font.Font(None, 48)
 small_font = pygame.font.Font(None, 32)
 
-# Logo (NEW)
-logo = pygame.image.load("ChronoClashLogo.png").convert_alpha()
-logo = pygame.transform.scale(logo, (500, 300))
+def reset_level_state():
+    global coins, coin_count, coins_generated, enemy_kill_count, defeated_enemies
+
+    coins = []
+    coin_count = 0
+    coins_generated = False   # 🔥 THIS is the key fix
+    enemy_kill_count = 0
+    defeated_enemies = []
 
 # Game states
-STATE_MENU = "menu"
-STATE_LEVEL_SELECT = "level_select"
-STATE_PLATFORMER = "platformer"
-STATE_COMBAT = "combat"
+STATE_MENU, STATE_LEVEL_SELECT, STATE_PLATFORMER, STATE_COMBAT = "menu", "level_select", "platformer", "combat"
 
-show_hitboxes = False
+# Global Variables
 current_state = STATE_MENU
+selected_level = 0
+player_x, player_y = 100, 400
+button_hovered = False
+defeated_enemies = []
+current_enemy = None
+show_hitboxes = False
 clock = pygame.time.Clock()
-selected_level = None
 
-def draw_button(text, x, y, width, height, color, hover_color):
+
+def draw_title():
+    x_pos = (SCREEN_WIDTH // 2) - (title.get_width() // 2)
+    y_pos = 15
+    screen.blit(title, (x_pos, y_pos))
+
+
+def draw_button(text, x, y, width, height, color, hover_color, font_size=32):
+    global button_hovered
+
     mouse = pygame.mouse.get_pos()
-    click = pygame.mouse.get_pressed()
+    click_state = pygame.mouse.get_pressed()
 
     rect = pygame.Rect(x, y, width, height)
     is_hovered = rect.collidepoint(mouse)
 
-    pygame.draw.rect(screen, hover_color if is_hovered else color, rect, border_radius=8)
-    pygame.draw.rect(screen, WHITE, rect, 2, border_radius=8)
+    if is_hovered:
+        if not button_hovered:
+            hover.play()
+            button_hovered = True
 
-    text_surface = small_font.render(text, True, WHITE)
-    text_rect = text_surface.get_rect(center=rect.center)
-    screen.blit(text_surface, text_rect)
-
-    return is_hovered and click[0]
-
-
-# UPDATED TITLE FUNCTION (LOGO INSTEAD OF TEXT)
-def createTitle():
-    screen.blit(
-        logo,
-        (SCREEN_WIDTH // 2 - logo.get_width() // 2, 15)
+    pygame.draw.rect(
+        screen,
+        hover_color if is_hovered else color,
+        rect,
+        border_radius=8
     )
 
+    custom_font = pygame.font.Font(None, font_size)
+    text_surf = custom_font.render(text, True, WHITE)
+    screen.blit(text_surf, text_surf.get_rect(center=rect.center))
 
-def main_menu():
-    global current_state
-
-    screen.fill(GRAY)
-
-    # Logo title
-    createTitle()
-
-    # Buttons
-    if draw_button("Play", 300, 250, 200, 50, GREEN, (120, 220, 120)):
-        pygame.time.delay(150)
-        current_state = STATE_LEVEL_SELECT
-
-    if draw_button("Testing", 300, 320, 200, 50, (65, 65, 65), (88, 88, 88)):
-        pygame.time.delay(150)
-        current_state = STATE_PLATFORMER
-
-    if draw_button("Quit", 300, 390, 200, 50, (150, 50, 50), (180, 80, 80)):
-        pygame.quit()
-        sys.exit()
+    return is_hovered and click_state[0]
 
 
-def level_select():
-    global current_state, selected_level
-
-    screen.fill(GRAY)
-
-    title = font.render("SELECT LEVEL", True, WHITE)
-    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
-
-    levels = ["Grassy Plains", "Desert", "Mountains", "Jungle", "Volcanic"]
-
-    for i, level_name in enumerate(levels):
-        row = i // 3
-        col = i % 3
-        x = 100 + col * 220
-        y = 150 + row * 100
-
-        if draw_button(level_name, x, y, 180, 60, GREEN, (120, 220, 120)):
-            pygame.time.delay(150)
-
-            selected_level = i
-            print("Selected level:", selected_level)  # (debug, optional)
-
-            current_state = STATE_PLATFORMER
-
-    if draw_button("Back", 20, 550, 100, 40, (100, 100, 100), (130, 130, 130)):
-        pygame.time.delay(150)
-        current_state = STATE_MENU
-
-
-def run_platformer():
-    global current_state, show_hitboxes
-
-    from test_plat import platformer_loop
-
-    result, show_hitboxes = platformer_loop(screen, clock, show_hitboxes, selected_level)
-
-    if result == "menu":
-        current_state = STATE_MENU
-    elif result == "combat":
-        current_state = STATE_COMBAT
-
-
-def run_combat():
-    global current_state
-
-    print("Combat Ran..")
-    current_state = STATE_PLATFORMER
+def play_menu_music():
+    try:
+        pygame.mixer.music.load('title_theme.mp3')
+        pygame.mixer.music.play(-1)
+    except:
+        print('File not found.')
 
 
 def main():
-    global current_state
+    global current_state, selected_level, player_x, player_y, defeated_enemies, current_enemy, show_hitboxes, button_hovered
 
-    running = True
-    while running:
+    play_menu_music()
+
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    if current_state != STATE_MENU:
-                        current_state = STATE_MENU
-                    else:
-                        running = False
+                pygame.quit()
+                sys.exit()
 
         if current_state == STATE_MENU:
-            main_menu()
+            screen.fill(GRAY)
+            draw_title()
+
+            mouse_pos = pygame.mouse.get_pos()
+
+            if not (pygame.Rect(300, 250, 200, 50).collidepoint(mouse_pos)):
+                button_hovered = False
+
+            if draw_button("Play", 300, 250, 200, 50, GREEN, (120, 220, 120)):
+                pygame.mixer.music.fadeout(1000)
+                pygame.time.delay(150)
+                click.play()
+                current_state = STATE_LEVEL_SELECT
+
+            pygame.display.flip()
+
+
+
+
         elif current_state == STATE_LEVEL_SELECT:
-            level_select()
+            screen.fill(GRAY)
+            # Title text
+            title_text = font.render("Level Selection", True, WHITE)
+            title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 60))
+            screen.blit(title_text, title_rect)
+            # Load preview images
+            grass_preview = pygame.image.load("grass_battle_bg.png").convert()
+            grass_preview = pygame.transform.scale(grass_preview, (180, 100))
+            volcano_preview = pygame.image.load("volcano_battle_bg.png").convert()
+            volcano_preview = pygame.transform.scale(volcano_preview, (180, 100))
+            desert_preview = pygame.image.load("desert_battle_bg.png").convert()
+            desert_preview = pygame.transform.scale(desert_preview, (180, 100))
+            mouse_pos = pygame.mouse.get_pos()
+            # Spread out horizontally
+            preview_y = 140
+            button_y = 260
+            level_data = [
+                {
+                    "name": "Emerald Meadows",
+                    "level": 0,
+                    "x": 60,
+                    "image": grass_preview
+                },
+                {
+                    "name": "Ember Peak",
+                    "level": 1,
+                    "x": 310,
+                    "image": volcano_preview
+                },
+                {
+                    "name": "Golden Dunes",
+                    "level": 2,
+                    "x": 560,
+                    "image": desert_preview
+                }
+            ]
+            hovering_any_button = False
+            for level in level_data:
+                x = level["x"]
+
+                # draw preview image
+                screen.blit(level["image"], (x, preview_y))
+
+                # image border
+                pygame.draw.rect(
+                    screen,
+                    WHITE,
+                    pygame.Rect(x, preview_y, 180, 100),
+                    2
+                )
+
+                button_rect = pygame.Rect(x, button_y, 180, 50)
+
+                if button_rect.collidepoint(mouse_pos):
+                    hovering_any_button = True
+
+                # smaller font only for Emerald Meadows
+                font_size = 28 if level["name"] == "Emerald Meadows" else 32
+
+                if draw_button(
+                        level["name"],
+                        x,
+                        button_y,
+                        180,
+                        50,
+                        GREEN,
+                        (120, 220, 120),
+                        font_size
+                ):
+                    reset_level_state()  # 🔥 important
+
+                    selected_level = level["level"]
+                    click.play()
+                    current_state = STATE_PLATFORMER
+            pygame.display.flip()
+            if not hovering_any_button:
+                button_hovered = False
         elif current_state == STATE_PLATFORMER:
-            run_platformer()
+            res, show_hitboxes, enemy, px, py = platformer_loop(
+                screen,
+                clock,
+                show_hitboxes,
+                player_x,
+                player_y,
+                defeated_enemies,
+                selected_level
+            )
+
+            player_x, player_y = px, py
+
+            if res == "combat":
+                current_enemy = enemy
+                current_state = STATE_COMBAT
+
+            elif res == "boss":
+                print("Boss fight would start here!")
+                current_state = STATE_MENU
+
+            elif res == "menu":
+                current_state = STATE_MENU
+
         elif current_state == STATE_COMBAT:
-            run_combat()
+            res = combat_loop(screen, clock, current_enemy)
 
-        pygame.display.flip()
+            if res == 'enemy_defeated':
+                defeated_enemies.append(current_enemy.enemy_id)
+
+            current_state = STATE_PLATFORMER
+
         clock.tick(60)
-
-    pygame.quit()
-    sys.exit()
 
 
 if __name__ == "__main__":
