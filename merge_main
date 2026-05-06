@@ -29,6 +29,15 @@ WHITE, GRAY, GREEN = (255, 255, 255), (50, 50, 50), (100, 200, 100)
 font = pygame.font.Font(None, 48)
 small_font = pygame.font.Font(None, 32)
 
+def reset_level_state():
+    global coins, coin_count, coins_generated, enemy_kill_count, defeated_enemies
+
+    coins = []
+    coin_count = 0
+    coins_generated = False   # 🔥 THIS is the key fix
+    enemy_kill_count = 0
+    defeated_enemies = []
+
 # Game states
 STATE_MENU, STATE_LEVEL_SELECT, STATE_PLATFORMER, STATE_COMBAT = "menu", "level_select", "platformer", "combat"
 
@@ -42,15 +51,19 @@ current_enemy = None
 show_hitboxes = False
 clock = pygame.time.Clock()
 
+
 def draw_title():
     x_pos = (SCREEN_WIDTH // 2) - (title.get_width() // 2)
     y_pos = 15
     screen.blit(title, (x_pos, y_pos))
 
-def draw_button(text, x, y, width, height, color, hover_color):
+
+def draw_button(text, x, y, width, height, color, hover_color, font_size=32):
     global button_hovered
+
     mouse = pygame.mouse.get_pos()
-    click = pygame.mouse.get_pressed()
+    click_state = pygame.mouse.get_pressed()
+
     rect = pygame.Rect(x, y, width, height)
     is_hovered = rect.collidepoint(mouse)
 
@@ -59,10 +72,19 @@ def draw_button(text, x, y, width, height, color, hover_color):
             hover.play()
             button_hovered = True
 
-    pygame.draw.rect(screen, hover_color if is_hovered else color, rect, border_radius=8)
-    text_surf = small_font.render(text, True, WHITE)
+    pygame.draw.rect(
+        screen,
+        hover_color if is_hovered else color,
+        rect,
+        border_radius=8
+    )
+
+    custom_font = pygame.font.Font(None, font_size)
+    text_surf = custom_font.render(text, True, WHITE)
     screen.blit(text_surf, text_surf.get_rect(center=rect.center))
-    return is_hovered and click[0]
+
+    return is_hovered and click_state[0]
+
 
 def play_menu_music():
     try:
@@ -72,10 +94,11 @@ def play_menu_music():
         print('File not found.')
 
 
-
 def main():
     global current_state, selected_level, player_x, player_y, defeated_enemies, current_enemy, show_hitboxes, button_hovered
+
     play_menu_music()
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -85,46 +108,131 @@ def main():
         if current_state == STATE_MENU:
             screen.fill(GRAY)
             draw_title()
+
             mouse_pos = pygame.mouse.get_pos()
+
             if not (pygame.Rect(300, 250, 200, 50).collidepoint(mouse_pos)):
                 button_hovered = False
+
             if draw_button("Play", 300, 250, 200, 50, GREEN, (120, 220, 120)):
                 pygame.mixer.music.fadeout(1000)
                 pygame.time.delay(150)
                 click.play()
                 current_state = STATE_LEVEL_SELECT
+
             pygame.display.flip()
+
+
+
 
         elif current_state == STATE_LEVEL_SELECT:
             screen.fill(GRAY)
+            # Title text
+            title_text = font.render("Level Selection", True, WHITE)
+            title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 60))
+            screen.blit(title_text, title_rect)
+            # Load preview images
+            grass_preview = pygame.image.load("grass_battle_bg.png").convert()
+            grass_preview = pygame.transform.scale(grass_preview, (180, 100))
+            volcano_preview = pygame.image.load("volcano_battle_bg.png").convert()
+            volcano_preview = pygame.transform.scale(volcano_preview, (180, 100))
+            desert_preview = pygame.image.load("desert_battle_bg.png").convert()
+            desert_preview = pygame.transform.scale(desert_preview, (180, 100))
             mouse_pos = pygame.mouse.get_pos()
-            if not (pygame.Rect(300, 200, 200, 50).collidepoint(mouse_pos)):
-                button_hovered = False
-            if draw_button("Level 1", 300, 200, 200, 50, GREEN, (120, 220, 120)):
-                selected_level = 0
-                click.play()
-                current_state = STATE_PLATFORMER
-            pygame.display.flip()
+            # Spread out horizontally
+            preview_y = 140
+            button_y = 260
+            level_data = [
+                {
+                    "name": "Emerald Meadows",
+                    "level": 0,
+                    "x": 60,
+                    "image": grass_preview
+                },
+                {
+                    "name": "Ember Peak",
+                    "level": 1,
+                    "x": 310,
+                    "image": volcano_preview
+                },
+                {
+                    "name": "Golden Dunes",
+                    "level": 2,
+                    "x": 560,
+                    "image": desert_preview
+                }
+            ]
+            hovering_any_button = False
+            for level in level_data:
+                x = level["x"]
 
+                # draw preview image
+                screen.blit(level["image"], (x, preview_y))
+
+                # image border
+                pygame.draw.rect(
+                    screen,
+                    WHITE,
+                    pygame.Rect(x, preview_y, 180, 100),
+                    2
+                )
+
+                button_rect = pygame.Rect(x, button_y, 180, 50)
+
+                if button_rect.collidepoint(mouse_pos):
+                    hovering_any_button = True
+
+                # smaller font only for Emerald Meadows
+                font_size = 28 if level["name"] == "Emerald Meadows" else 32
+
+                if draw_button(
+                        level["name"],
+                        x,
+                        button_y,
+                        180,
+                        50,
+                        GREEN,
+                        (120, 220, 120),
+                        font_size
+                ):
+                    reset_level_state()  # 🔥 important
+
+                    selected_level = level["level"]
+                    click.play()
+                    current_state = STATE_PLATFORMER
+            pygame.display.flip()
+            if not hovering_any_button:
+                button_hovered = False
         elif current_state == STATE_PLATFORMER:
-            # The loop returns data when a collision happens or ESC is pressed
             res, show_hitboxes, enemy, px, py = platformer_loop(
-                screen, clock, show_hitboxes, player_x, player_y,
-                defeated_enemies, selected_level
+                screen,
+                clock,
+                show_hitboxes,
+                player_x,
+                player_y,
+                defeated_enemies,
+                selected_level
             )
+
             player_x, player_y = px, py
+
             if res == "combat":
                 current_enemy = enemy
                 current_state = STATE_COMBAT
 
             elif res == "boss":
                 print("Boss fight would start here!")
-                current_state = STATE_MENU  # temporary fallback
+                current_state = STATE_MENU
+
+            elif res == "menu":
+                current_state = STATE_MENU
 
         elif current_state == STATE_COMBAT:
             res = combat_loop(screen, clock, current_enemy)
+
             if res == 'enemy_defeated':
                 defeated_enemies.append(current_enemy.enemy_id)
+
             current_state = STATE_PLATFORMER
 
         clock.tick(60)
