@@ -408,7 +408,8 @@ class Enemy:
         screen.blit(frame, (self.rect.x - camera_x, self.rect.y))
 
 def respawn(player, level):
-    x, y = spawnpoints[level]
+    global spawnpointsplayer
+    x, y = player[level]
     player.rect.x = x
     player.rect.y = y
     player.vel_x = 0
@@ -456,29 +457,32 @@ level_coins = {
     2: []
 }
 
-spawnpoints = {
+spawnpointsplayer = {
     0: (15, 286),
     1: (20, 250),
     2: (30, 200)
 }
 
+# Assets
+SCALE = 2
+alienSkin = [
+    pygame.transform.scale(pygame.image.load(f"AlienSkin{i}.png"), (11 * SCALE, 15 * SCALE)) for i
+    in range(1, 4)]
+alienSkin.append(
+    pygame.transform.scale(pygame.image.load("AlienSkinJump.png"), (11 * SCALE, 15 * SCALE)))
+enemy_frames = [pygame.transform.scale(pygame.image.load(f"RedEnemy{i}.png"), (22, 30)) for i in
+                range(1, 5)]
+
 def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, level):
     SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_width(), screen.get_height()
+    global coins, coin_count, coins_generated, enemy_kill_count, spawnpointsplayer
+
+    spawn_x, spawn_y = spawnpointsplayer[level]
+
+    player = Player(spawn_x, spawn_y, alienSkin)
+
     ui_font = pygame.font.Font(None, 22)
     dev_mode, show_controls = False, True
-    global coins, coin_count, coins_generated, enemy_kill_count
-
-    # Assets
-    SCALE = 2
-    alienSkin = [
-        pygame.transform.scale(pygame.image.load(f"AlienSkin{i}.png").convert_alpha(), (11 * SCALE, 15 * SCALE)) for i
-        in range(1, 4)]
-    alienSkin.append(
-        pygame.transform.scale(pygame.image.load("AlienSkinJump.png").convert_alpha(), (11 * SCALE, 15 * SCALE)))
-    enemy_frames = [pygame.transform.scale(pygame.image.load(f"RedEnemy{i}.png").convert_alpha(), (22, 30)) for i in
-                    range(1, 5)]
-
-    player = Player(p_x, p_y, alienSkin)
 
     # bounds
     if player.rect.left < 0:
@@ -1131,6 +1135,16 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         camera_x = 0 if dev_mode else max(0, min(player.rect.x - SCREEN_WIDTH // 2, 2000 - SCREEN_WIDTH))
 
         if level == 0:
+            if player.rect.colliderect(door_hitbox):
+                print("Touching door")
+            camera_x = 0 if dev_mode else max(0, min(player.rect.x - SCREEN_WIDTH // 2, 2000 - SCREEN_WIDTH))
+            for coin in level_coins[level][:]:
+                if player.rect.colliderect(coin["rect"]):
+                    level_coins[level].remove(coin)
+                    coin_count += 1
+                    coin_get.play()
+            player.update_animation(dt)
+        if level == 1:
             if player.rect.colliderect(door_hitbox):
                 print("Touching door")
             camera_x = 0 if dev_mode else max(0, min(player.rect.x - SCREEN_WIDTH // 2, 2000 - SCREEN_WIDTH))
