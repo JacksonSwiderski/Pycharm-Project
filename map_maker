@@ -1,5 +1,5 @@
 import pygame, random, math
-from test_plat import draw_platform, draw_platform1, draw_platform_tiled
+from test_plat import draw_platform, draw_platform1, draw_platform_tiled, draw_vertical_tiled
 from enemy_data import slime
 
 pygame.init()
@@ -89,6 +89,8 @@ rock_pile = pygame.image.load("RockPile.png")
 rock_pile = pygame.transform.scale(rock_pile, (150, 20))
 door_img = pygame.image.load('boss_door.png')
 door_img = pygame.transform.scale(door_img, (50, 50))
+cage_img = pygame.image.load('EmptyCage.png')
+cage_img = pygame.transform.scale(cage_img, (128, 128))
 
 #volcano
 groundoverlay_img = pygame.image.load("volcano_overlay.png")
@@ -101,6 +103,8 @@ underground1 = pygame.image.load("volcano_underground.png")
 underground1 = pygame.transform.scale(underground1, (111, 65))
 lavaimg = pygame.image.load("LavaTile.png")
 lavaimg = pygame.transform.scale(lavaimg, (32, 65))
+chain_img = pygame.image.load("Chain.png")
+chain_img = pygame.transform.scale(chain_img, (16, 32))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -671,6 +675,171 @@ def load_level(level):
             pygame.Rect(329, 409, 41, 33),
             pygame.Rect(344, 459, 35, 33),
             pygame.Rect(367, 468, 44, 29),
+
+            pygame.Rect(1831, 443, 21, 34),
+            pygame.Rect(1537, 124, 45, 57),
+            pygame.Rect(1579, 125, 37, 47),
+            pygame.Rect(1615, 126, 15, 37),
+            pygame.Rect(1628, 123, 14, 32),
+            pygame.Rect(1610, 121, 12, 18),
+            pygame.Rect(1643, 106, 54, 22),
+            pygame.Rect(1634, 120, 51, 16),
+            pygame.Rect(1629, 130, 34, 14),
+            pygame.Rect(1530, 172, 16, 11),
+            pygame.Rect(1577, 167, 13, 9),
+
+            pygame.Rect(867, 360, 68, 19),
+            pygame.Rect(880, 374, 84, 23),
+            pygame.Rect(900, 388, 88, 23),
+            pygame.Rect(970, 365, 39, 38),
+            pygame.Rect(996, 368, 36, 22),
+            pygame.Rect(1026, 358, 22, 24),
+            pygame.Rect(1044, 361, 13, 16),
+
+            pygame.Rect(749, 337, 34, 36),
+            pygame.Rect(730, 338, 31, 22),
+            pygame.Rect(739, 352, 20, 15),
+            pygame.Rect(772, 347, 27, 14),
+            pygame.Rect(771, 354, 19, 14),
+            pygame.Rect(1104, 319, 17, 27),
+            pygame.Rect(1093, 322, 17, 15),
+            pygame.Rect(1117, 323, 14, 15),
+            pygame.Rect(1245, 440, 19, 28),
+            pygame.Rect(1234, 444, 15, 16),
+            pygame.Rect(1261, 442, 10, 22),
+            pygame.Rect(1341, 387, 13, 30),
+            pygame.Rect(1326, 393, 19, 14),
+            pygame.Rect(1352, 393, 16, 16),
+            pygame.Rect(928, 393, 33, 178),
+            pygame.Rect(912, 399, 22, 34),
+            pygame.Rect(919, 426, 14, 42),
+            pygame.Rect(914, 504, 23, 28),
+            pygame.Rect(889, 524, 45, 28),
+            pygame.Rect(862, 547, 72, 24),
+            pygame.Rect(841, 556, 28, 15),
+            pygame.Rect(837, 566, 23, 7),
+            pygame.Rect(955, 500, 17, 47),
+            pygame.Rect(952, 537, 37, 33),
+            pygame.Rect(965, 532, 15, 16),
+            pygame.Rect(982, 551, 27, 19),
+            pygame.Rect(1002, 559, 22, 12),
+            pygame.Rect(954, 395, 20, 41),
+            pygame.Rect(956, 427, 12, 40),
+            pygame.Rect(965, 396, 18, 25),
+            pygame.Rect(977, 389, 19, 26),
+            pygame.Rect(920, 493, 13, 17),
+            pygame.Rect(1217, 296, 16, 29),
+            pygame.Rect(1204, 299, 19, 19),
+            pygame.Rect(1225, 297, 20, 20),
+            pygame.Rect(1308, 255, 22, 36),
+            pygame.Rect(1288, 256, 24, 16),
+            pygame.Rect(1297, 268, 15, 12),
+            pygame.Rect(1326, 259, 21, 14),
+            pygame.Rect(1323, 268, 16, 14),
+            pygame.Rect(1178, 221, 50, 23),
+            pygame.Rect(1190, 235, 27, 23),
+            pygame.Rect(1199, 250, 11, 16),
+            pygame.Rect(1330, 184, 25, 34),
+            pygame.Rect(1313, 190, 21, 14),
+            pygame.Rect(1323, 196, 17, 13),
+            pygame.Rect(1347, 192, 25, 14),
+            pygame.Rect(1344, 199, 18, 14),
+            pygame.Rect(540, 285, 31, 40),
+            pygame.Rect(511, 289, 42, 20),
+            pygame.Rect(519, 300, 28, 17),
+            pygame.Rect(558, 291, 39, 18),
+            pygame.Rect(559, 304, 26, 15),
+            pygame.Rect(492, 374, 56, 22),
+            pygame.Rect(506, 389, 31, 19),
+            pygame.Rect(515, 405, 15, 10),
+            pygame.Rect(463, 443, 15, 33),
+            pygame.Rect(454, 448, 16, 18),
+            pygame.Rect(474, 445, 14, 23),
+            pygame.Rect(216, 509, 39, 41),
+            pygame.Rect(206, 515, 18, 27),
+            pygame.Rect(245, 519, 18, 22),
+            pygame.Rect(614, 512, 137, 77),
+            pygame.Rect(568, 494, 70, 69),
+            pygame.Rect(538, 491, 48, 34),
+            pygame.Rect(544, 514, 33, 29),
+            pygame.Rect(722, 511, 51, 59),
+            pygame.Rect(758, 514, 33, 40),
+            pygame.Rect(784, 503, 27, 34),
+            pygame.Rect(805, 499, 22, 25),
+            pygame.Rect(815, 487, 33, 25),
+            pygame.Rect(840, 485, 16, 18),
+            pygame.Rect(961, 494, 52, 22),
+            pygame.Rect(976, 503, 54, 25),
+            pygame.Rect(1002, 514, 54, 29),
+            pygame.Rect(1034, 530, 44, 26),
+            pygame.Rect(1063, 518, 36, 26),
+            pygame.Rect(1088, 505, 32, 25),
+            pygame.Rect(1109, 499, 38, 17),
+            pygame.Rect(1137, 491, 42, 16),
+            pygame.Rect(1071, 533, 35, 21),
+            pygame.Rect(1092, 524, 35, 23),
+            pygame.Rect(1114, 509, 35, 26),
+            pygame.Rect(1142, 499, 35, 20),
+            pygame.Rect(1169, 487, 20, 25),
+            pygame.Rect(643, 227, 29, 49),
+            pygame.Rect(625, 230, 24, 20),
+            pygame.Rect(630, 246, 22, 15),
+            pygame.Rect(663, 228, 24, 25),
+            pygame.Rect(661, 248, 17, 15),
+            pygame.Rect(695, 178, 16, 35),
+            pygame.Rect(687, 179, 35, 21),
+            pygame.Rect(515, 175, 53, 21),
+            pygame.Rect(526, 191, 32, 11),
+            pygame.Rect(400, 194, 17, 13),
+            pygame.Rect(402, 135, 53, 13),
+            pygame.Rect(421, 143, 28, 15),
+            pygame.Rect(434, 157, 9, 10),
+            pygame.Rect(218, 98, 31, 21),
+            pygame.Rect(225, 115, 30, 21),
+            pygame.Rect(240, 119, 32, 25),
+            pygame.Rect(259, 119, 40, 17),
+            pygame.Rect(281, 100, 27, 24),
+            pygame.Rect(300, 96, 24, 22),
+            pygame.Rect(239, 242, 44, 21),
+            pygame.Rect(248, 257, 19, 17),
+            pygame.Rect(263, 253, 13, 15),
+
+            pygame.Rect(869, 51, 47, 33),
+            pygame.Rect(888, 65, 43, 29),
+            pygame.Rect(919, 60, 38, 27),
+            pygame.Rect(946, 57, 42, 41),
+            pygame.Rect(980, 57, 25, 32),
+            pygame.Rect(997, 48, 25, 32),
+            pygame.Rect(938, 78, 16, 15),
+
+            pygame.Rect(1885, 361, 117, 68),
+            pygame.Rect(1905, 424, 103, 28),
+            pygame.Rect(1911, 444, 92, 29),
+            pygame.Rect(1928, 465, 88, 46),
+            pygame.Rect(1887, 338, 120, 33),
+            pygame.Rect(1882, 359, 22, 49),
+            pygame.Rect(1917, 321, 86, 27),
+            pygame.Rect(1926, 299, 86, 31),
+            pygame.Rect(1960, 294, 52, 11),
+            pygame.Rect(1970, 268, 39, 44),
+            pygame.Rect(1968, 256, 48, 29),
+            pygame.Rect(1441, 428, 35, 19),
+            pygame.Rect(1447, 440, 24, 19),
+            pygame.Rect(1454, 450, 12, 36),
+            pygame.Rect(1449, 481, 22, 20),
+            pygame.Rect(1443, 497, 35, 33),
+            pygame.Rect(1435, 515, 22, 54),
+            pygame.Rect(1418, 538, 20, 36),
+            pygame.Rect(1455, 512, 30, 61),
+            pygame.Rect(1478, 534, 22, 46),
+            pygame.Rect(1492, 548, 14, 29),
+            pygame.Rect(1412, 553, 13, 23),
+            pygame.Rect(101, 101, 28, 45),
+            pygame.Rect(81, 105, 27, 19),
+            pygame.Rect(86, 116, 20, 16),
+            pygame.Rect(117, 106, 26, 19),
+            pygame.Rect(120, 118, 14, 18),
+
         ]
         platforms = [
             (pygame.Rect(0, 307, 66, 294), {}),
@@ -708,7 +877,7 @@ def load_level(level):
             (pygame.Rect(1167, 478, 29 - 7, 17), {}),
             (pygame.Rect(1098, 454, 57, 36), {}),
 
-            (pygame.Rect(1842, 240, 42, 374), {}),
+            (pygame.Rect(1842, 240, 42, 339), {}),
             (pygame.Rect(1788, 240, 55, 93), {}),
             (pygame.Rect(1754, 240, 37, 60), {}),
             (pygame.Rect(1725 - 3, 240, 29, 40), {}),
@@ -734,6 +903,28 @@ def load_level(level):
             (pygame.Rect(233, 90, 17, 29), {}),
             (pygame.Rect(224, 90, 11, 18), {}),
             (pygame.Rect(213, 90, 12, 10), {}),
+
+            (pygame.Rect(1227, 427, 57, 24), {}),
+            (pygame.Rect(1776, 70, 85, 30), {}),
+            (pygame.Rect(1317, 375, 64, 24), {}),
+            (pygame.Rect(1434, 401, 48, 35), {}),
+            (pygame.Rect(726, 323, 80, 29), {}),
+            (pygame.Rect(858, 346, 73, 22), {}),
+            (pygame.Rect(930, 346, 28, 35), {}),
+            (pygame.Rect(957, 347, 36, 45), {}),
+            (pygame.Rect(992, 347, 27, 28), {}),
+            (pygame.Rect(1017, 346, 45, 19), {}),
+            (pygame.Rect(1087, 310, 53, 20), {}),
+            (pygame.Rect(1196, 282, 58, 24), {}),
+            (pygame.Rect(1284, 242, 69, 22), {}),
+            (pygame.Rect(1170, 210, 66, 18), {}),
+            (pygame.Rect(1307, 176, 71, 21), {}),
+            (pygame.Rect(1405, 139, 63, 22), {}),
+            (pygame.Rect(1457, 128, 38, 43), {}),
+            (pygame.Rect(1490, 115, 49, 67), {}),
+            (pygame.Rect(1529, 103, 117, 25), {}),
+            (pygame.Rect(1639, 85, 63, 28), {}),
+            (pygame.Rect(74, 89, 82, 23), {}),
 
             (pygame.Rect(395, 181, 26, 19), {}),
             (pygame.Rect(863, 42, 29, 22), {"grass": False}),
@@ -767,19 +958,56 @@ def load_level(level):
             pygame.Rect(1809, 325, 22, 14),
             pygame.Rect(1777, 293, 16, 21),
             pygame.Rect(1745, 280, 17, 9),
-            pygame.Rect(1831, 443, 21, 34),
         ]
         chains = [
-            pygame.Rect(300, 0, 32, 220),
-            pygame.Rect(700, 50, 32, 300),
+            (pygame.Rect(392-5, 138, 32, 45), {}),
+            (pygame.Rect(413, 138, 32, 46), {}),
+            (pygame.Rect(945-4, 71, 15, 94), {}),
+        ]
+        cage = [
+            (pygame.Rect(919-34, 141+10, 128, 128), {}),
         ]
         water = []
         lava = [
             pygame.Rect(55, 579, 1960, 82),
+            pygame.Rect(172, 552, 155, 30),
+            pygame.Rect(417, 572, 194, 16),
+            pygame.Rect(855, 571, 255, 17),
+            pygame.Rect(830, 573, 38, 12),
+            pygame.Rect(603, 575, 47, 9),
+            pygame.Rect(411, 567, 54, 16),
+            pygame.Rect(415, 557, 35, 22),
+            pygame.Rect(414, 553, 27, 13),
+
+            pygame.Rect(1591, 570, 95, 12),
+            pygame.Rect(1643, 563, 42, 9),
+            pygame.Rect(1663, 554, 47, 8),
+            pygame.Rect(1657, 560, 27, 8),
+            pygame.Rect(1682, 543, 36, 11),
+            pygame.Rect(1702, 539, 17, 7),
+
+            pygame.Rect(1940, 511, 59, 24),
+            pygame.Rect(1953, 533, 47, 22),
+            pygame.Rect(1979, 555, 26, 25),
+            pygame.Rect(1097, 575, 38, 10),
+            pygame.Rect(1310, 568, 166, 23),
+            pygame.Rect(1249, 574, 77, 14),
+            pygame.Rect(1273, 572, 55, 12),
+            pygame.Rect(1469, 571, 58, 17),
+            pygame.Rect(1499, 574, 60, 14),
+
+            pygame.Rect(97, 571, 41, 9),
+            pygame.Rect(109, 568, 29, 6),
+            pygame.Rect(118, 565, 19, 6),
+            pygame.Rect(89, 574, 17, 7),
+
         ]
 
         fences = [
             # pygame.Rect(878, 307 - 32, 73, 8),
+        ]
+        water = [
+
         ]
         fenceHBox = [
             # pygame.Rect(285, 287, 66, 6),
@@ -932,11 +1160,14 @@ def load_level(level):
         door_hitbox,
         groundoverlay1,
         solidground,
+        chains,
+        water,
+        cage,
     )
 
 
 LEVEL = 1
-platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, underground, grassoverlay, lava, rockpile, door_pos, door_hitbox, groundoverlay1, solidground = load_level(LEVEL)
+platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, underground, grassoverlay, lava, rockpile, door_pos, door_hitbox, groundoverlay1, solidground, chains, water, cage = load_level(LEVEL)
 
 # -----------------------------
 # MAIN LOOP
@@ -971,7 +1202,7 @@ while running:
                 )
 
                 saved_rects.append(rect)
-                print(f"(pygame.Rect({rect.x}, {rect.y}, {rect.width}, {rect.height}), {{}}),")
+                print(f"pygame.Rect({rect.x}, {rect.y}, {rect.width}, {rect.height}),") #   (        {{}}),
 
         if event.type == pygame.MOUSEMOTION:
             current_pos = pygame.mouse.get_pos()
@@ -1045,8 +1276,6 @@ while running:
     elif LEVEL == 1:
         screen.fill(GROUND_COLOR)
         screen.blit(bg_img1, (0, 0))
-        for l in lava:
-            draw_platform1(screen, lavaimg, l)
         # update_and_draw_clouds(screen, dt)
         draw_platform1(screen, door_img, door_pos)
         for br in background_rects:
@@ -1055,10 +1284,14 @@ while running:
             pygame.draw.rect(screen, GROUND_COLOR, sg)
         for u in underground:
             draw_platform_tiled(screen, underground1, u)
+        for l in lava:
+            draw_platform1(screen, lavaimg, l)
         for p in platforms:
             draw_platform1(screen, ground_img, p)
-        # for t1 in tree1:
-        #     draw_platform1(screen, tree1_img, t1, camera_x)
+        for c in chains:
+            draw_vertical_tiled(screen, chain_img, c)
+        for c in cage:
+            draw_platform1(screen, cage_img, c)
         # for t2 in tree2:
         #     draw_platform1(screen, tree2_img, t2, camera_x)
         # for t3 in tree3:
