@@ -1,5 +1,5 @@
 import pygame, random, math
-from test_plat import draw_platform, draw_platform1
+from test_plat import draw_platform, draw_platform1, draw_platform_tiled
 from enemy_data import slime
 
 pygame.init()
@@ -658,26 +658,42 @@ def load_level(level):
             pygame.Rect(0, 0, 58, 61),
             pygame.Rect(56, -3, 56, 34),
             pygame.Rect(105, -2, 62, 19),
+
+            pygame.Rect(46, 228, 31, 40),
+            pygame.Rect(6, 150, 66, 65),
+            pygame.Rect(43, 256, 41, 25),
+            pygame.Rect(-15, 273, 66, 41),
+            pygame.Rect(112, 266, 24, 12),
+            pygame.Rect(41, 491, 296, 121),
+            pygame.Rect(99, 351, 260, 185),
+            pygame.Rect(329, 333, 69, 60),
+            pygame.Rect(336, 385, 45, 34),
+            pygame.Rect(329, 409, 41, 33),
+            pygame.Rect(344, 459, 35, 33),
+            pygame.Rect(367, 468, 44, 29),
         ]
         platforms = [
             (pygame.Rect(0, 307, 66, 294), {}),
             (pygame.Rect(63, 307, 25, 266), {}),
             (pygame.Rect(86, 307, 36, 208), {}),
-            (pygame.Rect(121, 307, 64, 155), {}),
+            (pygame.Rect(121, 307, 64, 155 - 20), {}),
+            (pygame.Rect(139, 536, 38, 75), {}),
             (pygame.Rect(184, 307, 41, 117), {}),
             (pygame.Rect(223, 307, 68, 91), {}),
             (pygame.Rect(285, 307, 53, 70), {}),
             (pygame.Rect(334, 307, 31, 51), {}),
             (pygame.Rect(361, 307, 42, 31), {}),
+            (pygame.Rect(106, 307, 37, 181), {}),
+            (pygame.Rect(128, 307, 33, 157), {}),
 
             (pygame.Rect(322, 481, 107, 133), {}),
             (pygame.Rect(200, 492, 70, 39), {}),
             # (pygame.Rect(513, 474, 312, 41), {}),
-            (pygame.Rect(513+50, 476, 104-50, 41), {}),
+            (pygame.Rect(513 + 50, 476, 104 - 50, 41), {}),
             (pygame.Rect(616, 476, 49, 62), {}),
-            (pygame.Rect(664, 476, 35, 86-13), {}),
-            (pygame.Rect(701-5, 476, 43, 63), {}),
-            (pygame.Rect(742-5, 476, 68, 46), {}),
+            (pygame.Rect(664, 476, 35, 86 - 13), {}),
+            (pygame.Rect(701 - 5, 476, 43, 63), {}),
+            (pygame.Rect(742 - 5, 476, 68, 46), {}),
             (pygame.Rect(529, 476, 35, 19), {}),
             (pygame.Rect(791, 476, 41, 31), {}),
             (pygame.Rect(825, 476, 30, 16), {}),
@@ -689,14 +705,14 @@ def load_level(level):
             (pygame.Rect(1042, 478, 57, 61), {}),
             (pygame.Rect(1097, 478, 28, 49), {}),
             (pygame.Rect(1123, 478, 44, 29), {}),
-            (pygame.Rect(1167, 478, 29-7, 17), {}),
+            (pygame.Rect(1167, 478, 29 - 7, 17), {}),
             (pygame.Rect(1098, 454, 57, 36), {}),
 
             (pygame.Rect(1842, 240, 42, 374), {}),
             (pygame.Rect(1788, 240, 55, 93), {}),
             (pygame.Rect(1754, 240, 37, 60), {}),
-            (pygame.Rect(1725-3, 240, 29, 40), {}),
-            (pygame.Rect(1693-3, 240, 34, 22), {}),
+            (pygame.Rect(1725 - 3, 240, 29, 40), {}),
+            (pygame.Rect(1693 - 3, 240, 34, 22), {}),
             (pygame.Rect(1720, 240, 35, 45), {}),
             (pygame.Rect(1884, 240, 34, 100), {}),
             (pygame.Rect(1915, 240, 16, 84), {}),
@@ -718,6 +734,11 @@ def load_level(level):
             (pygame.Rect(233, 90, 17, 29), {}),
             (pygame.Rect(224, 90, 11, 18), {}),
             (pygame.Rect(213, 90, 12, 10), {}),
+
+            (pygame.Rect(395, 181, 26, 19), {}),
+            (pygame.Rect(863, 42, 29, 22), {"grass": False}),
+            (pygame.Rect(1006, 43, 27, 19), {"grass": False}),
+            (pygame.Rect(887, 33, 127, 39), {"grass": False}),
 
             # EXCLUDED FROM GRASS OVERLAY
             # (pygame.Rect(1321, 245, 86, 32), {"grass": False})
@@ -748,8 +769,13 @@ def load_level(level):
             pygame.Rect(1745, 280, 17, 9),
             pygame.Rect(1831, 443, 21, 34),
         ]
+        chains = [
+            pygame.Rect(300, 0, 32, 220),
+            pygame.Rect(700, 50, 32, 300),
+        ]
+        water = []
         lava = [
-            # pygame.Rect(577, 357, 110, 64),
+            pygame.Rect(55, 579, 1960, 82),
         ]
 
         fences = [
@@ -1028,7 +1054,7 @@ while running:
         for sg in solidground:
             pygame.draw.rect(screen, GROUND_COLOR, sg)
         for u in underground:
-            draw_platform1(screen, underground1, u)
+            draw_platform_tiled(screen, underground1, u)
         for p in platforms:
             draw_platform1(screen, ground_img, p)
         # for t1 in tree1:
