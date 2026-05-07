@@ -409,9 +409,12 @@ class Enemy:
 
 def respawn(player, level):
     global spawnpointsplayer
-    x, y = player[level]
+
+    x, y = spawnpointsplayer[level]
+
     player.rect.x = x
     player.rect.y = y
+
     player.vel_x = 0
     player.vel_y = 0
 
@@ -419,36 +422,41 @@ def respawn(player, level):
 def update_and_draw_clouds(screen, dt):
     global clouds
 
-    # create timer once
+    # initialize timers once
     if not hasattr(update_and_draw_clouds, "spawn_timer"):
         update_and_draw_clouds.spawn_timer = 0
 
-    # count time
+    if not hasattr(update_and_draw_clouds, "next_spawn"):
+        update_and_draw_clouds.next_spawn = random.uniform(2, 5)
+
+    # increase timer
     update_and_draw_clouds.spawn_timer += dt
 
-    # every few seconds spawn a new random cloud
-    if update_and_draw_clouds.spawn_timer >= random.uniform(2, 5):
+    # spawn cloud
+    if update_and_draw_clouds.spawn_timer >= update_and_draw_clouds.next_spawn:
+
         update_and_draw_clouds.spawn_timer = 0
+        update_and_draw_clouds.next_spawn = random.uniform(2, 5)
 
         img = random.choice(cloud_images)
 
         new_cloud = {
             "image": img,
-            "x": -img.get_width(),  # start off-screen left
-            "y": random.randint(20, 120),  # random height
-            "speed": random.randint(20, 50)  # random slow speed
+            "x": -img.get_width(),
+            "y": random.randint(20, 120),
+            "speed": random.randint(20, 50)
         }
 
         clouds.append(new_cloud)
 
-    # move + draw clouds
+    # move/draw
     for cloud in clouds[:]:
         cloud["x"] += cloud["speed"] * dt
 
         screen.blit(cloud["image"], (cloud["x"], cloud["y"]))
 
-        # remove when fully off screen
-        if cloud["x"] > screen.get_width():
+        # remove offscreen
+        if cloud["x"] > screen.get_width() + 200:
             clouds.remove(cloud)
 
 level_coins = {
@@ -475,7 +483,12 @@ enemy_frames = [pygame.transform.scale(pygame.image.load(f"RedEnemy{i}.png"), (2
 
 def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, level):
     SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_width(), screen.get_height()
-    global coins, coin_count, coins_generated, enemy_kill_count, spawnpointsplayer
+    global coins, coin_count, coins_generated, enemy_kill_count, spawnpointsplayer, clouds
+
+    clouds.clear()
+
+    update_and_draw_clouds.spawn_timer = 0
+    update_and_draw_clouds.next_spawn = random.uniform(2, 5)
 
     spawn_x, spawn_y = spawnpointsplayer[level]
 
@@ -1342,7 +1355,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
         screen_width = screen.get_width()
 
-        x = (screen_width - text_width) // 2
+        x = (screen_width   - text_width) // 2
         y = 10  # top padding
 
         # background box
