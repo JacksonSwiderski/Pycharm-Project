@@ -224,6 +224,42 @@ def draw_platform1(screen, image, rect, camera_x=0):
 
     screen.blit(platform_surf, (rect.x - camera_x, rect.y))
 
+def draw_platform_tiled(screen, image, rect, camera_x=0):
+
+    # unwrap tuple if needed
+    if isinstance(rect, tuple):
+        rect = rect[0]
+
+    platform_surf = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+
+    t_w = image.get_width()
+    t_h = image.get_height()
+
+    # repeat horizontally + vertically
+    for y in range(0, rect.height, t_h):
+        for x in range(0, rect.width, t_w):
+
+            draw_w = min(t_w, rect.width - x)
+            draw_h = min(t_h, rect.height - y)
+
+            tile = image.subsurface((0, 0, draw_w, draw_h))
+
+            platform_surf.blit(tile, (x, y))
+
+    # rounded edges
+    mask = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+
+    pygame.draw.rect(
+        mask,
+        (255, 255, 255),
+        (0, 0, rect.width, rect.height),
+        border_radius=6
+    )
+
+    platform_surf.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+
+    screen.blit(platform_surf, (rect.x - camera_x, rect.y))
+
 def add_manual_coin(x, y, level):
     level_coins[level].append({
         "rect": pygame.Rect(x, y, 20, 20),
