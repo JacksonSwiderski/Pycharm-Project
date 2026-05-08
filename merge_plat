@@ -1356,7 +1356,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             (pygame.Rect(930, 346, 28, 35), {}),
             (pygame.Rect(957, 347, 36, 45), {}),
             (pygame.Rect(992, 347, 27, 28), {}),
-            (pygame.Rect(1017, 346, 45, 19), {}),
+            (pygame.Rect(1017, 346+1, 45, 19+3), {}),
             (pygame.Rect(1087, 310, 53, 20), {}),
             (pygame.Rect(1196, 282, 58, 24), {}),
             (pygame.Rect(1284, 242, 69, 22), {}),
@@ -1543,6 +1543,60 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             284 - 7,
             40,
             3
+        )
+
+        lavaflowers += generate_random_lava_flower_positions(
+            859,
+            859 + 200 - 23,
+            322 - 7,
+            322 - 7,
+            40,
+            2
+        )
+
+        lavaflowers += generate_random_lava_flower_positions(
+            616,
+            616 + 85 - 23,
+            191 - 7,
+            191 - 7,
+            40,
+            1
+        )
+
+        lavaflowers += generate_random_lava_flower_positions(
+            960,
+            960 + 130 - 23,
+            451 - 7,
+            451 - 7,
+            40,
+            2
+        )
+
+        lavaflowers += generate_random_lava_flower_positions(
+            535,
+            535 + 318 - 23,
+            447 - 7,
+            447 - 7,
+            40,
+            3
+        )
+
+        lavaflowers += generate_random_lava_flower_positions(
+            1531,
+            1531 + 104 - 23,
+            77 - 7,
+            77 - 7,
+            40,
+            1
+        )
+
+        lavaflowers += generate_random_lava_flower_positions(
+            1687,
+            1687 + 239 - 23,
+            214 - 7,
+            214 - 7,
+            40,
+            2
         )
 
         def groundoverlayrepeat(x, y, platform_width, img):
