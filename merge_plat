@@ -1568,8 +1568,8 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         lavaflowers += generate_random_lava_flower_positions(
             960,
             960 + 130 - 23,
-            451 - 7,
-            451 - 7,
+            451 - 4,
+            451 - 4,
             40,
             2
         )
@@ -1577,8 +1577,8 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         lavaflowers += generate_random_lava_flower_positions(
             535,
             535 + 318 - 23,
-            447 - 7,
-            447 - 7,
+            447 - 2,
+            447 - 2,
             40,
             3
         )
@@ -1659,10 +1659,10 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
         enemies = [
             Enemy(660-125, 445, 300, slime1, 'slime_1', enemy_frames),
-            Enemy(1773-75, 213-5, 250, slime1, 'slime_1', enemy_frames),
-            Enemy(1414, 305, 200, slime1, 'slime_1', enemy_frames),
-            Enemy(215, 55, 100, bat, 'slime_1', enemy_frames_bat),
-            Enemy(1146, 152, 125, bat, 'slime_1', enemy_frames_bat),
+            Enemy(1773-75, 213-5, 250, slime1, 'slime_2', enemy_frames),
+            Enemy(1414, 305, 200, bat, 'slime_3', enemy_frames_bat),
+            Enemy(215, 55, 100, bat, 'slime_4', enemy_frames_bat),
+            Enemy(1146, 152, 125, bat, 'slime_5', enemy_frames_bat),
         ]
 
         def generate_random_positions(min_x, max_x, min_y, max_y, min_distance, amount):
