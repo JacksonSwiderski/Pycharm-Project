@@ -25,7 +25,7 @@ slime = EnemyData(
 
 slime1 = EnemyData(
     name='Wrath',
-    hp=45,
+    hp=50,
     moves=[tackle, bite, solidify],
     music='battle.mp3',
     music_loop=11.294,
@@ -36,7 +36,7 @@ slime1 = EnemyData(
 
 bat = EnemyData(
     name='Lava Bat',
-    hp=50,
+    hp=55,
     moves=[Flame_Dash, Fireball_Burst, Lava_Drain],
     music='battle.mp3',
     music_loop=11.294,
