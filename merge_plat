@@ -1599,6 +1599,15 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             2
         )
 
+        lavaflowers += generate_random_lava_flower_positions(
+            1547,
+            1547 + 188 - 23,
+            356 + 3,
+            356 + 3,
+            40,
+            2
+        )
+
         def groundoverlayrepeat(x, y, platform_width, img):
             groundoverlay = []
 
