@@ -1,4 +1,5 @@
-from moves import tackle, bite, solidify
+from moves import tackle, bite, solidify, Fireball_Burst, Flame_Dash, Lava_Drain
+
 
 class EnemyData:
     def __init__(self, name, hp, moves, music, music_loop, bg, sprite, scale):
@@ -24,11 +25,22 @@ slime = EnemyData(
 
 slime1 = EnemyData(
     name='Wrath',
-    hp=30,
+    hp=45,
     moves=[tackle, bite, solidify],
     music='battle.mp3',
     music_loop=11.294,
     bg='volcano_battle_bg.png',
     sprite='RedEnemy1.png',
     scale=1.0
+)
+
+bat = EnemyData(
+    name='Lava Bat',
+    hp=50,
+    moves=[Flame_Dash, Fireball_Burst, Lava_Drain],
+    music='battle.mp3',
+    music_loop=11.294,
+    bg='volcano_battle_bg.png',
+    sprite='LavaBatFront.png',
+    scale=0.5
 )
