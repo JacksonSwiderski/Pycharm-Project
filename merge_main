@@ -19,6 +19,8 @@ pygame.display.set_caption("Chrono Clash")
 title = pygame.image.load('ChronoClashLogo.png').convert_alpha()
 title = pygame.transform.scale(title, (500, 300))
 
+current_level_assets = 0
+
 # Sounds
 click = pygame.mixer.Sound('select.wav')
 click.set_volume(0.5)
@@ -35,9 +37,13 @@ def reset_level_state():
 
     coins = []
     coin_count = 0
-    coins_generated = False   # 🔥 THIS is the key fix
+    coins_generated = False
     enemy_kill_count = 0
-    defeated_enemies = []
+    defeated_enemies = {
+        0: [],
+        1: [],
+        2: []
+    }
 
 # Game states
 STATE_MENU, STATE_LEVEL_SELECT, STATE_PLATFORMER, STATE_COMBAT = "menu", "level_select", "platformer", "combat"
@@ -96,7 +102,7 @@ def play_menu_music():
 
 
 def main():
-    global current_state, selected_level, player_x, player_y, defeated_enemies, current_enemy, show_hitboxes, button_hovered
+    global current_state, selected_level, player_x, player_y, defeated_enemies, current_enemy, show_hitboxes, button_hovered, current_level_assets
 
     play_menu_music()
 
@@ -237,7 +243,8 @@ def main():
             res = combat_loop(screen, clock, current_enemy)
 
             if res == 'enemy_defeated':
-                defeated_enemies.append(current_enemy.enemy_id)
+                defeated_enemies[selected_level].append(current_enemy.enemy_id)
+                current_enemy = None
 
             current_state = STATE_PLATFORMER
 
