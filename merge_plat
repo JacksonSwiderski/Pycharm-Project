@@ -8,6 +8,8 @@ pygame.mixer.init()
 coin_font = pygame.font.Font(None, 28)
 
 coin_count = 0
+coin_countlevel1 = 0
+enemy_kill_countlevel1 = 0
 enemy_kill_count = 0
 coins_generated = {
     0: False,
@@ -579,7 +581,7 @@ enemy_frames_bat = [pygame.transform.scale(pygame.image.load(f"LavaBat{i}.png"),
 
 def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, level):
     SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_width(), screen.get_height()
-    global coins, coin_count, coins_generated, enemy_kill_count, spawnpointsplayer, clouds
+    global coins, coin_count, coins_generated, enemy_kill_count, spawnpointsplayer, clouds, coin_countlevel1, enemy_kill_countlevel1
 
     clouds.clear()
 
@@ -1341,8 +1343,8 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             (pygame.Rect(683, 167, 46, 24), {}),
             (pygame.Rect(511, 166, 60, 16), {}),
             (pygame.Rect(395, 123, 63, 17), {}),
-            (pygame.Rect(248, 89, 39, 40), {}),
-            (pygame.Rect(285, 89, 19, 30), {}),
+            (pygame.Rect(248, 90, 39, 40), {}),
+            (pygame.Rect(285, 90, 19, 30), {}),
             (pygame.Rect(300, 90, 22, 18), {}),
             (pygame.Rect(316, 90, 23, 11), {}),
             (pygame.Rect(233, 90, 17, 29), {}),
@@ -1761,7 +1763,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
             for coin in level_coins[level][:]:
                 if player.rect.colliderect(coin["rect"]):
                     level_coins[level].remove(coin)
-                    coin_count += 1
+                    coin_countlevel1 += 1
                     coin_get.play()
             player.update_animation(dt)
 
@@ -1772,14 +1774,24 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         if player.rect.top > SCREEN_HEIGHT:
             respawn(player, level)
 
-        for e in enemies:
-            e.update(dt)
+        if level == 0:
+            for e in enemies:
+                e.update(dt)
 
-            if player.rect.colliderect(e.rect):
-                enemy_kill_count += 1
-                defeated_enemies.append(e.enemy_id)
+                if player.rect.colliderect(e.rect):
+                    enemy_kill_count += 1
+                    defeated_enemies.append(e.enemy_id)
 
-                return "combat", show_hitboxes, e, player.rect.x, player.rect.y
+                    return "combat", show_hitboxes, e, player.rect.x, player.rect.y
+        elif level == 1:
+            for e in enemies:
+                e.update(dt)
+
+                if player.rect.colliderect(e.rect):
+                    enemy_kill_countlevel1 += 1
+                    defeated_enemies.append(e.enemy_id)
+
+                    return "combat", show_hitboxes, e, player.rect.x, player.rect.y
 
         # ===== BOSS DOOR CHECK =====
         if level == 0:
@@ -1952,8 +1964,12 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
         screen.blit(coin_img, (box_x + 6, box_y + 6))
 
-        text = coin_font.render(f"{coin_count}/{required_coins}", True, (255, 255, 255))
-        screen.blit(text, (box_x - 53, box_y + 8))
+        if level == 0:
+            text = coin_font.render(f"{coin_count}/{required_coins}", True, (255, 255, 255))
+            screen.blit(text, (box_x - 53, box_y + 8))
+        elif level == 1:
+            text = coin_font.render(f"{coin_countlevel1}/{required_coins}", True, (255, 255, 255))
+            screen.blit(text, (box_x - 53, box_y + 8))
 
         # ===== OBJECTIVE UI (CENTER TOP) =====
         objective_text = ui_font.render(
@@ -1996,7 +2012,11 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         screen.blit(enemy_icon, (box_x + 6, enemy_box_y + 6))
 
         # enemy counter text
-        enemy_text = coin_font.render(f"{enemy_kill_count}/{required_fights}", True, (255, 255, 255))
-        screen.blit(enemy_text, (box_x - 40, enemy_box_y + 8))
+        if level == 0:
+            enemy_text = coin_font.render(f"{enemy_kill_countlevel1}/{required_fights}", True, (255, 255, 255))
+            screen.blit(enemy_text, (box_x - 40, enemy_box_y + 8))
+        elif level == 1:
+            enemy_text = coin_font.render(f"{enemy_kill_countlevel1}/{required_fights}", True, (255, 255, 255))
+            screen.blit(enemy_text, (box_x - 40, enemy_box_y + 8))
 
         pygame.display.flip()
