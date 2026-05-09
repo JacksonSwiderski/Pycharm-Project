@@ -1,4 +1,4 @@
-from moves import tackle, bite, solidify, Fireball_Burst, Flame_Dash, Lava_Drain
+from moves import tackle, bite, solidify, Fireball_Burst, Flame_Dash, Lava_Drain, royal_swing, flamethrower, royal_service
 
 
 class EnemyData:
@@ -43,4 +43,16 @@ bat = EnemyData(
     bg='volcano_battle_bg.png',
     sprite='LavaBatFront.png',
     scale=0.5
+)
+
+wrath_king = EnemyData(
+    # Some placeholders present!!
+    name='Wrath King',
+    hp=175,
+    moves=[royal_swing, flamethrower, royal_service],
+    music='battle.mp3', #
+    music_loop=11.294, #
+    bg='boss_battle_bg.png',
+    sprite='wrath_king.png',
+    scale=0.3
 )
