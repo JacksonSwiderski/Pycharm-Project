@@ -156,27 +156,6 @@ lava_flower_images = [
     lavaflower5img,
 ]
 
-'''
-{"rect": pygame.Rect(1797, 70, 20, 20), "img": coin_img, "base_y": 70, "offset": 0},
-    {"rect": pygame.Rect(1834, 102, 20, 20), "img": coin_img, "base_y": 102, "offset": 1},
-    {"rect": pygame.Rect(1853, 159, 20, 20), "img": coin_img, "base_y": 159, "offset": 2},
-    {"rect": pygame.Rect(1688, 110, 20, 20), "img": coin_img, "base_y": 110, "offset": 3},
-    {"rect": pygame.Rect(1719, 77, 20, 20), "img": coin_img, "base_y": 77, "offset": 4},
-    {"rect": pygame.Rect(1765, 59, 20, 20), "img": coin_img, "base_y": 59, "offset": 5},
-    {"rect": pygame.Rect(1865, 206, 20, 20), "img": coin_img, "base_y": 206, "offset": 6},
-
-    {"rect": pygame.Rect(473, 405, 20, 20), "img": coin_img, "base_y": 405, "offset": 0},
-    {"rect": pygame.Rect(508, 411, 20, 20), "img": coin_img, "base_y": 411, "offset": 0},
-    {"rect": pygame.Rect(545, 417, 20, 20), "img": coin_img, "base_y": 417, "offset": 0},
-    {"rect": pygame.Rect(591, 412, 20, 20), "img": coin_img, "base_y": 412, "offset": 0},
-    {"rect": pygame.Rect(625, 414, 20, 20), "img": coin_img, "base_y": 414, "offset": 0},
-    {"rect": pygame.Rect(659, 400, 20, 20), "img": coin_img, "base_y": 400, "offset": 0},
-
-    {"rect": pygame.Rect(941, 131, 20, 20), "img": coin_img, "base_y": 131, "offset": 0},
-    {"rect": pygame.Rect(1856, 384, 20, 20), "img": coin_img, "base_y": 384, "offset": 0},
-    {"rect": pygame.Rect(1912, 323, 20, 20), "img": coin_img, "base_y": 323, "offset": 0},
-    {"rect": pygame.Rect(872, 129, 20, 20), "img": coin_img, "base_y": 129, "offset": 0},'''
-
 bush = []
 
 clouds = []
@@ -579,7 +558,7 @@ enemy_frames = [pygame.transform.scale(pygame.image.load(f"RedEnemy{i}.png"), (2
 enemy_frames_bat = [pygame.transform.scale(pygame.image.load(f"LavaBat{i}.png"), (22, 20)) for i in
                 range(1, 4)]
 
-def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, level):
+def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,level):
     SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_width(), screen.get_height()
     global coins, coin_count, coins_generated, enemy_kill_count, spawnpointsplayer, clouds, coin_countlevel1, enemy_kill_countlevel1
 
@@ -607,106 +586,67 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
         background_rects = [
             pygame.Rect(866, 168, 107, 58), pygame.Rect(873, 225, 98, 13), pygame.Rect(202, 281, 60, 111),
-            pygame.Rect(257, 290, 27, 32),
-            pygame.Rect(252, 313, 18, 39), pygame.Rect(262, 344, 18, 20), pygame.Rect(258, 358, 34, 25),
-            pygame.Rect(176, 271, 30, 32),
-            pygame.Rect(185, 300, 25, 24), pygame.Rect(194, 319, 16, 24), pygame.Rect(183, 355, 29, 28),
-            pygame.Rect(199, 340, 12, 26),
+
+            pygame.Rect(257, 290, 27, 32), pygame.Rect(252, 313, 18, 39), pygame.Rect(262, 344, 18, 20),
+            pygame.Rect(258, 358, 34, 25), pygame.Rect(176, 271, 30, 32), pygame.Rect(185, 300, 25, 24),
+
+            pygame.Rect(194, 319, 16, 24), pygame.Rect(183, 355, 29, 28), pygame.Rect(199, 340, 12, 26),
             pygame.Rect(193, 346, 15, 21), pygame.Rect(522, 245, 115, 44), pygame.Rect(537, 287, 98, 28),
-            pygame.Rect(563, 313, 71, 48),
-            pygame.Rect(548, 305, 26, 26), pygame.Rect(529, 279, 16, 20), pygame.Rect(548, 342, 23, 19),
-            pygame.Rect(626, 264, 23, 26),
-            pygame.Rect(613, 282, 27, 32), pygame.Rect(618, 310, 28, 26), pygame.Rect(629, 329, 31, 22),
-            pygame.Rect(556, 323, 10, 25),
+
+            pygame.Rect(563, 313, 71, 48), pygame.Rect(548, 305, 26, 26), pygame.Rect(529, 279, 16, 20),
+            pygame.Rect(548, 342, 23, 19), pygame.Rect(626, 264, 23, 26), pygame.Rect(613, 282, 27, 32),
+
+            pygame.Rect(618, 310, 28, 26), pygame.Rect(629, 329, 31, 22), pygame.Rect(556, 323, 10, 25),
             pygame.Rect(872, 216, 10, 15),
 
-            pygame.Rect(1055, 273, 86, 73),
-            pygame.Rect(1046, 278, 21, 39),
-            pygame.Rect(1021, 295, 42, 23),
-            pygame.Rect(1034, 310, 29, 26),
-            pygame.Rect(1051, 326, 31, 41),
-            pygame.Rect(1041, 363, 47, 31),
-            pygame.Rect(1010, 385, 104, 59),
-            pygame.Rect(1077, 324, 77, 140),
-            pygame.Rect(1120, 291, 34, 24),
-            pygame.Rect(1142, 395, 42, 51),
-            pygame.Rect(1169, 416, 41, 28),
-            pygame.Rect(1141, 383, 23, 25),
-            pygame.Rect(1023, 376, 32, 16),
-            pygame.Rect(1036, 276, 28, 29),
-            pygame.Rect(1047, 325, 12, 23),
-            pygame.Rect(1595, 389, 24, 33),
-            pygame.Rect(1645, 395, 49, 24),
-            pygame.Rect(1658, 379, 32, 28),
-            pygame.Rect(1669, 360, 13, 27),
-            pygame.Rect(1855, 312, 51, 113),
-            pygame.Rect(1892, 390, 37, 36),
-            pygame.Rect(1896, 306, 16, 25),
-            pygame.Rect(1823, 383, 42, 46),
-            pygame.Rect(1838, 360, 26, 27),
-            pygame.Rect(1847, 346, 19, 25),
-            pygame.Rect(1852, 305, 9, 18),
-            pygame.Rect(1894, 377, 21, 25),
+            pygame.Rect(1055, 273, 86, 73), pygame.Rect(1046, 278, 21, 39), pygame.Rect(1021, 295, 42, 23),
+
+            pygame.Rect(1034, 310, 29, 26), pygame.Rect(1051, 326, 31, 41), pygame.Rect(1041, 363, 47, 31),
+
+            pygame.Rect(1010, 385, 104, 59), pygame.Rect(1077, 324, 77, 140), pygame.Rect(1120, 291, 34, 24),
+
+            pygame.Rect(1142, 395, 42, 51), pygame.Rect(1169, 416, 41, 28), pygame.Rect(1141, 383, 23, 25),
+
+            pygame.Rect(1023, 376, 32, 16), pygame.Rect(1036, 276, 28, 29), pygame.Rect(1047, 325, 12, 23),
+
+            pygame.Rect(1595, 389, 24, 33), pygame.Rect(1645, 395, 49, 24), pygame.Rect(1658, 379, 32, 28),
+
+            pygame.Rect(1669, 360, 13, 27), pygame.Rect(1855, 312, 51, 113), pygame.Rect(1892, 390, 37, 36),
+
+            pygame.Rect(1896, 306, 16, 25), pygame.Rect(1823, 383, 42, 46), pygame.Rect(1838, 360, 26, 27),
+
+            pygame.Rect(1847, 346, 19, 25), pygame.Rect(1852, 305, 9, 18), pygame.Rect(1894, 377, 21, 25),
+
             pygame.Rect(1922, 404, 28, 19),
         ]
 
         underground = [
-            pygame.Rect(455 - 18, 438, 236 + 30, 181),
-            pygame.Rect(741 - 7, 438, 70 + 15, 239),
-            pygame.Rect(446, 416, 34, 41),
-            pygame.Rect(472, 426, 33, 34),
-            pygame.Rect(646, 436, 52, 27),
-            pygame.Rect(668, 418+9, 38, 25),
-            pygame.Rect(441, 401, 24, 23),
-            pygame.Rect(682, 405+7, 24, 25),
-            pygame.Rect(730, 424, 28, 25),
-            pygame.Rect(785, 430, 44, 20),
-            pygame.Rect(799, 410, 33, 26),
-            pygame.Rect(1835, 405, 112, 205)
+            pygame.Rect(437, 438, 266, 181), pygame.Rect(734, 438, 85, 239),
+
+            pygame.Rect(446, 416, 34, 41), pygame.Rect(472, 426, 33, 34), pygame.Rect(646, 436, 52, 27),
+
+            pygame.Rect(668, 427, 38, 25), pygame.Rect(441, 401, 24, 23), pygame.Rect(682, 412, 24, 25),
+
+            pygame.Rect(730, 424, 28, 25), pygame.Rect(785, 430, 44, 20), pygame.Rect(799, 410, 33, 26),
+
+            pygame.Rect(1835, 405, 112, 205),
         ]
+
         platforms = [
-            (pygame.Rect(0, 308, 135, 300), {}),
-            (pygame.Rect(135, 345, 53, 260), {}),
-            (pygame.Rect(187, 375, 269, 230), {}),
-            (pygame.Rect(544 - 5, 348, 120, 32), {}),
-            (pygame.Rect(689, 364, 53, 240), {}),
-            (pygame.Rect(171, 258, 45, 17), {}),
-            (pygame.Rect(200, 268, 86, 28), {}),
-            (pygame.Rect(515, 214, 103, 41), {}),
-            (pygame.Rect(578, 242, 75, 27), {}),
-            (pygame.Rect(745, 242, 54, 31), {}),
-            (pygame.Rect(860, 153, 117, 30), {}),
-            (pygame.Rect(886, 229, 25, 15), {}),
-            (pygame.Rect(909, 219, 76, 25), {}),
-            (pygame.Rect(809, 395, 58, 246), {}),
-            (pygame.Rect(865, 365, 147, 255), {}),
-
-            # past half
-            (pygame.Rect(999, 417, 34, 243), {}),
-            (pygame.Rect(1000, 435, 262, 250), {}),
-            (pygame.Rect(1247 + 4, 410, 36, 237), {}),
-            (pygame.Rect(1284, 380, 69, 242), {}),
-            (pygame.Rect(1016, 292, 28, 17), {}),
-            (pygame.Rect(1043, 259, 28, 13), {}),
-            (pygame.Rect(1040, 235, 97, 50), {}),
-            (pygame.Rect(1035, 258, 41, 21), {}),
-            (pygame.Rect(1122, 262, 38, 40), {}),
-            (pygame.Rect(1165, 178, 135, 37), {}),
-
-            # EXCLUDED FROM GRASS OVERLAY
-            (pygame.Rect(1321, 245, 86, 32), {"grass": False}),
-            (pygame.Rect(1615, 146, 83, 28), {"grass": False}),
-
-            (pygame.Rect(1675, 311, 72, 293), {}),
-            (pygame.Rect(1746, 345, 36, 304), {}),
-            (pygame.Rect(1782, 378, 53, 234), {}),
-            (pygame.Rect(1850, 284, 66, 29), {}),
-            (pygame.Rect(1944, 239, 57, 393), {}),
-            (pygame.Rect(1454, 196, 71, 25), {}),
-            (pygame.Rect(1347, 407, 342, 239), {}),
-            (pygame.Rect(1549, 374+6, 54, 28), {}),
-            (pygame.Rect(2000, 0, 50, 600), {}),
-        ]
+        (pygame.Rect(0, 308, 135, 300), {}), (pygame.Rect(135, 345, 53, 260), {}), (pygame.Rect(187, 375, 269, 230),{}),
+        (pygame.Rect(539, 348, 120, 32), {}), (pygame.Rect(689, 364, 53, 240), {}), (pygame.Rect(171, 258, 45, 17), {}),
+        (pygame.Rect(200, 268, 86, 28), {}), (pygame.Rect(515, 214, 103, 41), {}), (pygame.Rect(578, 242, 75, 27), {}),
+        (pygame.Rect(745, 242, 54, 31), {}), (pygame.Rect(860, 153, 117, 30), {}), (pygame.Rect(886, 229, 25, 15), {}),
+        (pygame.Rect(909, 219, 76, 25), {}), (pygame.Rect(809, 395, 58, 246), {}), (pygame.Rect(865, 365, 147, 255),{}),
+        (pygame.Rect(999, 417, 34, 243), {}), (pygame.Rect(1000, 435, 262, 250), {}), (pygame.Rect(1251, 410, 36, 237),{}),
+        (pygame.Rect(1284, 380, 69, 242), {}), (pygame.Rect(1016, 292, 28, 17), {}), (pygame.Rect(1043, 259, 28, 13),{}),
+        (pygame.Rect(1040, 235, 97, 50), {}), (pygame.Rect(1035, 258, 41, 21), {}), (pygame.Rect(1122, 262, 38, 40),{}),
+        (pygame.Rect(1165, 178, 135, 37), {}),
+        (pygame.Rect(1321, 245, 86, 32), {"grass": False}), (pygame.Rect(1615, 146, 83, 28), {"grass": False}),
+        (pygame.Rect(1675, 311, 72, 293), {}), (pygame.Rect(1746, 345, 36, 304), {}), (pygame.Rect(1782, 378, 53, 234),{}),
+        (pygame.Rect(1850, 284, 66, 29), {}), (pygame.Rect(1944, 239, 57, 393), {}), (pygame.Rect(1454, 196, 71, 25),{}),
+        (pygame.Rect(1347, 407, 342, 239), {}), (pygame.Rect(1555, 380, 54, 28), {}), (pygame.Rect(2000, 0, 50, 600),{}),
+    ]
         if not coins_generated[level]:
             level_coins[level] = generate_coins_on_platforms(platforms, 40)
             add_manual_coin(1797, 70, level)
@@ -878,196 +818,28 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         bushes = []
 
         # platform 1 bushes
-        bushes += generate_random_positions(
-            187,
-            455 - 40,
-            353,
-            354,
-            40,
-            3
-        )
+        bushes += generate_random_positions(187, 455 - 40, 353, 354, 40, 3)
+        bushes += generate_random_positions(173, 175, 240, 240, 40, 1)
+        bushes += generate_random_positions(582, 652 - 40, 222, 222, 40, 1)
+        bushes += generate_random_positions(545, 539 + 120 - 40, 326, 326, 40, 1)
+        bushes += generate_random_positions(867, 1011 - 40, 343, 343, 55, 2)
+        bushes += generate_random_positions(912, 983 - 40, 197, 197, 40, 1)
+        bushes += generate_random_positions(1040, 1040 + 208 - 40, 405 + 31 - 21, 405 + 31 - 21, 40, 2)
+        bushes += generate_random_positions(1164, 1164 + 135 - 40, 162 + 18 - 21, 162 + 18 - 21, 40, 1)
+        bushes += generate_random_positions(1359, 1359 + 192 - 40, 371 + 36 - 21, 371 + 36 - 21, 40, 2)
+        bushes += generate_random_positions(1845, 1845 + 74 - 40, 261 + 25 - 21, 261 + 25 - 21, 40, 1)
 
-        # platform 2 bushes
-        bushes += generate_random_positions(
-            173,
-            175,
-            240,
-            240,
-            40,
-            1
-        )
-
-        # platform 3 bushes
-        bushes += generate_random_positions(
-            582,
-            652-40,
-            222,
-            222,
-            40,
-            1
-        )
-        # 544-5, 348, 120
-        bushes += generate_random_positions(
-            545,
-            539+120 - 40,
-            326,
-            326,
-            40,
-            1
-        )
-
-        bushes += generate_random_positions(
-            867,
-            1011 - 40,
-            343,
-            343,
-            55,
-            2
-        )
-
-        bushes += generate_random_positions(
-            912,
-            983 - 40,
-            197,
-            197,
-            40,
-            1
-        )
-
-        bushes += generate_random_positions(
-            1040,
-            1040 + 208 - 40,
-            405 + 31 - 21,
-            405 + 31 - 21,
-            40,
-            2
-        )
-
-        bushes += generate_random_positions(
-            1164,
-            1164+135 - 40,
-            162 + 18 - 21,
-            162 + 18 - 21,
-            40,
-            1
-        )
-
-        bushes += generate_random_positions(
-            1359,
-            1359 + 192 - 40,
-            371 + 36 - 21,
-            371 + 36 - 21,
-            40,
-            2
-        )
-
-        bushes += generate_random_positions(
-            1845,
-            1845 + 74 - 40,
-            261 + 25 - 21,
-            261 + 25 - 21,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            1282,
-            1282 + 73 - 23,
-            365 + 18 - 28,
-            365 + 18 - 28,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            1040,
-            1040 + 98 - 23,
-            213 + 22 - 28,
-            213 + 22 - 28,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            1118,
-            1118 + 43 - 23,
-            248 + 16 - 28,
-            248 + 16 - 28,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            1451,
-            1451 + 74 - 23,
-            175 + 22 - 28,
-            175 + 22 - 28,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            1607,
-            1607 + 67 - 23,
-            386 + 22 - 28,
-            386 + 22 - 28,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            1675,
-            1675 + 74 - 23,
-            286 + 26 - 28,
-            286 + 26 - 28,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            811,
-            811 + 56 - 23,
-            373 + 25 - 28,
-            373 + 25 - 28,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            689,
-            689 + 59 - 23,
-            342 + 24 - 28,
-            342 + 24 - 28,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            741,
-            741 + 55 - 23,
-            223 + 22 - 28,
-            223 + 22 - 28,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            134,
-            134 + 58 - 23,
-            327 + 23 - 28,
-            327 + 23 - 28,
-            40,
-            1
-        )
-
-        flowers += generate_random_flower_positions(
-            46,
-            46 + 86 - 23,
-            284 + 25 - 28,
-            284 + 25 - 28,
-            40,
-            1
-        )
+        flowers += generate_random_flower_positions(1282, 1282 + 73 - 23, 365 + 18 - 28, 365 + 18 - 28, 40, 1)
+        flowers += generate_random_flower_positions(1040, 1040 + 98 - 23, 213 + 22 - 28, 213 + 22 - 28, 40, 1)
+        flowers += generate_random_flower_positions(1118, 1118 + 43 - 23, 248 + 16 - 28, 248 + 16 - 28, 40, 1)
+        flowers += generate_random_flower_positions(1451, 1451 + 74 - 23, 175 + 22 - 28, 175 + 22 - 28, 40, 1)
+        flowers += generate_random_flower_positions(1607, 1607 + 67 - 23, 386 + 22 - 28, 386 + 22 - 28, 40, 1)
+        flowers += generate_random_flower_positions(1675, 1675 + 74 - 23, 286 + 26 - 28, 286 + 26 - 28, 40, 1)
+        flowers += generate_random_flower_positions(811, 811 + 56 - 23, 373 + 25 - 28, 373 + 25 - 28, 40, 1)
+        flowers += generate_random_flower_positions(689, 689 + 59 - 23, 342 + 24 - 28, 342 + 24 - 28, 40, 1)
+        flowers += generate_random_flower_positions(741, 741 + 55 - 23, 223 + 22 - 28, 223 + 22 - 28, 40, 1)
+        flowers += generate_random_flower_positions(134, 134 + 58 - 23, 327 + 23 - 28, 327 + 23 - 28, 40, 1)
+        flowers += generate_random_flower_positions(46, 46 + 86 - 23, 284 + 25 - 28, 284 + 25 - 28, 40, 1)
 
         spawnpoints = [pygame.Rect(15, 286+2, 10, 3)]
         enemies = [
@@ -1082,391 +854,179 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
         background_rects = [
         ]
         underground12 = [
-            pygame.Rect(0, 115, 61, 108),
-            pygame.Rect(0, 214, 66, 94),
-            pygame.Rect(47, 278, 89, 31),
-            pygame.Rect(67, 230, 54, 49),
-            pygame.Rect(61, 196, 44, 44),
-            pygame.Rect(62, 173, 29, 29),
-            pygame.Rect(108, 264, 19, 16),
-            pygame.Rect(-18, 116, 78, 53),
-            pygame.Rect(-22, 89, 63, 27),
-            pygame.Rect(-12, 55, 42, 37),
-            pygame.Rect(0, 0, 58, 61),
-            pygame.Rect(56, -3, 56, 34),
+            pygame.Rect(0, 115, 61, 108), pygame.Rect(0, 214, 66, 94), pygame.Rect(47, 278, 89, 31),
+            pygame.Rect(67, 230, 54, 49), pygame.Rect(61, 196, 44, 44), pygame.Rect(62, 173, 29, 29),
+            pygame.Rect(108, 264, 19, 16), pygame.Rect(-18, 116, 78, 53), pygame.Rect(-22, 89, 63, 27),
+            pygame.Rect(-12, 55, 42, 37), pygame.Rect(0, 0, 58, 61), pygame.Rect(56, -3, 56, 34),
             pygame.Rect(105, -2, 62, 19),
-
-            pygame.Rect(46, 228, 31, 40),
-            pygame.Rect(6, 150, 66, 65),
-            pygame.Rect(43, 256, 41, 25),
-            pygame.Rect(-15, 273, 66, 41),
-            pygame.Rect(112, 266, 24, 12),
-            pygame.Rect(41, 491, 296, 121),
-            pygame.Rect(99, 351, 260, 185),
-            pygame.Rect(329, 333, 69, 60),
-            pygame.Rect(336, 385, 45, 34),
-            pygame.Rect(329, 409, 41, 33),
-            pygame.Rect(344, 459, 35, 33),
-            pygame.Rect(367, 468, 44, 29),
-
-            pygame.Rect(1831, 443, 21, 34),
-            pygame.Rect(1537, 124, 45, 57),
-            pygame.Rect(1579, 125, 37, 47),
-            pygame.Rect(1615, 126, 15, 37),
-            pygame.Rect(1628, 123, 14, 32),
-            pygame.Rect(1610, 121, 12, 18),
-            pygame.Rect(1643, 106, 54, 22),
-            pygame.Rect(1634, 120, 51, 16),
-            pygame.Rect(1629, 130, 34, 14),
-            pygame.Rect(1530, 172, 16, 11),
-            pygame.Rect(1577, 167, 13, 9),
-
-            pygame.Rect(867, 360, 68, 19),
-            pygame.Rect(880, 374, 84, 23),
-            pygame.Rect(900, 388, 88, 23),
-            pygame.Rect(970, 365, 39, 38),
-            pygame.Rect(996, 368, 36, 22),
-            pygame.Rect(1026, 358, 22, 24),
+            pygame.Rect(46, 228, 31, 40), pygame.Rect(6, 150, 66, 65), pygame.Rect(43, 256, 41, 25),
+            pygame.Rect(-15, 273, 66, 41), pygame.Rect(112, 266, 24, 12), pygame.Rect(41, 491, 296, 121),
+            pygame.Rect(99, 351, 260, 185), pygame.Rect(329, 333, 69, 60), pygame.Rect(336, 385, 45, 34),
+            pygame.Rect(329, 409, 41, 33), pygame.Rect(344, 459, 35, 33), pygame.Rect(367, 468, 44, 29),
+            pygame.Rect(1831, 443, 21, 34), pygame.Rect(1537, 124, 45, 57), pygame.Rect(1579, 125, 37, 47),
+            pygame.Rect(1615, 126, 15, 37), pygame.Rect(1628, 123, 14, 32), pygame.Rect(1610, 121, 12, 18),
+            pygame.Rect(1643, 106, 54, 22), pygame.Rect(1634, 120, 51, 16), pygame.Rect(1629, 130, 34, 14),
+            pygame.Rect(1530, 172, 16, 11), pygame.Rect(1577, 167, 13, 9),
+            pygame.Rect(867, 360, 68, 19), pygame.Rect(880, 374, 84, 23), pygame.Rect(900, 388, 88, 23),
+            pygame.Rect(970, 365, 39, 38), pygame.Rect(996, 368, 36, 22), pygame.Rect(1026, 358, 22, 24),
             pygame.Rect(1044, 361, 13, 16),
-
-            pygame.Rect(749, 337, 34, 36),
-            pygame.Rect(730, 338, 31, 22),
-            pygame.Rect(739, 352, 20, 15),
-            pygame.Rect(772, 347, 27, 14),
-            pygame.Rect(771, 354, 19, 14),
-            pygame.Rect(1104, 319, 17, 27),
-            pygame.Rect(1093, 322, 17, 15),
-            pygame.Rect(1117, 323, 14, 15),
-            pygame.Rect(1245, 440, 19, 28),
-            pygame.Rect(1234, 444, 15, 16),
-            pygame.Rect(1261, 442, 10, 22),
-            pygame.Rect(1341, 387, 13, 30),
-            pygame.Rect(1326, 393, 19, 14),
-            pygame.Rect(1352, 393, 16, 16),
-            pygame.Rect(928, 393, 33, 178),
-            pygame.Rect(912, 399, 22, 34),
-            pygame.Rect(919, 426, 14, 42),
-            pygame.Rect(914, 504, 23, 28),
-            pygame.Rect(889, 524, 45, 28),
-            pygame.Rect(862, 547, 72, 24),
-            pygame.Rect(841, 556, 28, 15),
-            pygame.Rect(837, 566, 23, 7),
-            pygame.Rect(955, 500, 17, 47),
-            pygame.Rect(952, 537, 37, 33),
-            pygame.Rect(965, 532, 15, 16),
-            pygame.Rect(982, 551, 27, 19),
-            pygame.Rect(1002, 559, 22, 12),
-            pygame.Rect(954, 395, 20, 41),
-            pygame.Rect(956, 427, 12, 40),
-            pygame.Rect(965, 396, 18, 25),
-            pygame.Rect(977, 389, 19, 26),
-            pygame.Rect(920, 493, 13, 17),
-            pygame.Rect(1217, 296, 16, 29),
-            pygame.Rect(1204, 299, 19, 19),
-            pygame.Rect(1225, 297, 20, 20),
-            pygame.Rect(1308, 255, 22, 36),
-            pygame.Rect(1288, 256, 24, 16),
-            pygame.Rect(1297, 268, 15, 12),
-            pygame.Rect(1326, 259, 21, 14),
-            pygame.Rect(1323, 268, 16, 14),
-            pygame.Rect(1178, 221, 50, 23),
-            pygame.Rect(1190, 235, 27, 23),
-            pygame.Rect(1199, 250, 11, 16),
-            pygame.Rect(1330, 184, 25, 34),
-            pygame.Rect(1313, 190, 21, 14),
-            pygame.Rect(1323, 196, 17, 13),
-            pygame.Rect(1347, 192, 25, 14),
-            pygame.Rect(1344, 199, 18, 14),
-            pygame.Rect(540, 285, 31, 40),
-            pygame.Rect(511, 289, 42, 20),
-            pygame.Rect(519, 300, 28, 17),
-            pygame.Rect(558, 291, 39, 18),
-            pygame.Rect(559, 304, 26, 15),
-            pygame.Rect(492, 374, 56, 22),
-            pygame.Rect(506, 389, 31, 19),
-            pygame.Rect(515, 405, 15, 10),
-            pygame.Rect(463, 443, 15, 33),
-            pygame.Rect(454, 448, 16, 18),
-            pygame.Rect(474, 445, 14, 23),
-            pygame.Rect(216, 509, 39, 41),
-            pygame.Rect(206, 515, 18, 27),
-            pygame.Rect(245, 519, 18, 22),
-            pygame.Rect(614, 512, 137, 77),
-            pygame.Rect(568, 494, 70, 69),
-            pygame.Rect(538, 491, 48, 34),
-            pygame.Rect(544, 514, 33, 29),
-            pygame.Rect(722, 511, 51, 59),
-            pygame.Rect(758, 514, 33, 40),
-            pygame.Rect(784, 503, 27, 34),
-            pygame.Rect(805, 499, 22, 25),
-            pygame.Rect(815, 487, 33, 25),
+            pygame.Rect(749, 337, 34, 36), pygame.Rect(730, 338, 31, 22), pygame.Rect(739, 352, 20, 15),
+            pygame.Rect(772, 347, 27, 14), pygame.Rect(771, 354, 19, 14), pygame.Rect(1104, 319, 17, 27),
+            pygame.Rect(1093, 322, 17, 15), pygame.Rect(1117, 323, 14, 15),
+            pygame.Rect(1245, 440, 19, 28), pygame.Rect(1234, 444, 15, 16), pygame.Rect(1261, 442, 10, 22),
+            pygame.Rect(1341, 387, 13, 30), pygame.Rect(1326, 393, 19, 14), pygame.Rect(1352, 393, 16, 16),
+            pygame.Rect(928, 393, 33, 178), pygame.Rect(912, 399, 22, 34), pygame.Rect(919, 426, 14, 42),
+            pygame.Rect(914, 504, 23, 28), pygame.Rect(889, 524, 45, 28), pygame.Rect(862, 547, 72, 24),
+            pygame.Rect(841, 556, 28, 15), pygame.Rect(837, 566, 23, 7), pygame.Rect(955, 500, 17, 47),
+            pygame.Rect(952, 537, 37, 33), pygame.Rect(965, 532, 15, 16), pygame.Rect(982, 551, 27, 19),
+            pygame.Rect(1002, 559, 22, 12), pygame.Rect(954, 395, 20, 41), pygame.Rect(956, 427, 12, 40),
+            pygame.Rect(965, 396, 18, 25), pygame.Rect(977, 389, 19, 26), pygame.Rect(920, 493, 13, 17),
+            pygame.Rect(1217, 296, 16, 29), pygame.Rect(1204, 299, 19, 19), pygame.Rect(1225, 297, 20, 20),
+            pygame.Rect(1308, 255, 22, 36), pygame.Rect(1288, 256, 24, 16), pygame.Rect(1297, 268, 15, 12),
+            pygame.Rect(1326, 259, 21, 14), pygame.Rect(1323, 268, 16, 14),
+            pygame.Rect(1178, 221, 50, 23), pygame.Rect(1190, 235, 27, 23), pygame.Rect(1199, 250, 11, 16),
+            pygame.Rect(1330, 184, 25, 34), pygame.Rect(1313, 190, 21, 14), pygame.Rect(1323, 196, 17, 13),
+            pygame.Rect(1347, 192, 25, 14), pygame.Rect(1344, 199, 18, 14),
+            pygame.Rect(540, 285, 31, 40), pygame.Rect(511, 289, 42, 20), pygame.Rect(519, 300, 28, 17),
+            pygame.Rect(558, 291, 39, 18), pygame.Rect(559, 304, 26, 15), pygame.Rect(492, 374, 56, 22),
+            pygame.Rect(506, 389, 31, 19), pygame.Rect(515, 405, 15, 10),
+            pygame.Rect(463, 443, 15, 33), pygame.Rect(454, 448, 16, 18), pygame.Rect(474, 445, 14, 23),
+            pygame.Rect(216, 509, 39, 41), pygame.Rect(206, 515, 18, 27), pygame.Rect(245, 519, 18, 22),
+            pygame.Rect(614, 512, 137, 77), pygame.Rect(568, 494, 70, 69), pygame.Rect(538, 491, 48, 34),
+            pygame.Rect(544, 514, 33, 29), pygame.Rect(722, 511, 51, 59), pygame.Rect(758, 514, 33, 40),
+            pygame.Rect(784, 503, 27, 34), pygame.Rect(805, 499, 22, 25), pygame.Rect(815, 487, 33, 25),
             pygame.Rect(840, 485, 16, 18),
-            pygame.Rect(961, 494, 52, 22),
-            pygame.Rect(976, 503, 54, 25),
-            pygame.Rect(1002, 514, 54, 29),
-            pygame.Rect(1034, 530, 44, 26),
-            pygame.Rect(1063, 518, 36, 26),
-            pygame.Rect(1088, 505, 32, 25),
-            pygame.Rect(1109, 499, 38, 17),
-            pygame.Rect(1137, 491, 42, 16),
-            pygame.Rect(1071, 533, 35, 21),
-            pygame.Rect(1092, 524, 35, 23),
-            pygame.Rect(1114, 509, 35, 26),
-            pygame.Rect(1142, 499, 35, 20),
-            pygame.Rect(1169, 487, 20, 25),
-            pygame.Rect(643, 227, 29, 49),
-            pygame.Rect(625, 230, 24, 20),
-            pygame.Rect(630, 246, 22, 15),
-            pygame.Rect(663, 228, 24, 25),
-            pygame.Rect(661, 248, 17, 15),
-            pygame.Rect(695, 178, 16, 35),
-            pygame.Rect(687, 179, 35, 21),
-            pygame.Rect(515, 175, 53, 21),
-            pygame.Rect(526, 191, 32, 11),
-            pygame.Rect(400, 194, 17, 13),
-            pygame.Rect(402, 135, 53, 13),
-            pygame.Rect(421, 143, 28, 15),
+            pygame.Rect(961, 494, 52, 22), pygame.Rect(976, 503, 54, 25), pygame.Rect(1002, 514, 54, 29),
+            pygame.Rect(1034, 530, 44, 26), pygame.Rect(1063, 518, 36, 26), pygame.Rect(1088, 505, 32, 25),
+            pygame.Rect(1109, 499, 38, 17), pygame.Rect(1137, 491, 42, 16),
+            pygame.Rect(1071, 533, 35, 21), pygame.Rect(1092, 524, 35, 23), pygame.Rect(1114, 509, 35, 26),
+            pygame.Rect(1142, 499, 35, 20), pygame.Rect(1169, 487, 20, 25),
+            pygame.Rect(643, 227, 29, 49), pygame.Rect(625, 230, 24, 20), pygame.Rect(630, 246, 22, 15),
+            pygame.Rect(663, 228, 24, 25), pygame.Rect(661, 248, 17, 15),
+            pygame.Rect(695, 178, 16, 35), pygame.Rect(687, 179, 35, 21),
+            pygame.Rect(515, 175, 53, 21), pygame.Rect(526, 191, 32, 11),
+            pygame.Rect(400, 194, 17, 13), pygame.Rect(402, 135, 53, 13), pygame.Rect(421, 143, 28, 15),
             pygame.Rect(434, 157, 9, 10),
-            pygame.Rect(218, 98, 31, 21),
-            pygame.Rect(225, 115, 30, 21),
-            pygame.Rect(240, 119, 32, 25),
-            pygame.Rect(259, 119, 40, 17),
-            pygame.Rect(281, 100, 27, 24),
-            pygame.Rect(300, 96, 24, 22),
-            pygame.Rect(239, 242, 44, 21),
-            pygame.Rect(248, 257, 19, 17),
-            pygame.Rect(263, 253, 13, 15),
-
-            pygame.Rect(869, 51, 47, 33),
-            pygame.Rect(888, 65, 43, 29),
-            pygame.Rect(919, 60, 38, 27),
-            pygame.Rect(946, 57, 42, 41),
-            pygame.Rect(980, 57, 25, 32),
-            pygame.Rect(997, 48, 25, 32),
+            pygame.Rect(218, 98, 31, 21), pygame.Rect(225, 115, 30, 21), pygame.Rect(240, 119, 32, 25),
+            pygame.Rect(259, 119, 40, 17), pygame.Rect(281, 100, 27, 24), pygame.Rect(300, 96, 24, 22),
+            pygame.Rect(239, 242, 44, 21), pygame.Rect(248, 257, 19, 17), pygame.Rect(263, 253, 13, 15),
+            pygame.Rect(869, 51, 47, 33), pygame.Rect(888, 65, 43, 29), pygame.Rect(919, 60, 38, 27),
+            pygame.Rect(946, 57, 42, 41), pygame.Rect(980, 57, 25, 32), pygame.Rect(997, 48, 25, 32),
             pygame.Rect(938, 78, 16, 15),
-
-            pygame.Rect(1885, 361, 117, 68),
-            pygame.Rect(1905, 424, 103, 28),
-            pygame.Rect(1911, 444, 92, 29),
-            pygame.Rect(1928, 465, 88, 46),
-            pygame.Rect(1887, 338, 120, 33),
-            pygame.Rect(1882, 359, 22, 49),
-            pygame.Rect(1917, 321, 86, 27),
-            pygame.Rect(1926, 299, 86, 31),
-            pygame.Rect(1960, 294, 52, 11),
-            pygame.Rect(1970, 268, 39, 44),
-            pygame.Rect(1968, 256, 48, 29),
-            pygame.Rect(1441, 428, 35, 19),
-            pygame.Rect(1447, 440, 24, 19),
-            pygame.Rect(1454, 450, 12, 36),
-            pygame.Rect(1449, 481, 22, 20),
-            pygame.Rect(1443, 497, 35, 33),
-            pygame.Rect(1435, 515, 22, 54),
-            pygame.Rect(1418, 538, 20, 36),
-            pygame.Rect(1455, 512, 30, 61),
-            pygame.Rect(1478, 534, 22, 46),
-            pygame.Rect(1492, 548, 14, 29),
-            pygame.Rect(1412, 553, 13, 23),
-            pygame.Rect(101, 101, 28, 45),
-            pygame.Rect(81, 105, 27, 19),
-            pygame.Rect(86, 116, 20, 16),
-            pygame.Rect(117, 106, 26, 19),
-            pygame.Rect(120, 118, 14, 18),
-
-            pygame.Rect(1618, 408, 49, 59),
-            pygame.Rect(1631, 457, 25, 25),
-            pygame.Rect(1573, 409, 51, 30),
-            pygame.Rect(1588, 431, 37, 21),
-            pygame.Rect(1653, 403, 73, 30),
-            pygame.Rect(1653, 423, 42, 25),
-            pygame.Rect(1713, 409, 21, 17),
-            pygame.Rect(1063, 393, 9, 22),
-            pygame.Rect(1058, 396, 8, 10),
-            pygame.Rect(1068, 396, 7, 12),
-            pygame.Rect(1793, 147, 43, 17),
-            pygame.Rect(1803, 157, 23, 13),
+            pygame.Rect(1885, 361, 117, 68), pygame.Rect(1905, 424, 103, 28), pygame.Rect(1911, 444, 92, 29),
+            pygame.Rect(1928, 465, 88, 46), pygame.Rect(1887, 338, 120, 33), pygame.Rect(1882, 359, 22, 49),
+            pygame.Rect(1917, 321, 86, 27), pygame.Rect(1926, 299, 86, 31), pygame.Rect(1960, 294, 52, 11),
+            pygame.Rect(1970, 268, 39, 44), pygame.Rect(1968, 256, 48, 29),
+            pygame.Rect(1441, 428, 35, 19), pygame.Rect(1447, 440, 24, 19), pygame.Rect(1454, 450, 12, 36),
+            pygame.Rect(1449, 481, 22, 20), pygame.Rect(1443, 497, 35, 33), pygame.Rect(1435, 515, 22, 54),
+            pygame.Rect(1418, 538, 20, 36), pygame.Rect(1455, 512, 30, 61), pygame.Rect(1478, 534, 22, 46),
+            pygame.Rect(1492, 548, 14, 29), pygame.Rect(1412, 553, 13, 23),
+            pygame.Rect(101, 101, 28, 45), pygame.Rect(81, 105, 27, 19), pygame.Rect(86, 116, 20, 16),
+            pygame.Rect(117, 106, 26, 19), pygame.Rect(120, 118, 14, 18),
+            pygame.Rect(1618, 408, 49, 59), pygame.Rect(1631, 457, 25, 25), pygame.Rect(1573, 409, 51, 30),
+            pygame.Rect(1588, 431, 37, 21), pygame.Rect(1653, 403, 73, 30), pygame.Rect(1653, 423, 42, 25),
+            pygame.Rect(1713, 409, 21, 17), pygame.Rect(1063, 393, 9, 22), pygame.Rect(1058, 396, 8, 10),
+            pygame.Rect(1068, 396, 7, 12), pygame.Rect(1793, 147, 43, 17), pygame.Rect(1803, 157, 23, 13),
             pygame.Rect(1792, 87, 46, 59),
-
         ]
         platforms = [
-            (pygame.Rect(0, 307, 66, 294), {}),
-            (pygame.Rect(63, 307, 25, 266), {}),
+            (pygame.Rect(0, 307, 66, 294), {}), (pygame.Rect(63, 307, 25, 266), {}),
             (pygame.Rect(86, 307, 36, 208), {}),
-            (pygame.Rect(121, 307, 64, 155 - 20), {}),
-            (pygame.Rect(139, 536, 38, 75), {}),
+            (pygame.Rect(121, 307, 64, 135), {}), (pygame.Rect(139, 536, 38, 75), {}),
             (pygame.Rect(184, 307, 41, 117), {}),
-            (pygame.Rect(223, 307, 68, 91), {}),
-            (pygame.Rect(285, 307, 53, 70), {}),
+            (pygame.Rect(223, 307, 68, 91), {}), (pygame.Rect(285, 307, 53, 70), {}),
             (pygame.Rect(334, 307, 31, 51), {}),
-            (pygame.Rect(361, 307, 42, 31), {}),
-            (pygame.Rect(106, 307, 37, 181), {}),
+            (pygame.Rect(361, 307, 42, 31), {}), (pygame.Rect(106, 307, 37, 181), {}),
             (pygame.Rect(128, 307, 33, 157), {}),
 
-            (pygame.Rect(322, 481, 107, 133), {}),
-            (pygame.Rect(200, 492, 70, 39), {}),
-            # (pygame.Rect(513, 474, 312, 41), {}),
-            (pygame.Rect(513 + 50, 476, 104 - 50, 41), {}),
-            (pygame.Rect(616, 476, 49, 62), {}),
-            (pygame.Rect(664, 476, 35, 86 - 13), {}),
-            (pygame.Rect(701 - 5, 476, 43, 63), {}),
-            (pygame.Rect(742 - 5, 476, 68, 46), {}),
-            (pygame.Rect(529, 476, 35, 19), {}),
+            (pygame.Rect(322, 481, 107, 133), {}), (pygame.Rect(200, 492, 70, 39), {}),
+            (pygame.Rect(563, 476, 54, 41), {}),
+            (pygame.Rect(616, 476, 49, 62), {}), (pygame.Rect(664, 476, 35, 73), {}),
+            (pygame.Rect(696, 476, 45, 63), {}),
+            (pygame.Rect(737, 476, 63, 46), {}), (pygame.Rect(529, 476, 35, 19), {}),
             (pygame.Rect(791, 476, 41, 31), {}),
             (pygame.Rect(825, 476, 30, 16), {}),
 
-            (pygame.Rect(482, 356, 77, 26), {}),
-            (pygame.Rect(445, 430, 56, 23), {}),
+            (pygame.Rect(482, 356, 77, 26), {}), (pygame.Rect(445, 430, 56, 23), {}),
             (pygame.Rect(958, 478, 51, 22), {}),
-            (pygame.Rect(1006, 478, 39, 42), {}),
-            (pygame.Rect(1042, 478, 57, 61), {}),
+            (pygame.Rect(1006, 478, 39, 42), {}), (pygame.Rect(1042, 478, 57, 61), {}),
             (pygame.Rect(1097, 478, 28, 49), {}),
-            (pygame.Rect(1123, 478, 44, 29), {}),
-            (pygame.Rect(1167, 478, 29 - 7, 17), {}),
+            (pygame.Rect(1123, 478, 44, 29), {}), (pygame.Rect(1160, 478, 22, 17), {}),
             (pygame.Rect(1098, 454, 57, 36), {}),
 
-            (pygame.Rect(1842, 240, 42, 339), {}),
-            (pygame.Rect(1788, 240, 55, 93), {}),
+            (pygame.Rect(1842, 240, 42, 339), {}), (pygame.Rect(1788, 240, 55, 93), {}),
             (pygame.Rect(1754, 240, 37, 60), {}),
-            (pygame.Rect(1725 - 3, 240, 29, 40), {}),
-            (pygame.Rect(1693 - 3, 240, 34, 22), {}),
+            (pygame.Rect(1722, 240, 26, 40), {}), (pygame.Rect(1690, 240, 31, 22), {}),
             (pygame.Rect(1720, 240, 35, 45), {}),
-            (pygame.Rect(1884, 240, 34, 100), {}),
-            (pygame.Rect(1915, 240, 16, 84), {}),
+            (pygame.Rect(1884, 240, 34, 100), {}), (pygame.Rect(1915, 240, 16, 84), {}),
             (pygame.Rect(1931, 240, 25, 67), {}),
-            (pygame.Rect(1952, 240, 23, 55), {}),
-            (pygame.Rect(1972, 240, 26, 28), {}),
+            (pygame.Rect(1952, 240, 23, 55), {}), (pygame.Rect(1972, 240, 26, 28), {}),
 
-            (pygame.Rect(133, 261+15, 54, 54-15), {}),
-            (pygame.Rect(234, 233, 52, 16), {}),
+            (pygame.Rect(148, 276, 39, 39), {}), (pygame.Rect(234, 233, 52, 16), {}),
             (pygame.Rect(502, 271, 109, 25), {}),
-            (pygame.Rect(618, 214, 82, 24), {}),
-            (pygame.Rect(683, 167, 46, 24), {}),
+            (pygame.Rect(618, 214, 82, 24), {}), (pygame.Rect(683, 167, 46, 24), {}),
             (pygame.Rect(511, 166, 60, 16), {}),
-            (pygame.Rect(395, 123, 63, 17), {}),
-            (pygame.Rect(248, 90, 39, 40), {}),
-            (pygame.Rect(285, 90, 19, 30), {}),
-            (pygame.Rect(300, 90, 22, 18), {}),
-            (pygame.Rect(316, 90, 23, 11), {}),
-            (pygame.Rect(233, 90, 17, 29), {}),
-            (pygame.Rect(224, 90, 11, 18), {}),
-            (pygame.Rect(213, 90, 12, 10), {}),
+            (pygame.Rect(395, 123, 63, 17), {}), (pygame.Rect(248, 90, 39, 40), {}), (pygame.Rect(285, 90, 19, 30), {}),
+            (pygame.Rect(300, 90, 22, 18), {}), (pygame.Rect(316, 90, 23, 11), {}), (pygame.Rect(233, 90, 17, 29), {}),
+            (pygame.Rect(224, 90, 11, 18), {}), (pygame.Rect(213, 90, 12, 10), {}),
 
-            (pygame.Rect(1227, 427, 57, 24), {}),
-            (pygame.Rect(1776, 70, 85, 30), {}),
+            (pygame.Rect(1227, 427, 57, 24), {}), (pygame.Rect(1776, 70, 85, 30), {}),
             (pygame.Rect(1317, 375, 64, 24), {}),
-            (pygame.Rect(1434, 401, 48, 35), {}),
-            (pygame.Rect(726, 323, 80, 29), {}),
+            (pygame.Rect(1434, 401, 48, 35), {}), (pygame.Rect(726, 323, 80, 29), {}),
             (pygame.Rect(858, 346, 73, 22), {}),
-            (pygame.Rect(930, 346, 28, 35), {}),
-            (pygame.Rect(957, 347, 36, 45), {}),
+            (pygame.Rect(930, 346, 28, 35), {}), (pygame.Rect(957, 347, 36, 45), {}),
             (pygame.Rect(992, 347, 27, 28), {}),
-            (pygame.Rect(1017, 346+1, 45, 19+3), {}),
-            (pygame.Rect(1087, 310, 53, 20), {}),
+            (pygame.Rect(1020, 349, 48, 22), {}), (pygame.Rect(1087, 310, 53, 20), {}),
             (pygame.Rect(1196, 282, 58, 24), {}),
-            (pygame.Rect(1284, 242, 69, 22), {}),
-            (pygame.Rect(1170, 210, 66, 18), {}),
+            (pygame.Rect(1284, 242, 69, 22), {}), (pygame.Rect(1170, 210, 66, 18), {}),
             (pygame.Rect(1307, 176, 71, 21), {}),
-            (pygame.Rect(1405, 139, 63, 22), {}),
-            (pygame.Rect(1457, 128, 38, 43), {}),
+            (pygame.Rect(1405, 139, 63, 22), {}), (pygame.Rect(1457, 128, 38, 43), {}),
             (pygame.Rect(1490, 115, 49, 67), {}),
-            (pygame.Rect(1529, 103, 117, 25), {}),
-            (pygame.Rect(1639, 85, 63, 28), {}),
+            (pygame.Rect(1529, 103, 117, 25), {}), (pygame.Rect(1639, 85, 63, 28), {}),
             (pygame.Rect(74, 89, 82, 23), {}),
-            (pygame.Rect(1054, 387, 27, 13), {}),
-            (pygame.Rect(1561, 388, 180, 28), {}),
+            (pygame.Rect(1054, 387, 27, 13), {}), (pygame.Rect(1561, 388, 180, 28), {}),
             (pygame.Rect(1787, 142, 58, 12), {}),
 
-            (pygame.Rect(395, 181, 26, 19), {}),
-            (pygame.Rect(863, 42, 29, 22), {"grass": False}),
-            (pygame.Rect(1006, 43, 27, 19), {"grass": False}),
-            (pygame.Rect(887, 33, 127, 39), {"grass": False}),
-
-            # EXCLUDED FROM GRASS OVERLAY
-            # (pygame.Rect(1321, 245, 86, 32), {"grass": False})
+            (pygame.Rect(395, 181, 26, 19), {}), (pygame.Rect(863, 42, 29, 22), {"grass": False}),
+            (pygame.Rect(1006, 43, 27, 19), {"grass": False}), (pygame.Rect(887, 33, 127, 39), {"grass": False}),
         ]
         solidground = [
-            pygame.Rect(1793, 481, 51, 130),
-            pygame.Rect(1757, 510, 38, 99),
-            pygame.Rect(1687, 564, 35, 36),
-            pygame.Rect(1720, 536, 41, 67),
-            pygame.Rect(1883, 430, 23, 175),
-            pygame.Rect(1904, 470, 27, 132),
-            pygame.Rect(1929, 533, 26, 76),
-            pygame.Rect(1955, 558, 22, 45),
-            pygame.Rect(1977, 579, 24, 38),
-            pygame.Rect(1813, 463, 33, 33),
-            pygame.Rect(1741, 526, 23, 15),
-            pygame.Rect(1702, 551, 23, 19),
-            pygame.Rect(1656, 577, 49, 29),
-            pygame.Rect(1629, 586, 50, 22),
-            pygame.Rect(1917, 507, 24, 40),
-            pygame.Rect(1900, 453, 14, 30),
-            pygame.Rect(1872, 403, 19, 35),
-            pygame.Rect(1875, 323, 18, 38),
-            pygame.Rect(1819, 323, 31, 26),
-            pygame.Rect(1835, 345, 14, 22),
-            pygame.Rect(1809, 325, 22, 14),
-            pygame.Rect(1777, 293, 16, 21),
-            pygame.Rect(1745, 280, 17, 9),
+            pygame.Rect(1793, 481, 51, 130), pygame.Rect(1757, 510, 38, 99), pygame.Rect(1687, 564, 35, 36),
+            pygame.Rect(1720, 536, 41, 67), pygame.Rect(1883, 430, 23, 175), pygame.Rect(1904, 470, 27, 132),
+            pygame.Rect(1929, 533, 26, 76), pygame.Rect(1955, 558, 22, 45), pygame.Rect(1977, 579, 24, 38),
+            pygame.Rect(1813, 463, 33, 33), pygame.Rect(1741, 526, 23, 15), pygame.Rect(1702, 551, 23, 19),
+            pygame.Rect(1656, 577, 49, 29), pygame.Rect(1629, 586, 50, 22), pygame.Rect(1917, 507, 24, 40),
+            pygame.Rect(1900, 453, 14, 30), pygame.Rect(1872, 403, 19, 35), pygame.Rect(1875, 323, 18, 38),
+            pygame.Rect(1819, 323, 31, 26), pygame.Rect(1835, 345, 14, 22), pygame.Rect(1809, 325, 22, 14),
+            pygame.Rect(1777, 293, 16, 21), pygame.Rect(1745, 280, 17, 9),
         ]
         chains = [
-            (pygame.Rect(392 - 5, 138, 32, 45), {}),
-            (pygame.Rect(413, 138, 32, 46), {}),
-            (pygame.Rect(945 - 4, 71, 15, 94), {}),
-            pygame.Rect(1789, 95, 32, 51),
-            pygame.Rect(1833, 95, 32, 52),
-
-            pygame.Rect(1698, 261, 32, 129),
-            pygame.Rect(1792, 330, 32, 154),
-            pygame.Rect(1251, 466, 32, 111),
-            pygame.Rect(1311, 192, 32, 52),
-            pygame.Rect(1461, 165, 32, 43),
-            pygame.Rect(1667, 128, 32, 42),
-            pygame.Rect(654, 269, 32, 50),
-            pygame.Rect(467, 470, 32, 106),
-            pygame.Rect(1009, 72, 32, 58),
-            pygame.Rect(875, 78, 323, 27),
-            pygame.Rect(250, 136, 32, 45),
-            pygame.Rect(86, 124, 32, 28),
-            pygame.Rect(232, 396, 32, 100),
+            (pygame.Rect(387, 138, 32, 45), {}), (pygame.Rect(413, 138, 32, 46), {}),
+            (pygame.Rect(941, 71, 15, 94), {}),
+            pygame.Rect(1789, 95, 32, 51), pygame.Rect(1833, 95, 32, 52), pygame.Rect(1698, 261, 32, 129),
+            pygame.Rect(1792, 330, 32, 154), pygame.Rect(1251, 466, 32, 111), pygame.Rect(1311, 192, 32, 52),
+            pygame.Rect(1461, 165, 32, 43), pygame.Rect(1667, 128, 32, 42), pygame.Rect(654, 269, 32, 50),
+            pygame.Rect(467, 470, 32, 106), pygame.Rect(1009, 72, 32, 58), pygame.Rect(875, 78, 323, 27),
+            pygame.Rect(250, 136, 32, 45), pygame.Rect(86, 124, 32, 28), pygame.Rect(232, 396, 32, 100),
         ]
         cage = [
             (pygame.Rect(919 - 34, 141 + 10, 128, 128), {}),
         ]
         water = []
         lava = [
-            pygame.Rect(55, 579, 1960, 82),
-            pygame.Rect(172, 552, 155, 30),
-            pygame.Rect(417, 572, 194, 16),
-            pygame.Rect(855, 571, 255, 17),
-            pygame.Rect(830, 573, 38, 12),
-            pygame.Rect(603, 575, 47, 9),
-            pygame.Rect(411, 567, 54, 16),
-            pygame.Rect(415, 557, 35, 22),
-            pygame.Rect(414, 553, 27, 13),
+            pygame.Rect(55, 579, 1960, 82), pygame.Rect(172, 552, 155, 30), pygame.Rect(417, 572, 194, 16),
+            pygame.Rect(855, 571, 255, 17), pygame.Rect(830, 573, 38, 12), pygame.Rect(603, 575, 47, 9),
+            pygame.Rect(411, 567, 54, 16), pygame.Rect(415, 557, 35, 22), pygame.Rect(414, 553, 27, 13),
 
-            pygame.Rect(1591, 570, 95, 12),
-            pygame.Rect(1643, 563, 42, 9),
-            pygame.Rect(1663, 554, 47, 8),
-            pygame.Rect(1657, 560, 27, 8),
-            pygame.Rect(1682, 543, 36, 11),
-            pygame.Rect(1702, 539, 17, 7),
+            pygame.Rect(1591, 570, 95, 12), pygame.Rect(1643, 563, 42, 9), pygame.Rect(1663, 554, 47, 8),
+            pygame.Rect(1657, 560, 27, 8), pygame.Rect(1682, 543, 36, 11), pygame.Rect(1702, 539, 17, 7),
 
-            pygame.Rect(1940, 511, 59, 24),
-            pygame.Rect(1953, 533, 47, 22),
-            pygame.Rect(1979, 555, 26, 25),
-            pygame.Rect(1097, 575, 38, 10),
-            pygame.Rect(1310, 568, 166, 23),
-            pygame.Rect(1249, 574, 77, 14),
-            pygame.Rect(1273, 572, 55, 12),
-            pygame.Rect(1469, 571, 58, 17),
-            pygame.Rect(1499, 574, 60, 14),
+            pygame.Rect(1940, 511, 59, 24), pygame.Rect(1953, 533, 47, 22), pygame.Rect(1979, 555, 26, 25),
+            pygame.Rect(1097, 575, 38, 10), pygame.Rect(1310, 568, 166, 23), pygame.Rect(1249, 574, 77, 14),
+            pygame.Rect(1273, 572, 55, 12), pygame.Rect(1469, 571, 58, 17), pygame.Rect(1499, 574, 60, 14),
 
-            pygame.Rect(97, 571, 41, 9),
-            pygame.Rect(109, 568, 29, 6),
-            pygame.Rect(118, 565, 19, 6),
+            pygame.Rect(97, 571, 41, 9), pygame.Rect(109, 568, 29, 6), pygame.Rect(118, 565, 19, 6),
             pygame.Rect(89, 574, 17, 7),
-
         ]
 
         water = [
@@ -1540,77 +1100,14 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
             return generated_flowers
 
-        lavaflowers += generate_random_lava_flower_positions(
-            54,
-            54 + 323 - 23,
-            284 - 7,
-            284 - 7,
-            40,
-            3
-        )
-
-        lavaflowers += generate_random_lava_flower_positions(
-            859,
-            859 + 200 - 23,
-            322 - 7,
-            322 - 7,
-            40,
-            2
-        )
-
-        lavaflowers += generate_random_lava_flower_positions(
-            616,
-            616 + 85 - 23,
-            191 - 7,
-            191 - 7,
-            40,
-            1
-        )
-
-        lavaflowers += generate_random_lava_flower_positions(
-            960,
-            960 + 130 - 23,
-            451 - 4,
-            451 - 4,
-            40,
-            2
-        )
-
-        lavaflowers += generate_random_lava_flower_positions(
-            535,
-            535 + 318 - 23,
-            447 - 2,
-            447 - 2,
-            40,
-            3
-        )
-
-        lavaflowers += generate_random_lava_flower_positions(
-            1531,
-            1531 + 104 - 23,
-            77 - 7,
-            77 - 7,
-            40,
-            1
-        )
-
-        lavaflowers += generate_random_lava_flower_positions(
-            1687,
-            1687 + 239 - 23,
-            214 - 7,
-            214 - 7,
-            40,
-            2
-        )
-
-        lavaflowers += generate_random_lava_flower_positions(
-            1547,
-            1547 + 188 - 23,
-            356 + 3,
-            356 + 3,
-            40,
-            2
-        )
+        lavaflowers += generate_random_lava_flower_positions(54, 54 + 323 - 23, 284 - 7, 284 - 7, 40, 3)
+        lavaflowers += generate_random_lava_flower_positions(859, 859 + 200 - 23, 322 - 7, 322 - 7, 40, 2)
+        lavaflowers += generate_random_lava_flower_positions(616, 616 + 85 - 23, 191 - 7, 191 - 7, 40, 1)
+        lavaflowers += generate_random_lava_flower_positions(960, 960 + 130 - 23, 451 - 4, 451 - 4, 40, 2)
+        lavaflowers += generate_random_lava_flower_positions(535, 535 + 318 - 23, 447 - 2, 447 - 2, 40, 3)
+        lavaflowers += generate_random_lava_flower_positions(1531, 1531 + 104 - 23, 77 - 7, 77 - 7, 40, 1)
+        lavaflowers += generate_random_lava_flower_positions(1687, 1687 + 239 - 23, 214 - 7, 214 - 7, 40, 2)
+        lavaflowers += generate_random_lava_flower_positions(1547, 1547 + 188 - 23, 356 + 3, 356 + 3, 40, 2)
 
         def groundoverlayrepeat(x, y, platform_width, img):
             groundoverlay = []
@@ -1780,7 +1277,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
                 if player.rect.colliderect(e.rect):
                     enemy_kill_count += 1
-                    defeated_enemies.append(e.enemy_id)
+                    defeated_enemies[level].append(e.enemy_id)
 
                     return "combat", show_hitboxes, e, player.rect.x, player.rect.y
         elif level == 1:
@@ -1789,7 +1286,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies, le
 
                 if player.rect.colliderect(e.rect):
                     enemy_kill_countlevel1 += 1
-                    defeated_enemies.append(e.enemy_id)
+                    defeated_enemies[level].append(e.enemy_id)
 
                     return "combat", show_hitboxes, e, player.rect.x, player.rect.y
 
