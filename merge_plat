@@ -59,11 +59,11 @@ grass_img = pygame.transform.scale(grass_img, (111, 120))
 spawn_img = pygame.image.load("SpawnPointBed.png")
 spawn_img = pygame.transform.scale(spawn_img, (32, 32))
 spawn_img1 = pygame.image.load("DoorEntrance2.png")
-spawn_img1 = pygame.transform.scale(spawn_img1, (32, 32))
+spawn_img1 = pygame.transform.scale(spawn_img1, (40, 45))
 spawn_img2 = pygame.image.load("DoorEntrance3.png")
 spawn_img2 = pygame.transform.scale(spawn_img2, (40, 45))
 spawn_img3 = pygame.image.load("DoorEntrance1.png")
-spawn_img3 = pygame.transform.scale(spawn_img3, (32, 32))
+spawn_img3 = pygame.transform.scale(spawn_img3, (40, 45))
 fence1_img = pygame.image.load("Fence2.png")
 fence1_img = pygame.transform.scale(fence1_img, (32, 32))
 fencef_img = pygame.image.load("FenceFloor.png")
@@ -860,7 +860,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
         flowers += generate_random_flower_positions(134, 134 + 58 - 23, 327 + 23 - 28, 327 + 23 - 28, 40, 1)
         flowers += generate_random_flower_positions(46, 46 + 86 - 23, 284 + 25 - 28, 284 + 25 - 28, 40, 1)
 
-        spawnpoints = [pygame.Rect(15, 286+2, 10, 3)]
+        spawnpoints = [pygame.Rect(15, 286 - 21, 10, 3)]
         enemies = [
             Enemy(525, 182, 80, slime, 'slime_1', enemy_frames),
             Enemy(220, 235, 35, slime, 'slime_2', enemy_frames),
