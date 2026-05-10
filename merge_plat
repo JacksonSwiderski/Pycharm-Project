@@ -49,6 +49,8 @@ f1 = 22
 f2 = 26
 lf1 = 22
 lf2 = 30
+r1 = 39
+r2 = 32
 # Load Image Assets
 bg_img = pygame.image.load("backgroundImage.png")
 bg_img = pygame.transform.scale(bg_img, (2000, 600))
@@ -56,6 +58,12 @@ grass_img = pygame.image.load("GroundTop2.png")
 grass_img = pygame.transform.scale(grass_img, (111, 120))
 spawn_img = pygame.image.load("SpawnPointBed.png")
 spawn_img = pygame.transform.scale(spawn_img, (32, 32))
+spawn_img1 = pygame.image.load("DoorEntrance2.png")
+spawn_img1 = pygame.transform.scale(spawn_img1, (32, 32))
+spawn_img2 = pygame.image.load("DoorEntrance3.png")
+spawn_img2 = pygame.transform.scale(spawn_img2, (40, 45))
+spawn_img3 = pygame.image.load("DoorEntrance1.png")
+spawn_img3 = pygame.transform.scale(spawn_img3, (32, 32))
 fence1_img = pygame.image.load("Fence2.png")
 fence1_img = pygame.transform.scale(fence1_img, (32, 32))
 fencef_img = pygame.image.load("FenceFloor.png")
@@ -106,6 +114,12 @@ door_img = pygame.image.load('boss_door.png')
 door_img = pygame.transform.scale(door_img, (50, 50))
 cage_img = pygame.image.load('EmptyCage.png')
 cage_img = pygame.transform.scale(cage_img, (128, 128))
+rockimg1 = pygame.image.load("Rock1.png")
+rockimg1 = pygame.transform.scale(rockimg1, (r1, r2))
+rockimg2 = pygame.image.load("Rock2.png")
+rockimg2 = pygame.transform.scale(rockimg2, (r1, r2))
+rockimg3 = pygame.image.load("Rock3.png")
+rockimg3 = pygame.transform.scale(rockimg3, (r1, r2))
 
 #volcano
 groundoverlay_img = pygame.image.load("volcano_overlay.png")
@@ -145,6 +159,12 @@ flower_images = [
     flower3img,
     flower4img,
     flower5img,
+]
+
+rock_images = [
+    rockimg1,
+    rockimg2,
+    rockimg3,
 ]
 
 lava_flower_images = [
@@ -871,8 +891,8 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
             pygame.Rect(970, 365, 39, 38), pygame.Rect(996, 368, 36, 22), pygame.Rect(1026, 358, 22, 24),
             pygame.Rect(1044, 361, 13, 16),
             pygame.Rect(749, 337, 34, 36), pygame.Rect(730, 338, 31, 22), pygame.Rect(739, 352, 20, 15),
-            pygame.Rect(772, 347, 27, 14), pygame.Rect(771, 354, 19, 14), pygame.Rect(1104, 319, 17, 27),
-            pygame.Rect(1093, 322, 17, 15), pygame.Rect(1117, 323, 14, 15),
+            pygame.Rect(772, 347, 27, 14), pygame.Rect(771, 354, 19, 14), pygame.Rect(1104+7, 319, 17, 27),
+            pygame.Rect(1093+7, 322, 17, 15), pygame.Rect(1117+7, 323, 14, 15),
             pygame.Rect(1245, 440, 19, 28), pygame.Rect(1234, 444, 15, 16), pygame.Rect(1261, 442, 10, 22),
             pygame.Rect(1341, 387, 13, 30), pygame.Rect(1326, 393, 19, 14), pygame.Rect(1352, 393, 16, 16),
             pygame.Rect(928, 393, 33, 178), pygame.Rect(912, 399, 22, 34), pygame.Rect(919, 426, 14, 42),
@@ -927,7 +947,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
             pygame.Rect(1588, 431, 37, 21), pygame.Rect(1653, 403, 73, 30), pygame.Rect(1653, 423, 42, 25),
             pygame.Rect(1713, 409, 21, 17), pygame.Rect(1063, 393, 9, 22), pygame.Rect(1058, 396, 8, 10),
             pygame.Rect(1068, 396, 7, 12), pygame.Rect(1793, 147, 43, 17), pygame.Rect(1803, 157, 23, 13),
-            pygame.Rect(1792, 87, 46, 59),
+            pygame.Rect(1792, 87, 46, 59), pygame.Rect(1014, 361, 20, 12),
         ]
         platforms = [
             (pygame.Rect(0, 307, 66, 294), {}), (pygame.Rect(63, 307, 25, 266), {}),
@@ -974,9 +994,9 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
             (pygame.Rect(1317, 375, 64, 24), {}),
             (pygame.Rect(1434, 401, 48, 35), {}), (pygame.Rect(726, 323, 80, 29), {}),
             (pygame.Rect(858, 346, 73, 22), {}),
-            (pygame.Rect(930, 346, 28, 35), {}), (pygame.Rect(957, 347, 36, 45), {}),
-            (pygame.Rect(992, 347, 27, 28), {}),
-            (pygame.Rect(1020, 349, 48, 22), {}), (pygame.Rect(1087, 310, 53, 20), {}),
+            (pygame.Rect(930, 346, 28, 35), {}), (pygame.Rect(957, 346, 36, 45), {}),
+            (pygame.Rect(992, 346, 27, 28), {}),
+            (pygame.Rect(1020, 349-3, 48, 22), {}), (pygame.Rect(1087+7, 310, 53, 20), {}),
             (pygame.Rect(1196, 282, 58, 24), {}),
             (pygame.Rect(1284, 242, 69, 22), {}), (pygame.Rect(1170, 210, 66, 18), {}),
             (pygame.Rect(1307, 176, 71, 21), {}),
@@ -1057,6 +1077,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
         door_hitbox = pygame.Rect(1950 + 25, 195, 50, 50)  # for collision only
 
         lavaflowers = []
+        rocks = []
 
         if not coins_generated[level]:
             level_coins[level] = generate_coins_on_platforms(platforms, 15)
@@ -1100,14 +1121,46 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
 
             return generated_flowers
 
+        def generate_random_positionsr(min_x, max_x, min_y, max_y, min_distance, amount):
+            generated_rocks = []
+
+            used_x_positions = []
+
+            for _ in range(amount):
+                x = random.randint(min_x, max_x)
+                y = random.randint(min_y, max_y)
+
+                while any(abs(x - used_x) <= min_distance for used_x in used_x_positions):
+                    x = random.randint(min_x, max_x)
+
+                used_x_positions.append(x)
+
+                generated_rocks.append({
+                    "rect": pygame.Rect(x, y, 40, 21),
+                    "img": random.choice(rock_images)
+                })
+
+            return generated_rocks
+
         lavaflowers += generate_random_lava_flower_positions(54, 54 + 323 - 23, 284 - 7, 284 - 7, 40, 3)
-        lavaflowers += generate_random_lava_flower_positions(859, 859 + 200 - 23, 322 - 7, 322 - 7, 40, 2)
+        lavaflowers += generate_random_lava_flower_positions(859, 859 + 200 - 23, 322 - 9, 322 - 9, 40, 2)
         lavaflowers += generate_random_lava_flower_positions(616, 616 + 85 - 23, 191 - 7, 191 - 7, 40, 1)
         lavaflowers += generate_random_lava_flower_positions(960, 960 + 130 - 23, 451 - 4, 451 - 4, 40, 2)
         lavaflowers += generate_random_lava_flower_positions(535, 535 + 318 - 23, 447 - 2, 447 - 2, 40, 3)
         lavaflowers += generate_random_lava_flower_positions(1531, 1531 + 104 - 23, 77 - 7, 77 - 7, 40, 1)
         lavaflowers += generate_random_lava_flower_positions(1687, 1687 + 239 - 23, 214 - 7, 214 - 7, 40, 2)
         lavaflowers += generate_random_lava_flower_positions(1547, 1547 + 188 - 23, 356 + 3, 356 + 3, 40, 2)
+
+        rocks += generate_random_positionsr(498, 498 + 116 - 32, 243 + 9, 243 + 9, 40, 1)
+        rocks += generate_random_positionsr(892, 892 + 120 - 32, 9 + 3, 9 + 3, 40, 1)
+        rocks += generate_random_positionsr(211, 211 + 130 - 32, 59 + 9, 59 + 9, 40, 1)
+        rocks += generate_random_positionsr(1399, 1399 + 55 - 32, 106 + 9, 106 + 9, 40, 1)
+        rocks += generate_random_positionsr(1312, 1312 + 75 - 32, 345 + 9, 345 + 9, 40, 1)
+        rocks += generate_random_positionsr(323, 323 + 108 - 32, 451 + 9, 451 + 9, 40, 1)
+        rocks += generate_random_positionsr(196, 196 + 79 - 32, 462 + 9, 462 + 9, 40, 1)
+        rocks += generate_random_positionsr(1166, 1166 + 73 - 32, 180 + 9, 180 + 9, 40, 1)
+        rocks += generate_random_positionsr(231, 231 + 58 - 39, 207 + 9, 207 + 9, 39, 1)
+
 
         def groundoverlayrepeat(x, y, platform_width, img):
             groundoverlay = []
@@ -1210,7 +1263,9 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
         flowers = []
 
         # generate_random_flower_positions
-        spawnpoints = [pygame.Rect(15, 286 + 2, 10, 3)]
+        spawnpoints1 = [
+            pygame.Rect(15, 286 - 21, 10, 3)
+                       ]
     else:
         background_rects, spawnpoints = [], []
         platforms = [pygame.Rect(0, 550, 800, 50), pygame.Rect(200, 400, 100, 20)]
@@ -1350,7 +1405,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
             for r in rockpile: #rockpile
                 draw_platform(screen, rock_pile, r, camera_x)
             for s in spawnpoints:
-                screen.blit(spawn_img, (s.x - camera_x, s.y))
+                screen.blit(spawn_img1, (s.x - camera_x, s.y))
             player.draw(screen, camera_x)
             for img, pos in grassoverlay:
                 screen.blit(img, (pos[0] - camera_x, pos[1]))
@@ -1390,16 +1445,10 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
                 draw_vertical_tiled(screen, chain_img, c, camera_x)
             for c in cage:
                 draw_platform1(screen, cage_img, c, camera_x)
-            # for t1 in tree1:
-            #     draw_platform1(screen, tree1_img, t1, camera_x)
-            # for t2 in tree2:
-            #     draw_platform1(screen, tree2_img, t2, camera_x)
-            # for t3 in tree3:
-            #     draw_platform1(screen, tree3_img, t3, camera_x)
-            # for r in rockpile:  # rockpile
-            #     draw_platform1(screen, rock_pile, r, camera_x)
-            for s in spawnpoints:
-                screen.blit(spawn_img, (s.x - camera_x, s.y))
+            for r in rocks:
+                draw_platform(screen, r["img"], r["rect"], camera_x)
+            for s in spawnpoints1:
+                screen.blit(spawn_img2, (s.x - camera_x, s.y))
             player.draw(screen, camera_x)
             for img, pos in groundoverlay1:
                 screen.blit(img, (pos[0] - camera_x, pos[1]))
