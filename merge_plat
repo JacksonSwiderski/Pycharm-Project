@@ -1098,6 +1098,25 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
             add_manual_coin(1699, 362, level)
             add_manual_coin(1590, 361, level)
             add_manual_coin(1648, 313, level)
+
+            add_manual_coin(200, 463, level)
+            add_manual_coin(136, 504, level)
+            add_manual_coin(136, 504, level)
+            add_manual_coin(136, 504, level)
+            add_manual_coin(689, 135, level)
+            add_manual_coin(658, 97, level)
+            add_manual_coin(616, 71, level)
+            add_manual_coin(575, 90, level)
+            add_manual_coin(548, 132, level)
+
+            add_manual_coin(888, 521, level)
+
+            add_manual_coin(722, 118, level)
+            add_manual_coin(766, 83, level)
+            add_manual_coin(810, 78, level)
+            add_manual_coin(845, 128, level)
+            add_manual_coin(868, 191, level)
+
             coins_generated[level] = True
 
         def generate_random_lava_flower_positions(min_x, max_x, min_y, max_y, min_distance, amount):
