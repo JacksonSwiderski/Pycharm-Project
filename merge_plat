@@ -1253,7 +1253,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
         rocks = []
 
         if not coins_generated[level]:
-            level_coins[level] = generate_coins_on_platforms(platforms, 15)
+            level_coins[level] = generate_coins_on_platforms(platforms, 40)
             add_manual_coin(74, 62, level)
             add_manual_coin(99, 62, level)
             add_manual_coin(125, 62, level)
@@ -1490,6 +1490,62 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
             pygame.Rect(444, 548, 28, 16),
             pygame.Rect(521, 546, 29, 19),
 
+            pygame.Rect(789, 271, 75, 49),
+            pygame.Rect(854, 269, 36, 33),
+            pygame.Rect(781, 313, 40, 32),
+            pygame.Rect(807, 310, 28, 23),
+            pygame.Rect(855, 296, 17, 13),
+            pygame.Rect(881, 272, 23, 17),
+            pygame.Rect(788, 343, 18, 10),
+
+            pygame.Rect(619, 351, 162, 25),
+            pygame.Rect(634, 365, 58, 25),
+            pygame.Rect(653, 370, 99, 42),
+            pygame.Rect(736, 365, 24, 27),
+            pygame.Rect(670, 402, 71, 22),
+            pygame.Rect(691, 413, 40, 23),
+            pygame.Rect(714, 427, 12, 33),
+            pygame.Rect(703, 431, 19, 13),
+
+            pygame.Rect(404, 330, 90, 26),
+            pygame.Rect(415, 348, 70, 22),
+            pygame.Rect(434, 362, 41, 20),
+            pygame.Rect(531, 416, 46, 19),
+            pygame.Rect(543, 429, 22, 13),
+            pygame.Rect(467, 159, 36, 63),
+            pygame.Rect(436, 170, 88, 26),
+            pygame.Rect(452, 185, 31, 21),
+            pygame.Rect(498, 189, 14, 20),
+            pygame.Rect(934, 424, 55, 26),
+            pygame.Rect(961, 438, 22, 24),
+            pygame.Rect(945, 442, 20, 14),
+            pygame.Rect(205, 258, 68, 20),
+            pygame.Rect(256, 254, 38, 37),
+            pygame.Rect(272, 282, 21, 25),
+            pygame.Rect(276, 256, 24, 41),
+            pygame.Rect(666, 109, 85, 21),
+            pygame.Rect(746, 107, 43, 33),
+            pygame.Rect(677, 126, 86, 17),
+            pygame.Rect(709, 137, 41, 14),
+            pygame.Rect(951, 122, 38, 33),
+            pygame.Rect(933, 125, 29, 17),
+            pygame.Rect(944, 137, 18, 11),
+            pygame.Rect(973, 126, 40, 22),
+            pygame.Rect(1009, 130, 13, 11),
+
+            pygame.Rect(1828, 387, 174, 42),
+            pygame.Rect(1936, 425, 66, 70),
+            pygame.Rect(1951, 490, 52, 26),
+            pygame.Rect(1977, 515, 28, 23),
+            pygame.Rect(1920, 531, 81, 18),
+            pygame.Rect(1905, 536, 30, 15),
+            pygame.Rect(1851, 418, 99, 29),
+            pygame.Rect(1881, 439, 69, 33),
+            pygame.Rect(1911, 469, 38, 13),
+            pygame.Rect(1928, 262, 74, 30),
+            pygame.Rect(1944, 290, 60, 18),
+            pygame.Rect(1962, 304, 44, 33),
+
         ]
         platforms = [
             (pygame.Rect(0, 64, 75, 574), {}),
@@ -1511,6 +1567,26 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
 
             (pygame.Rect(68, 138, 12, 14), {}),
             (pygame.Rect(71, 317, 33, 11), {}),
+
+            (pygame.Rect(390, 307, 115, 33), {}),
+            (pygame.Rect(605, 334, 108, 25), {}),
+            (pygame.Rect(650, 287, 62, 48), {}),
+            (pygame.Rect(676, 262, 35, 27), {}),
+            (pygame.Rect(710, 262, 85, 97), {}),
+            (pygame.Rect(793, 240, 125, 37), {}),
+            (pygame.Rect(422, 142, 121, 39), {}),
+            (pygame.Rect(518, 403, 70, 20), {}),
+            (pygame.Rect(278, 235, 48, 24), {}),
+            (pygame.Rect(400, 161, 37, 14), {}),
+            (pygame.Rect(649, 92, 153, 25), {}),
+            (pygame.Rect(914, 106, 117, 26), {}),
+
+            (pygame.Rect(1815, 331, 188, 59), {}),
+            (pygame.Rect(1857, 544, 148, 65), {}),
+            (pygame.Rect(1999, 389, 82, 242), {}),
+            (pygame.Rect(1915, 227, 89, 37), {}),
+            (pygame.Rect(1999, 228, 46, 113),{}),
+
         ]
         solidground = []
         chains = []
@@ -1525,7 +1601,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
         tree3 = []
 
         rockpile = []
-        door_pos = pygame.Rect(1950, 195, 50, 50)  # for drawing
+        door_pos = pygame.Rect(1950, 195-15, 50, 50)  # for drawing
         door_hitbox = pygame.Rect(1950 + 25, 195, 50, 50)  # for collision only
 
         lavaflowers = []
@@ -1536,6 +1612,26 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
         if not coins_generated[level]:
             level_coins[level] = generate_coins_on_platforms(platforms, 15)
             add_manual_coin(77, 289, level)
+
+            add_manual_coin(88, 495, level)
+            add_manual_coin(139, 495, level)
+            add_manual_coin(191, 496, level)
+            add_manual_coin(237, 495, level)
+            add_manual_coin(467, 534, level)
+            add_manual_coin(503, 532, level)
+            add_manual_coin(923, 69, level)
+            add_manual_coin(964, 73, level)
+            add_manual_coin(999, 74, level)
+            add_manual_coin(1020, 39, level)
+            add_manual_coin(1064, 24, level)
+            add_manual_coin(1099, 58, level)
+            add_manual_coin(1122, 108, level)
+            add_manual_coin(1140, 160, level)
+            add_manual_coin(1151, 224, level)
+
+            add_manual_coin(663, 57, level)
+            add_manual_coin(713, 57, level)
+            add_manual_coin(763, 57, level)
 
             coins_generated[level] = True
 
