@@ -1177,10 +1177,116 @@ def load_level(level):
             (pygame.Rect(1639, 545, 223, 62), {}),
             (pygame.Rect(1722, 470, 84, 76), {}),
             (pygame.Rect(921, 405, 77, 30), {}),
-            (pygame.Rect(48, 137, 33, 17), {}),
+
+            (pygame.Rect(68, 138, 12, 14), {}),
+            (pygame.Rect(71, 317, 33, 11), {}),
+
+            (pygame.Rect(390, 307, 115, 33), {}),
+            (pygame.Rect(605, 334, 108, 25), {}),
+            (pygame.Rect(650, 287, 62, 48), {}),
+            (pygame.Rect(676, 262, 35, 27), {}),
+            (pygame.Rect(710, 262, 85, 97), {}),
+            (pygame.Rect(793, 240, 125, 37), {}),
+            (pygame.Rect(422, 142, 121, 39), {}),
+            (pygame.Rect(518, 403, 70, 20), {}),
+            (pygame.Rect(278, 235, 48, 24), {}),
+            (pygame.Rect(400, 161, 37, 14), {}),
+            (pygame.Rect(649, 92, 153, 25), {}),
+            (pygame.Rect(914, 106, 117, 26), {}),
+
+            (pygame.Rect(1815, 331, 188, 59), {}),
+            (pygame.Rect(1857, 544, 148, 65), {}),
+            (pygame.Rect(1999, 389, 82, 242), {}),
+            (pygame.Rect(1915, 227, 89, 37), {}),
+            (pygame.Rect(1999, 228, 46, 113), {}),
         ]
         spawnpoints = []
-        underground2 = []
+        underground3 = [
+            pygame.Rect(67, 261, 154, 26),
+            pygame.Rect(66, 283, 135, 25),
+            pygame.Rect(63, 296, 89, 42),
+            pygame.Rect(135, 300, 33, 23),
+            pygame.Rect(61, 327, 29, 52),
+            pygame.Rect(68, 317, 38, 37),
+            pygame.Rect(60, 371, 65, 36),
+            pygame.Rect(107, 381, 47, 19),
+            pygame.Rect(81, 366, 21, 15),
+
+            pygame.Rect(64, 423, 119, 34),
+            pygame.Rect(53, 447, 106, 37),
+            pygame.Rect(47, 473, 78, 68),
+            pygame.Rect(100, 501, 67, 37),
+            pygame.Rect(154, 509, 45, 30),
+            pygame.Rect(165, 418, 30, 26),
+
+            pygame.Rect(464, 488, 59, 27),
+            pygame.Rect(481, 500, 24, 31),
+            pygame.Rect(473, 506, 17, 16),
+            pygame.Rect(494, 509, 17, 18),
+            pygame.Rect(470, 528, 26, 31),
+            pygame.Rect(487, 527, 27, 37),
+            pygame.Rect(501, 537, 31, 24),
+            pygame.Rect(454, 540, 34, 24),
+            pygame.Rect(444, 548, 28, 16),
+            pygame.Rect(521, 546, 29, 19),
+
+            pygame.Rect(789, 271, 75, 49),
+            pygame.Rect(854, 269, 36, 33),
+            pygame.Rect(781, 313, 40, 32),
+            pygame.Rect(807, 310, 28, 23),
+            pygame.Rect(855, 296, 17, 13),
+            pygame.Rect(881, 272, 23, 17),
+            pygame.Rect(788, 343, 18, 10),
+
+            pygame.Rect(619, 351, 162, 25),
+            pygame.Rect(634, 365, 58, 25),
+            pygame.Rect(653, 370, 99, 42),
+            pygame.Rect(736, 365, 24, 27),
+            pygame.Rect(670, 402, 71, 22),
+            pygame.Rect(691, 413, 40, 23),
+            pygame.Rect(714, 427, 12, 33),
+            pygame.Rect(703, 431, 19, 13),
+
+            pygame.Rect(404, 330, 90, 26),
+            pygame.Rect(415, 348, 70, 22),
+            pygame.Rect(434, 362, 41, 20),
+            pygame.Rect(531, 416, 46, 19),
+            pygame.Rect(543, 429, 22, 13),
+            pygame.Rect(467, 159, 36, 63),
+            pygame.Rect(436, 170, 88, 26),
+            pygame.Rect(452, 185, 31, 21),
+            pygame.Rect(498, 189, 14, 20),
+            pygame.Rect(934, 424, 55, 26),
+            pygame.Rect(961, 438, 22, 24),
+            pygame.Rect(945, 442, 20, 14),
+            pygame.Rect(205, 258, 68, 20),
+            pygame.Rect(256, 254, 38, 37),
+            pygame.Rect(272, 282, 21, 25),
+            pygame.Rect(276, 256, 24, 41),
+            pygame.Rect(666, 109, 85, 21),
+            pygame.Rect(746, 107, 43, 33),
+            pygame.Rect(677, 126, 86, 17),
+            pygame.Rect(709, 137, 41, 14),
+            pygame.Rect(951, 122, 38, 33),
+            pygame.Rect(933, 125, 29, 17),
+            pygame.Rect(944, 137, 18, 11),
+            pygame.Rect(973, 126, 40, 22),
+            pygame.Rect(1009, 130, 13, 11),
+
+            pygame.Rect(1828, 387, 174, 42),
+            pygame.Rect(1936, 425, 66, 70),
+            pygame.Rect(1951, 490, 52, 26),
+            pygame.Rect(1977, 515, 28, 23),
+            pygame.Rect(1920, 531, 81, 18),
+            pygame.Rect(1905, 536, 30, 15),
+            pygame.Rect(1851, 418, 99, 29),
+            pygame.Rect(1881, 439, 69, 33),
+            pygame.Rect(1911, 469, 38, 13),
+            pygame.Rect(1928, 262, 74, 30),
+            pygame.Rect(1944, 290, 60, 18),
+            pygame.Rect(1962, 304, 44, 33),
+
+        ]
         background_rects = []
         tree1 = []
         tree2 = []
@@ -1264,11 +1370,12 @@ def load_level(level):
         water,
         cage,
         groundoverlay3,
+        underground3
     )
 
 
 LEVEL = 2
-platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, underground, grassoverlay, lava, rockpile, door_pos, door_hitbox, groundoverlay1, solidground, chains, water, cage, groundoverlay3 = load_level(LEVEL)
+platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, underground, grassoverlay, lava, rockpile, door_pos, door_hitbox, groundoverlay1, solidground, chains, water, cage, groundoverlay3, underground3 = load_level(LEVEL)
 
 # -----------------------------
 # MAIN LOOP
@@ -1423,7 +1530,7 @@ while running:
     elif LEVEL == 2:
         screen.fill(DESERT_COLOR)
         screen.blit(bg_img_desert, (0, 0))
-        for u in underground:
+        for u in underground3:
             draw_platform_tiled(screen, underground2, u)
         for p in platforms:
             draw_platformdesert(screen, ground_img2, p)
