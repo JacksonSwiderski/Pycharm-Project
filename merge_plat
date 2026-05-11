@@ -11,7 +11,9 @@ required_coins = 40
 required_fights = 5
 coin_count = 0
 coin_countlevel1 = 0
+coin_countlevel2 = 0
 enemy_kill_countlevel1 = 0
+enemy_kill_countlevel2 = 0
 enemy_kill_count = 0
 coins_generated = {
     0: False,
@@ -28,6 +30,7 @@ BLUE = (135, 206, 235)
 RED = (200, 50, 50)
 DIRT_COLOR = (1, 2, 5)
 GROUND_COLOR = (23, 22, 22)
+DESERT_COLOR = (222, 166, 75)
 ranonce = 0
 
 GRAVITY = 0.8
@@ -135,16 +138,68 @@ lavaimg = pygame.transform.scale(lavaimg, (32, 65))
 chain_img = pygame.image.load("Chain.png")
 chain_img = pygame.transform.scale(chain_img, (16, 32))
 
-cloud_images = [
-    pygame.image.load("Cloud1.png"),
-    pygame.image.load("Cloud2.png"),
-    pygame.image.load("Cloud3.png"),
-    pygame.image.load("Cloud4.png"),
-    pygame.image.load("Cloud5.png"),
-    pygame.image.load("Cloud6.png"),
-    pygame.image.load("Cloud7.png"),
-    pygame.image.load("Cloud8.png"),
+#desert
+groundoverlay_img_desert = pygame.image.load("sand_overlay.png")
+groundoverlay_img_desert = pygame.transform.scale(groundoverlay_img_desert, (45, 20))
+bg_img_desert = pygame.image.load("desert_bg.png")
+bg_img_desert = pygame.transform.scale(bg_img_desert, (2000, 600))
+underground2 = pygame.image.load("sand_underground.png")
+underground2 = pygame.transform.scale(underground2, (111, 65))
+ground_img2 = pygame.image.load("sand.png")
+ground_img2 = pygame.transform.scale(ground_img2, (64, 64))
 
+CLOUD_SCALE = 1  # change this anytime
+
+def load_cloud(file):
+    img = pygame.image.load(file)
+    w, h = img.get_width(), img.get_height()
+    return pygame.transform.scale(img, (int(w * CLOUD_SCALE), int(h * CLOUD_SCALE)))
+
+cloud_images = [
+    load_cloud("Cloud1.png"),
+    load_cloud("Cloud2.png"),
+    load_cloud("Cloud3.png"),
+    load_cloud("Cloud4.png"),
+    load_cloud("Cloud5.png"),
+    load_cloud("Cloud6.png"),
+    load_cloud("Cloud7.png"),
+    load_cloud("Cloud8.png"),
+]
+
+CLOUD_SCALE_VOLCANO = 0.5
+
+def load_cloud(file):
+    img = pygame.image.load(file)
+    w, h = img.get_width(), img.get_height()
+    return pygame.transform.scale(img, (int(w * CLOUD_SCALE_VOLCANO), int(h * CLOUD_SCALE_VOLCANO)))
+
+cloud_images_volcano = [
+    load_cloud("Cloud1V.png"),
+    load_cloud("Cloud2V.png"),
+    load_cloud("Cloud3V.png"),
+    load_cloud("Cloud4V.png"),
+    load_cloud("Cloud5V.png"),
+    load_cloud("Cloud6V.png"),
+    load_cloud("Cloud7V.png"),
+    load_cloud("Cloud8V.png"),
+]
+
+CLOUD_SCALE_DESERT = 0.5  # change this anytime
+
+def load_cloud(file):
+    img = pygame.image.load(file)
+    w, h = img.get_width(), img.get_height()
+    return pygame.transform.scale(img, (int(w * CLOUD_SCALE_DESERT), int(h * CLOUD_SCALE_DESERT)))
+
+cloud_images_desert = [
+    load_cloud("Cloud1D.png"),
+    load_cloud("Cloud2D.png"),
+    load_cloud("Cloud3D.png"),
+    load_cloud("Cloud4D.png"),
+    load_cloud("Cloud5D.png"),
+    load_cloud("Cloud6D.png"),
+    load_cloud("Cloud7D.png"),
+    load_cloud("Cloud8D.png"),
 ]
 
 bush_images = [
@@ -178,6 +233,8 @@ lava_flower_images = [
 bush = []
 
 clouds = []
+cloudsvolcano = []
+cloudsdesert = []
 
 bg_tile_original = pygame.image.load("backgroundTile.png")
 TILE_SCALE = 0.1
@@ -250,6 +307,37 @@ def draw_platform1(screen, image, rect, camera_x=0):
 
     screen.blit(platform_surf, (rect.x - camera_x, rect.y))
 
+def draw_platformdesert(screen, image, rect, camera_x=0):
+
+    # unwrap tuple if needed
+    if isinstance(rect, tuple):
+        rect = rect[0]
+
+    platform_surf = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+
+    t_w, t_h = image.get_width(), image.get_height()
+
+    # repeat horizontally + vertically
+    for x in range(0, rect.width, t_w):
+        for y in range(0, rect.height, t_h):
+            draw_w = min(t_w, rect.width - x)
+            draw_h = min(t_h, rect.height - y)
+
+            tile = image.subsurface((0, 0, draw_w, draw_h))
+            platform_surf.blit(tile, (x, y))
+
+    # rounded corners mask
+    mask = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+    pygame.draw.rect(
+        mask,
+        (255, 255, 255),
+        (0, 0, rect.width, rect.height),
+        border_radius=6
+    )
+
+    platform_surf.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+
+    screen.blit(platform_surf, (rect.x - camera_x, rect.y))
 def draw_platform_tiled(screen, image, rect, camera_x=0):
 
     # unwrap tuple if needed
@@ -553,6 +641,85 @@ def update_and_draw_clouds(screen, dt):
         if cloud["x"] > screen.get_width() + 200:
             clouds.remove(cloud)
 
+def update_and_draw_clouds_volcano(screen, dt):
+    global cloudsvolcano
+
+    # initialize timers once
+    if not hasattr(update_and_draw_clouds_volcano, "spawn_timer1"):
+        update_and_draw_clouds_volcano.spawn_timer1 = 0
+
+    if not hasattr(update_and_draw_clouds_volcano, "next_spawn1"):
+        update_and_draw_clouds_volcano.next_spawn1 = random.uniform(2, 5)
+
+    # increase timer
+    update_and_draw_clouds_volcano.spawn_timer1 += dt
+
+    # spawn cloud
+    if update_and_draw_clouds_volcano.spawn_timer1 >= update_and_draw_clouds_volcano.next_spawn1:
+
+        update_and_draw_clouds_volcano.spawn_timer1 = 0
+        update_and_draw_clouds_volcano.next_spawn1 = random.uniform(2, 5)
+
+        img = random.choice(cloud_images_volcano)
+
+        new_cloud = {
+            "image": img,
+            "x": -img.get_width(),
+            "y": random.randint(20, 120),
+            "speed": random.randint(20, 50)
+        }
+
+        cloudsvolcano.append(new_cloud)
+
+    # move/draw
+    for cloud in cloudsvolcano[:]:
+        cloud["x"] += cloud["speed"] * dt
+
+        screen.blit(cloud["image"], (cloud["x"], cloud["y"]))
+
+        # remove offscreen
+        if cloud["x"] > screen.get_width() + 200:
+            cloudsvolcano.remove(cloud)
+
+def update_and_draw_clouds_desert(screen, dt):
+    global cloudsdesert
+
+    # initialize timers once
+    if not hasattr(update_and_draw_clouds_desert, "spawn_timer2"):
+        update_and_draw_clouds_desert.spawn_timer2 = 0
+
+    if not hasattr(update_and_draw_clouds_desert, "next_spawn2"):
+        update_and_draw_clouds_desert.next_spawn2 = random.uniform(2, 5)
+
+    # increase timer
+    update_and_draw_clouds_desert.spawn_timer2 += dt
+
+    # spawn cloud
+    if update_and_draw_clouds_desert.spawn_timer2 >= update_and_draw_clouds_desert.next_spawn2:
+        update_and_draw_clouds_desert.spawn_timer2 = 0
+        update_and_draw_clouds_desert.next_spawn2 = random.uniform(2, 5)
+
+        img = random.choice(cloud_images_desert)
+
+        new_cloud = {
+            "image": img,
+            "x": -img.get_width(),
+            "y": random.randint(20, 120),
+            "speed": random.randint(20, 50)
+        }
+
+        cloudsdesert.append(new_cloud)
+
+    # move/draw
+    for cloud in cloudsdesert[:]:
+        cloud["x"] += cloud["speed"] * dt
+
+        screen.blit(cloud["image"], (cloud["x"], cloud["y"]))
+
+        # remove offscreen
+        if cloud["x"] > screen.get_width() + 200:
+            cloudsdesert.remove(cloud)
+
 level_coins = {
     0: [],
     1: [],
@@ -562,7 +729,7 @@ level_coins = {
 spawnpointsplayer = {
     0: (15, 286),
     1: (21, 263),
-    2: (30, 200)
+    2: (109, 154)
 }
 
 # Assets
@@ -579,12 +746,18 @@ enemy_frames_bat = [pygame.transform.scale(pygame.image.load(f"LavaBat{i}.png"),
 
 def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,level):
     SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_width(), screen.get_height()
-    global coins, coin_count, coins_generated, enemy_kill_count, spawnpointsplayer, clouds, coin_countlevel1, enemy_kill_countlevel1
+    global coins, coin_count, coins_generated, enemy_kill_count, spawnpointsplayer, clouds, coin_countlevel1, enemy_kill_countlevel1, enemy_kill_count_level2, coin_countlevel2
 
     clouds.clear()
 
     update_and_draw_clouds.spawn_timer = 0
     update_and_draw_clouds.next_spawn = random.uniform(2, 5)
+
+    update_and_draw_clouds_volcano.spawn_timer1 = 0
+    update_and_draw_clouds_volcano.next_spawn1 = random.uniform(2, 5)
+
+    update_and_draw_clouds_desert.spawn_timer2 = 0
+    update_and_draw_clouds_desert.next_spawn2 = random.uniform(2, 5)
 
     spawn_x, spawn_y = spawnpointsplayer[level]
 
@@ -1285,10 +1458,140 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
         spawnpoints1 = [
             pygame.Rect(15, 286 - 21, 10, 3)
                        ]
-    else:
-        background_rects, spawnpoints = [], []
-        platforms = [pygame.Rect(0, 550, 800, 50), pygame.Rect(200, 400, 100, 20)]
-        enemies = []
+    elif level == 2:
+        background_rects = [
+        ]
+        underground3 = [
+            pygame.Rect(67, 261, 154, 26),
+            pygame.Rect(66, 283, 135, 25),
+            pygame.Rect(63, 296, 89, 42),
+            pygame.Rect(135, 300, 33, 23),
+            pygame.Rect(61, 327, 29, 52),
+            pygame.Rect(68, 317, 38, 37),
+            pygame.Rect(60, 371, 65, 36),
+            pygame.Rect(107, 381, 47, 19),
+            pygame.Rect(81, 366, 21, 15),
+
+            pygame.Rect(64, 423, 119, 34),
+            pygame.Rect(53, 447, 106, 37),
+            pygame.Rect(47, 473, 78, 68),
+            pygame.Rect(100, 501, 67, 37),
+            pygame.Rect(154, 509, 45, 30),
+            pygame.Rect(165, 418, 30, 26),
+
+            pygame.Rect(464, 488, 59, 27),
+            pygame.Rect(481, 500, 24, 31),
+            pygame.Rect(473, 506, 17, 16),
+            pygame.Rect(494, 509, 17, 18),
+            pygame.Rect(470, 528, 26, 31),
+            pygame.Rect(487, 527, 27, 37),
+            pygame.Rect(501, 537, 31, 24),
+            pygame.Rect(454, 540, 34, 24),
+            pygame.Rect(444, 548, 28, 16),
+            pygame.Rect(521, 546, 29, 19),
+
+        ]
+        platforms = [
+            (pygame.Rect(0, 64, 75, 574), {}),
+            (pygame.Rect(74, 219, 232, 48), {}),
+            (pygame.Rect(74, 393, 134, 37), {}),
+            (pygame.Rect(73, 527, 320, 105), {}),
+            (pygame.Rect(278, 438, 85, 91), {}),
+            (pygame.Rect(453, 470, 80, 30), {}),
+            (pygame.Rect(392, 557, 286, 63), {}),
+            (pygame.Rect(655, 479, 58, 127), {}),
+            (pygame.Rect(711, 458, 61, 153), {}),
+            (pygame.Rect(771, 434, 81, 177), {}),
+            (pygame.Rect(836, 514, 452, 99), {}),
+            (pygame.Rect(1286, 567, 170, 51), {}),
+            (pygame.Rect(1455, 515, 185, 89), {}),
+            (pygame.Rect(1639, 545, 223, 62), {}),
+            (pygame.Rect(1722, 470, 84, 76), {}),
+            (pygame.Rect(921, 405, 77, 30), {}),
+        ]
+        solidground = []
+        chains = []
+        cage = []
+        water = []
+        lava = []
+        water = []
+        fences = []
+        fenceHBox = []
+        tree1 = []
+        tree2 = []
+        tree3 = []
+
+        rockpile = []
+        door_pos = pygame.Rect(1950, 195, 50, 50)  # for drawing
+        door_hitbox = pygame.Rect(1950 + 25, 195, 50, 50)  # for collision only
+
+        lavaflowers = []
+        rocks = []
+        bushes = []
+        flowers = []
+
+        if not coins_generated[level]:
+            level_coins[level] = generate_coins_on_platforms(platforms, 15)
+            # add_manual_coin(74, 62, level)
+
+            coins_generated[level] = True
+
+        xg = 134
+        yg = 14
+
+        excluded_indices = {29}
+
+        def groundoverlayrepeat3(x, y, platform_width, img):
+            groundoverlay2 = []
+
+            start_x = x - 5
+            end_x = x + platform_width + 5
+            start_y = y - 1
+
+            img_width = img.get_width()
+            img_height = img.get_height()
+
+            current_x = start_x
+
+            while current_x < end_x:
+                remaining = end_x - current_x
+
+                # width we actually want to draw
+                draw_width = min(img_width, remaining)
+
+                # crop the image if needed
+                cropped_img = img.subsurface((0, 0, draw_width, img_height))
+
+                groundoverlay2.append((cropped_img, (current_x, start_y)))
+
+                current_x += img_width
+
+            return groundoverlay2
+
+        groundoverlay3 = []
+
+        for item in platforms:
+            rect, flags = item
+
+            if not flags.get("grass", True):
+                continue
+
+            groundoverlay3 += groundoverlayrepeat3(
+                rect.x,
+                rect.y,
+                rect.width,
+                groundoverlay_img_desert
+            )
+
+        enemies = [
+            # Enemy(660 - 125, 445, 300, slime1, 'slime_1', enemy_frames),
+        ]
+        enemies = [e for e in enemies if e.enemy_id not in defeated_enemies[level]]
+
+        # generate_random_flower_positions
+        spawnpoints2 = [
+            pygame.Rect(109, 154+22, 37, 36),
+        ]
 
     if level == 0:
         enemies = [e for e in enemies if e.enemy_id not in defeated_enemies[0]]
@@ -1315,9 +1618,12 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
         if level == 0:
             underground_collision = underground
             underground_draw = underground
-        else:
+        elif level == 1:
             underground_collision = []  # no collision in level 1
             underground_draw = underground12  # visual only
+        elif level == 2:
+            underground_collision = []  # no collision in level 1
+            underground_draw = underground3  # visual only
 
         player.move_and_collide(platforms, fenceHBox, underground_collision)
         camera_x = 0 if dev_mode else max(0, min(player.rect.x - SCREEN_WIDTH // 2, 2000 - SCREEN_WIDTH))
@@ -1340,6 +1646,16 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
                 if player.rect.colliderect(coin["rect"]):
                     level_coins[level].remove(coin)
                     coin_countlevel1 += 1
+                    coin_get.play()
+            player.update_animation(dt)
+        if level == 2:
+            if player.rect.colliderect(door_hitbox):
+                print("Touching door")
+            camera_x = 0 if dev_mode else max(0, min(player.rect.x - SCREEN_WIDTH // 2, 2000 - SCREEN_WIDTH))
+            for coin in level_coins[level][:]:
+                if player.rect.colliderect(coin["rect"]):
+                    level_coins[level].remove(coin)
+                    coin_countlevel2 += 1
                     coin_get.play()
             player.update_animation(dt)
 
@@ -1368,6 +1684,16 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
                     defeated_enemies[1].append(e.enemy_id)
 
                     return "combat", show_hitboxes, e, player.rect.x, player.rect.y
+        if level == 2:
+            for e in enemies:
+                e.update(dt)
+
+                if player.rect.colliderect(e.rect):
+                    enemy_kill_count_level2 += 1
+                    defeated_enemies[2].append(e.enemy_id)
+
+                    return "combat", show_hitboxes, e, player.rect.x, player.rect.y
+
 
         # ===== BOSS DOOR CHECK =====
         if level == 0:
@@ -1387,6 +1713,19 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
             if player.rect.colliderect(door_hitbox):
 
                     if coin_countlevel1 >= required_coins and len(defeated_enemies[level]) >= required_fights:
+                        print("Entering boss fight...")
+
+                        # TEMPORARY BOSS PLACEHOLDER
+                        pygame.time.delay(1000)
+
+                        return "boss", show_hitboxes, None, player.rect.x, player.rect.y
+
+                    else:
+                        print("You need more coins or fights!")
+        elif level == 2:
+            if player.rect.colliderect(door_hitbox):
+
+                    if coin_countlevel2 >= required_coins and len(defeated_enemies[level]) >= required_fights:
                         print("Entering boss fight...")
 
                         # TEMPORARY BOSS PLACEHOLDER
@@ -1442,7 +1781,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
         elif level == 1:
             screen.fill(GROUND_COLOR)
             screen.blit(bg_img1, (0, 0))
-            # update_and_draw_clouds(screen, dt)
+            update_and_draw_clouds_volcano(screen, dt)
             draw_platform1(screen, door_img, door_pos, camera_x)
             for br in background_rects:
                 draw_platform1(screen, bg_tile_img, br, camera_x)
@@ -1470,6 +1809,50 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
                 screen.blit(spawn_img2, (s.x - camera_x, s.y))
             player.draw(screen, camera_x)
             for img, pos in groundoverlay1:
+                screen.blit(img, (pos[0] - camera_x, pos[1]))
+            for f in fences:
+                screen.blit(fence1_img, (f.x - camera_x, f.y))
+            for b in bushes:
+                draw_platform1(screen, b["img"], b["rect"], camera_x)
+            for lf in lavaflowers:
+                screen.blit(
+                    lf["img"],
+                    (lf["rect"].x - camera_x, lf["rect"].y)
+                )
+            # for fh in fenceHBox:
+            #     draw_platform1(screen, fencef_img, fh, camera_x)
+            for e in enemies: e.draw(screen, camera_x)
+            for coin in level_coins[level]:
+                screen.blit(coin["img"], (coin["rect"].x - camera_x, coin["rect"].y))
+        elif level == 2:
+            screen.fill(DESERT_COLOR)
+            screen.blit(bg_img_desert, (0, 0))
+            update_and_draw_clouds_desert(screen, dt)
+            draw_platform1(screen, door_img, door_pos, camera_x)
+            for br in background_rects:
+                draw_platform1(screen, bg_tile_img, br, camera_x)
+            # for w in water:
+            #     draw_platform1(screen, waterimg, w, camera_x)
+            for sg in solidground:
+                pygame.draw.rect(
+                    screen,
+                    DESERT_COLOR,
+                    (sg.x - camera_x, sg.y, sg.width, sg.height)
+                )
+            for u in underground3:
+                draw_platform_tiled(screen, underground2, u, camera_x)
+            for p in platforms:
+                draw_platformdesert(screen, ground_img2, p, camera_x)
+            for c in chains:
+                draw_vertical_tiled(screen, chain_img, c, camera_x)
+            for c in cage:
+                draw_platform1(screen, cage_img, c, camera_x)
+            for r in rocks:
+                draw_platform(screen, r["img"], r["rect"], camera_x)
+            for s in spawnpoints2:
+                screen.blit(spawn_img3, (s.x - camera_x, s.y))
+            player.draw(screen, camera_x)
+            for img, pos in groundoverlay3:
                 screen.blit(img, (pos[0] - camera_x, pos[1]))
             for f in fences:
                 screen.blit(fence1_img, (f.x - camera_x, f.y))
