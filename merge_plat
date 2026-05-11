@@ -1,5 +1,5 @@
 import pygame, random, math
-from enemy_data import slime, slime1, bat
+from enemy_data import slime, slime1, bat, slimereal
 
 pygame.init()
 pygame.font.init()
@@ -743,6 +743,13 @@ enemy_frames = [pygame.transform.scale(pygame.image.load(f"RedEnemy{i}.png"), (2
                 range(1, 5)]
 enemy_frames_bat = [pygame.transform.scale(pygame.image.load(f"LavaBat{i}.png"), (22, 20)) for i in
                 range(1, 4)]
+enemy_frames_slime = [
+    pygame.transform.scale(pygame.image.load(f"Slime1.png"), (22, 20)),
+    pygame.transform.scale(pygame.image.load(f"Slime2.png"), (22, 20)),
+    pygame.transform.scale(pygame.image.load(f"Slime3.png"), (22, 25)),
+    pygame.transform.scale(pygame.image.load(f"Slime4.png"), (22, 20)),
+
+]
 
 def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,level):
     SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_width(), screen.get_height()
@@ -1035,12 +1042,12 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
 
         spawnpoints = [pygame.Rect(15, 286 - 21, 10, 3)]
         enemies = [
-            Enemy(525, 182, 80, slime, 'slime_1', enemy_frames),
-            Enemy(220, 235, 35, slime, 'slime_2', enemy_frames),
+            Enemy(525, 182+14, 80, slimereal, 'slime_1', enemy_frames_slime),
+            Enemy(220, 235+14, 35, slimereal, 'slime_2', enemy_frames_slime),
 
-            Enemy(1056+20, 375+25, 100, slime, 'slime_3', enemy_frames),
-            Enemy(1172+12, 140+5, 85, slime, 'slime_4', enemy_frames),
-            Enemy(1375+13, 365+7, 120, slime, 'slime_5', enemy_frames),
+            Enemy(1056+20, 375+25+14, 100, slimereal, 'slime_3', enemy_frames_slime),
+            Enemy(1172+12, 140+5+14, 85, slimereal, 'slime_4', enemy_frames_slime),
+            Enemy(1375+13, 365+7+14, 120, slimereal, 'slime_5', enemy_frames_slime),
         ]
         enemies = [e for e in enemies if e.enemy_id not in defeated_enemies[level]]
     elif level == 1:
@@ -1587,6 +1594,9 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
             (pygame.Rect(1915, 227, 89, 37), {}),
             (pygame.Rect(1999, 228, 46, 113),{}),
 
+            (pygame.Rect(1801, 378+3, 50, 18), {}),
+            (pygame.Rect(1906, 256, 34, 12), {}),
+
         ]
         solidground = []
         chains = []
@@ -1683,7 +1693,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
             )
 
         enemies = [
-            # Enemy(660 - 125, 445, 300, slime1, 'slime_1', enemy_frames),
+            # Enemy(660 - 125, 445, 300, slimereal, 'slime_1', enemy_frames_slime),
         ]
         enemies = [e for e in enemies if e.enemy_id not in defeated_enemies[level]]
 
