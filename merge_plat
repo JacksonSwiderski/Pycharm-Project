@@ -1,5 +1,5 @@
 import pygame, random, math
-from enemy_data import slime, slime1, bat, slimereal
+from enemy_data import slime, slime1, bat, slimereal, anubis
 
 pygame.init()
 pygame.font.init()
@@ -750,6 +750,8 @@ enemy_frames_slime = [
     pygame.transform.scale(pygame.image.load(f"Slime4.png"), (22, 20)),
 
 ]
+enemy_frames_anubis = [pygame.transform.scale(pygame.image.load(f"Anubis{i}.png"), (32, 45)) for i in
+                range(1, 4)]
 
 def platformer_loop(screen, clock, show_hitboxes, px, py, defeated_enemies,level):
     SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_width(), screen.get_height()
@@ -1696,7 +1698,9 @@ def platformer_loop(screen, clock, show_hitboxes, px, py, defeated_enemies,level
             )
 
         enemies = [
-            # Enemy(660 - 125, 445, 300, slimereal, 'slime_1', enemy_frames_slime),
+            Enemy(159-75, 496-16, 150, anubis, 'slime_1', enemy_frames_anubis),
+            Enemy(683-7, 231 - 16, 95, anubis, 'slime_1', enemy_frames_anubis),
+            Enemy(1465 - 7, 480 - 12, 171-15, anubis, 'slime_1', enemy_frames_anubis),
         ]
         enemies = [e for e in enemies if e.enemy_id not in defeated_enemies[level]]
 
@@ -1801,7 +1805,8 @@ def platformer_loop(screen, clock, show_hitboxes, px, py, defeated_enemies,level
                 e.update(dt)
 
                 if player.rect.colliderect(e.rect):
-                    enemy_kill_count_level2 += 1
+                    global enemy_kill_countlevel2
+                    enemy_kill_countlevel2 += 1
                     defeated_enemies[2].append(e.enemy_id)
 
                     return "combat", show_hitboxes, e, player.rect.x, player.rect.y
