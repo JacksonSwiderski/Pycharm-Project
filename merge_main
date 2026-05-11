@@ -207,6 +207,7 @@ def main():
 
                     selected_level = level["level"]
                     current_level_assets = level
+                    player_x, player_y = 100, 400
                     click.play()
                     current_state = STATE_PLATFORMER
             pygame.display.flip()
