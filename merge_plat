@@ -751,7 +751,7 @@ enemy_frames_slime = [
 
 ]
 
-def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,level):
+def platformer_loop(screen, clock, show_hitboxes, px, py, defeated_enemies,level):
     SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_width(), screen.get_height()
     global coins, coin_count, coins_generated, enemy_kill_count, spawnpointsplayer, clouds, coin_countlevel1, enemy_kill_countlevel1, enemy_kill_count_level2, coin_countlevel2
 
@@ -766,9 +766,12 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
     update_and_draw_clouds_desert.spawn_timer2 = 0
     update_and_draw_clouds_desert.next_spawn2 = random.uniform(2, 5)
 
-    spawn_x, spawn_y = spawnpointsplayer[level]
+    if px == 100 and py == 400:
+        start_x, start_y = spawnpointsplayer[level]
+    else:
+        start_x, start_y = px, py
 
-    player = Player(spawn_x, spawn_y, alienSkin)
+    player = Player(start_x, start_y, alienSkin)
 
     ui_font = pygame.font.Font(None, 22)
     dev_mode, show_controls = False, True
