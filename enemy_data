@@ -45,6 +45,17 @@ anubis = EnemyData(
     scale=0.5
 )
 
+vulture = EnemyData(
+    name='Anubis',
+    hp=30,
+    moves=[tackle, bite, solidify],
+    music='battle.mp3',
+    music_loop=11.294,
+    bg='desert_battle_bg.png',
+    sprite='Vulture5.png',
+    scale=0.5
+)
+
 slime1 = EnemyData(
     name='Wrath',
     hp=50,
