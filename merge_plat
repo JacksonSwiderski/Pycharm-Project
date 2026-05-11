@@ -2035,6 +2035,9 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
         elif level == 1:
             text = coin_font.render(f"{coin_countlevel1}/{required_coins}", True, (255, 255, 255))
             screen.blit(text, (box_x - 53, box_y + 8))
+        elif level == 2:
+            text = coin_font.render(f"{coin_countlevel2}/{required_coins}", True, (255, 255, 255))
+            screen.blit(text, (box_x - 53, box_y + 8))
 
         # ===== OBJECTIVE UI (CENTER TOP) =====
         objective_text = ui_font.render(
@@ -2082,6 +2085,9 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
             screen.blit(enemy_text, (box_x - 40, enemy_box_y + 8))
         elif level == 1:
             enemy_text = coin_font.render(f"{enemy_kill_countlevel1}/{required_fights}", True, (255, 255, 255))
+            screen.blit(enemy_text, (box_x - 40, enemy_box_y + 8))
+        elif level == 2:
+            enemy_text = coin_font.render(f"{enemy_kill_countlevel2}/{required_fights}", True, (255, 255, 255))
             screen.blit(enemy_text, (box_x - 40, enemy_box_y + 8))
 
         pygame.display.flip()
