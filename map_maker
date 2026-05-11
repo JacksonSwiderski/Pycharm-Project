@@ -1177,6 +1177,7 @@ def load_level(level):
             (pygame.Rect(1639, 545, 223, 62), {}),
             (pygame.Rect(1722, 470, 84, 76), {}),
             (pygame.Rect(921, 405, 77, 30), {}),
+            (pygame.Rect(48, 137, 33, 17), {}),
         ]
         spawnpoints = []
         underground2 = []
