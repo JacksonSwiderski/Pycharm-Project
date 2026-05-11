@@ -1508,6 +1508,9 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
             (pygame.Rect(1639, 545, 223, 62), {}),
             (pygame.Rect(1722, 470, 84, 76), {}),
             (pygame.Rect(921, 405, 77, 30), {}),
+
+            (pygame.Rect(68, 138, 12, 14), {}),
+            (pygame.Rect(71, 317, 33, 11), {}),
         ]
         solidground = []
         chains = []
@@ -1532,7 +1535,7 @@ def platformer_loop(screen, clock, show_hitboxes, p_x, p_y, defeated_enemies,lev
 
         if not coins_generated[level]:
             level_coins[level] = generate_coins_on_platforms(platforms, 15)
-            # add_manual_coin(74, 62, level)
+            add_manual_coin(77, 289, level)
 
             coins_generated[level] = True
 
