@@ -1,5 +1,5 @@
 import pygame, random, math
-from test_plat import draw_platform, draw_platform1, draw_platform_tiled, draw_vertical_tiled
+from test_plat import draw_platform, draw_platform1, draw_platform_tiled, draw_vertical_tiled, draw_platformdesert
 from enemy_data import slime
 
 pygame.init()
@@ -39,6 +39,7 @@ jump.set_volume(0.8)
 landing.set_volume(0.8)
 coin_get.set_volume(0.8)
 defeated_enemies = []
+DESERT_COLOR = (222, 166, 75)
 
 p1 = 45
 p2 = 35
@@ -51,6 +52,12 @@ grass_img = pygame.image.load("GroundTop2.png")
 grass_img = pygame.transform.scale(grass_img, (111, 120))
 spawn_img = pygame.image.load("SpawnPointBed.png")
 spawn_img = pygame.transform.scale(spawn_img, (32, 32))
+spawn_img1 = pygame.image.load("DoorEntrance2.png")
+spawn_img1 = pygame.transform.scale(spawn_img1, (40, 45))
+spawn_img2 = pygame.image.load("DoorEntrance3.png")
+spawn_img2 = pygame.transform.scale(spawn_img2, (40, 45))
+spawn_img3 = pygame.image.load("DoorEntrance1.png")
+spawn_img3 = pygame.transform.scale(spawn_img3, (40, 45))
 fence1_img = pygame.image.load("Fence2.png")
 fence1_img = pygame.transform.scale(fence1_img, (32, 32))
 fencef_img = pygame.image.load("FenceFloor.png")
@@ -105,6 +112,16 @@ lavaimg = pygame.image.load("LavaTile.png")
 lavaimg = pygame.transform.scale(lavaimg, (32, 65))
 chain_img = pygame.image.load("Chain.png")
 chain_img = pygame.transform.scale(chain_img, (16, 32))
+
+#desert
+groundoverlay_img_desert = pygame.image.load("sand_overlay.png")
+groundoverlay_img_desert = pygame.transform.scale(groundoverlay_img_desert, (45, 20))
+bg_img_desert = pygame.image.load("desert_bg.png")
+bg_img_desert = pygame.transform.scale(bg_img_desert, (2000, 600))
+underground2 = pygame.image.load("sand_underground.png")
+underground2 = pygame.transform.scale(underground2, (111, 65))
+ground_img2 = pygame.image.load("sand.png")
+ground_img2 = pygame.transform.scale(ground_img2, (64, 64))
 
 cloud_images = [
     pygame.image.load("Cloud1.png"),
@@ -1142,6 +1159,88 @@ def load_level(level):
         # generate_random_flower_positions
         spawnpoints = [pygame.Rect(15, 286 + 2, 10, 3)]
         grassoverlay = []
+    elif LEVEL == 2:
+        platforms = [
+            (pygame.Rect(0, 64, 75, 574), {}),
+            (pygame.Rect(74, 219, 232, 48), {}),
+            (pygame.Rect(74, 393, 134, 37), {}),
+            (pygame.Rect(73, 527, 320, 105), {}),
+            (pygame.Rect(278, 438, 85, 91), {}),
+            (pygame.Rect(453, 470, 80, 30), {}),
+            (pygame.Rect(392, 557, 286, 63), {}),
+            (pygame.Rect(655, 479, 58, 127), {}),
+            (pygame.Rect(711, 458, 61, 153), {}),
+            (pygame.Rect(771, 434, 81, 177), {}),
+            (pygame.Rect(836, 514, 452, 99), {}),
+            (pygame.Rect(1286, 567, 170, 51), {}),
+            (pygame.Rect(1455, 515, 185, 89), {}),
+            (pygame.Rect(1639, 545, 223, 62), {}),
+            (pygame.Rect(1722, 470, 84, 76), {}),
+            (pygame.Rect(921, 405, 77, 30), {}),
+        ]
+        spawnpoints = []
+        underground2 = []
+        background_rects = []
+        tree1 = []
+        tree2 = []
+        tree3 = []
+        bushes = []
+        fences = []
+        fenceHBox = []
+        underground = []
+        grassoverlay = []
+        lava = []
+        rockpile = []
+        door_pos = []
+        door_hitbox = []
+        groundoverlay1 = []
+        solidground = []
+        chains = []
+        water = []
+        cage = []
+
+        def groundoverlayrepeat3(x, y, platform_width, img):
+            groundoverlay2 = []
+
+            start_x = x - 5
+            end_x = x + platform_width + 5
+            start_y = y - 1
+
+            img_width = img.get_width()
+            img_height = img.get_height()
+
+            current_x = start_x
+
+            while current_x < end_x:
+                remaining = end_x - current_x
+
+                # width we actually want to draw
+                draw_width = min(img_width, remaining)
+
+                # crop the image if needed
+                cropped_img = img.subsurface((0, 0, draw_width, img_height))
+
+                groundoverlay2.append((cropped_img, (current_x, start_y)))
+
+                current_x += img_width
+
+            return groundoverlay2
+
+        groundoverlay3 = []
+
+        for item in platforms:
+            rect, flags = item
+
+            if not flags.get("grass", True):
+                continue
+
+            groundoverlay3 += groundoverlayrepeat3(
+                rect.x,
+                rect.y,
+                rect.width,
+                groundoverlay_img_desert
+            )
+
     return (
         platforms,
         spawnpoints,
@@ -1163,11 +1262,12 @@ def load_level(level):
         chains,
         water,
         cage,
+        groundoverlay3,
     )
 
 
-LEVEL = 1
-platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, underground, grassoverlay, lava, rockpile, door_pos, door_hitbox, groundoverlay1, solidground, chains, water, cage = load_level(LEVEL)
+LEVEL = 2
+platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, underground, grassoverlay, lava, rockpile, door_pos, door_hitbox, groundoverlay1, solidground, chains, water, cage, groundoverlay3 = load_level(LEVEL)
 
 # -----------------------------
 # MAIN LOOP
@@ -1319,7 +1419,17 @@ while running:
                 coin["img"],
                 (coin["rect"].x, float_y)
             )
-
+    elif LEVEL == 2:
+        screen.fill(DESERT_COLOR)
+        screen.blit(bg_img_desert, (0, 0))
+        for u in underground:
+            draw_platform_tiled(screen, underground2, u)
+        for p in platforms:
+            draw_platformdesert(screen, ground_img2, p)
+        for s in spawnpoints:
+            screen.blit(spawn_img3, (s.x, s.y))
+        for img, pos in groundoverlay3:
+            screen.blit(img, (pos[0], pos[1]))
     # -----------------------------
     # UI / DEBUG
     # -----------------------------
