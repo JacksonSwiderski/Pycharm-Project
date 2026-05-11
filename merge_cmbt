@@ -203,8 +203,20 @@ class Battle:
 
         float_offset = math.sin(self.float_timer) * 8
         enemy_float_offset = math.sin(self.float_timer) * 10
+
         screen.blit(self.player_sprite, (100, 280 + float_offset))
-        screen.blit(self.enemy_sprite, (550, 250 + enemy_float_offset))
+
+        anchor_x = 550
+        ground_y = 450
+
+        if self.enemy.name == "Wrath King":
+            anchor_x -= 100
+
+        enemy_rect = self.enemy_sprite.get_rect()
+
+        enemy_rect.midbottom = (anchor_x, ground_y + enemy_float_offset)
+
+        screen.blit(self.enemy_sprite, enemy_rect)
 
         # Text/UI Box
         pygame.draw.rect(screen, (0, 0, 0), (0, 500, 800, 100))
