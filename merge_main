@@ -161,13 +161,15 @@ def main():
                     "name": "Ember Peak",
                     "level": 1,
                     "x": 310,
-                    "image": volcano_preview
+                    "image": volcano_preview,
+                    'boss': wrath_king
                 },
                 {
                     "name": "Golden Dunes",
                     "level": 2,
                     "x": 560,
-                    "image": desert_preview
+                    "image": desert_preview,
+                    'boss': wrath_king
                 }
             ]
             hovering_any_button = False
