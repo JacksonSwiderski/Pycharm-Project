@@ -33,17 +33,12 @@ font = pygame.font.Font(None, 48)
 small_font = pygame.font.Font(None, 32)
 
 def reset_level_state():
-    global coins, coin_count, coins_generated, enemy_kill_count, defeated_enemies
+    global coins, coin_count, coins_generated, enemy_kill_count
 
     coins = []
     coin_count = 0
     coins_generated = False
     enemy_kill_count = 0
-    defeated_enemies = {
-        0: [],
-        1: [],
-        2: []
-    }
 
 # Game states
 STATE_MENU, STATE_LEVEL_SELECT, STATE_PLATFORMER, STATE_COMBAT = "menu", "level_select", "platformer", "combat"
@@ -53,7 +48,11 @@ current_state = STATE_MENU
 selected_level = 0
 player_x, player_y = 100, 400
 button_hovered = False
-defeated_enemies = []
+defeated_enemies = {
+    0: [],
+    1: [],
+    2: []
+}
 current_enemy = None
 show_hitboxes = False
 clock = pygame.time.Clock()
