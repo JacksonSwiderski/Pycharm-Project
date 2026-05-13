@@ -1,6 +1,5 @@
 import pygame, random, math
 from test_plat import draw_platform, draw_platform1, draw_platform_tiled, draw_vertical_tiled, draw_platformdesert
-from enemy_data import slime
 
 pygame.init()
 pygame.mouse.set_visible(False)
@@ -313,6 +312,10 @@ def load_level(level):
             pygame.Rect(1913, 372, 40, 21),
             pygame.Rect(1836, 379, 16, 12),
         ]
+
+        groundoverlay3 = []
+
+        underground3 = []
 
         fences = [
             pygame.Rect(878, 307 - 32, 73, 8),
@@ -858,6 +861,8 @@ def load_level(level):
             pygame.Rect(120, 118, 14, 18),
 
         ]
+        groundoverlay3 = []
+        underground3 = []
         platforms = [
             (pygame.Rect(0, 307, 66, 294), {}),
             (pygame.Rect(63, 307, 25, 266), {}),
@@ -1199,6 +1204,19 @@ def load_level(level):
             (pygame.Rect(1999, 389, 82, 242), {}),
             (pygame.Rect(1915, 227, 89, 37), {}),
             (pygame.Rect(1999, 228, 46, 113), {}),
+
+            (pygame.Rect(1967, 462, 49, 19), {}),
+            (pygame.Rect(1071, 369, 91, 24), {}),
+            (pygame.Rect(1160, 480, 57, 33), {}),
+            (pygame.Rect(1038, 224 + 15, 153, 31), {}),
+            (pygame.Rect(1367, 148, 37, 68), {}),
+            (pygame.Rect(1316, 288, 315, 57), {}),
+            (pygame.Rect(1286, 326, 49, 16), {}),
+            (pygame.Rect(1355, 200, 24, 13), {}),
+            (pygame.Rect(1506, 148, 10, 48), {}),
+            (pygame.Rect(1591, 109, 10, 57), {}),
+            (pygame.Rect(1702, 92, 10, 50), {}),
+            (pygame.Rect(1788 + 52, 87, 110, 23), {}),
         ]
         spawnpoints = []
         underground3 = [
@@ -1374,7 +1392,7 @@ def load_level(level):
     )
 
 
-LEVEL = 2
+LEVEL = 1
 platforms, spawnpoints, background_rects, tree1, tree2, tree3, bushes, fences, fenceHBox, underground, grassoverlay, lava, rockpile, door_pos, door_hitbox, groundoverlay1, solidground, chains, water, cage, groundoverlay3, underground3 = load_level(LEVEL)
 
 # -----------------------------
