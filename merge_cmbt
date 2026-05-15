@@ -2,6 +2,7 @@ import random
 import pygame
 from enum import Enum
 import math
+from moves import get_player_moves
 
 from select import select
 
@@ -99,10 +100,9 @@ def draw_hp_bar(screen, x, y, unit):
 
 class Battle:
     def __init__(self, enemy_data_obj, selected_skin):
-        from moves import dash_attack, ray_blast, heal
         self.turn_locked = False
 
-        self.player = Unit('Alien', 50, [dash_attack, ray_blast, heal])
+        self.player = Unit('Player', 50, get_player_moves(selected_skin))
 
         # Pull data from the enemy object passed by the platformer loop
         data = enemy_data_obj.enemy_data
@@ -120,6 +120,7 @@ class Battle:
             if selected_skin == "alien":
                 self.player_sprite = pygame.image.load('AlienBattle.png').convert_alpha()
                 self.player_sprite = pygame.transform.scale(self.player_sprite, (150, 170))
+                self.player = Unit('Player', 50, get_player_moves(selected_skin))
             elif selected_skin == "alien ":
                 self.player_sprite = pygame.image.load('AlienBattle.png').convert_alpha()
                 self.player_sprite = pygame.transform.scale(self.player_sprite, (150, 170))
