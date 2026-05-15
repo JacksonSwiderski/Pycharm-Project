@@ -259,7 +259,7 @@ def main():
 
         elif current_state == STATE_COMBAT:
             print("Main: current_enemy is", type(current_enemy))
-            res = combat_loop(screen, clock, current_enemy)
+            res = combat_loop(screen, clock, current_enemy, selected_skin)
 
             if res == 'enemy_defeated':
                 defeated_enemies[selected_level].append(current_enemy.enemy_id)
@@ -287,16 +287,22 @@ def main():
                 selected_skin = "alien"
                 click.play()
 
-            if draw_button("Elon Musk", 250, 280, 300, 50, GREEN, (120, 220, 120)):
+            if draw_button("Elon Skin", 250, 280, 300, 50, GREEN, (120, 220, 120)):
                 selected_skin = "elon"
                 click.play()
 
-            if draw_button("Back", 250, 360, 300, 50, GREEN, (120, 220, 120)):
+            # NEW THIRD OPTION
+            if draw_button("Hatsune Miku", 250, 360, 300, 50, GREEN, (120, 220, 120)):
+                selected_skin = "miku"
+                click.play()
+
+            # Move Back button lower
+            if draw_button("Back", 250, 440, 300, 50, GREEN, (120, 220, 120)):
                 click.play()
                 current_state = STATE_MENU
 
             skin_text = small_font.render(f"Current Skin: {selected_skin}", True, WHITE)
-            screen.blit(skin_text, (270, 450))
+            screen.blit(skin_text, (270, 450+85))
 
             pygame.display.flip()
 
