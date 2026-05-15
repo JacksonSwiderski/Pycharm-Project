@@ -6,9 +6,34 @@ class Move:
         self.points = points
 
 # Player Moves
-dash_attack = Move('Dash Attack', 15, 'normal', 10)
-ray_blast = Move('Ray Blast', 18, 'energy', 5)
-heal = Move('Heal', -25, 'normal', 1)
+def get_player_moves(selected_skin):
+    if selected_skin == "alien":
+        return [
+            Move('Dash Attack', 15, 'normal', 10),
+            Move('Ray Blast', 18, 'energy', 5),
+            Move('Heal', -25, 'normal', 1)
+        ]
+
+    elif selected_skin == "elon":
+        return [
+            Move('Dash Attack', 15, 'normal', 10),
+            Move('Ray Blast', 18, 'energy', 5),
+            Move('Heal', -25, 'normal', 1)
+        ]
+
+    elif selected_skin == "miku":
+        return [
+            Move('Overdrive Pulse', 15, 'normal', 10),
+            Move('Miku Miku Beammm', 30, 'energy', 5),
+            Move('Cure.exe (heal)', -25, 'normal', 1)
+        ]
+
+    else:
+        return [
+            Move('Punch', 10, 'normal', 10),
+            Move('Kick', 12, 'normal', 5),
+            Move('Heal', -20, 'normal', 1)
+        ]
 
 # Enemy Moves
 # Slime
