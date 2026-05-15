@@ -8,7 +8,7 @@ STATE_MENU, STATE_LEVEL_SELECT, STATE_PLATFORMER, STATE_COMBAT, STATE_SKIN_SELEC
     "menu", "level_select", "platformer", "combat", "skin_select"
 )
 
-selected_skin = "alien "
+selected_skin = "miku"
 
 # Initialize Pygame
 pygame.mixer.pre_init(44100, -16, 2, 512)
