@@ -4,6 +4,12 @@ from test_plat import platformer_loop, Enemy, enemy_frames
 from test_cmbt import combat_loop
 from enemy_data import wrath_king
 
+STATE_MENU, STATE_LEVEL_SELECT, STATE_PLATFORMER, STATE_COMBAT, STATE_SKIN_SELECT = (
+    "menu", "level_select", "platformer", "combat", "skin_select"
+)
+
+selected_skin = "alien "
+
 # Initialize Pygame
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
@@ -101,7 +107,7 @@ def play_menu_music():
 
 
 def main():
-    global current_state, selected_level, player_x, player_y, defeated_enemies, current_enemy, show_hitboxes, button_hovered, current_level_assets
+    global current_state, selected_level, player_x, player_y, defeated_enemies, current_enemy, show_hitboxes, button_hovered, current_level_assets, selected_skin
 
     play_menu_music()
 
@@ -117,14 +123,24 @@ def main():
 
             mouse_pos = pygame.mouse.get_pos()
 
-            if not (pygame.Rect(300, 250, 200, 50).collidepoint(mouse_pos)):
+            if not (
+                    pygame.Rect(300, 250, 200, 50).collidepoint(mouse_pos)
+                    or pygame.Rect(300, 320, 200, 50).collidepoint(mouse_pos)
+            ):
                 button_hovered = False
 
+            # PLAY BUTTON
             if draw_button("Play", 300, 250, 200, 50, GREEN, (120, 220, 120)):
                 pygame.mixer.music.fadeout(1000)
                 pygame.time.delay(150)
                 click.play()
                 current_state = STATE_LEVEL_SELECT
+
+            # SKIN SELECT BUTTON
+            if draw_button("Choose Skin", 300, 320, 200, 50, GREEN, (120, 220, 120)):
+                pygame.time.delay(150)
+                click.play()
+                current_state = STATE_SKIN_SELECT
 
             pygame.display.flip()
 
@@ -222,7 +238,8 @@ def main():
                 player_x,
                 player_y,
                 defeated_enemies,
-                selected_level
+                selected_level,
+                selected_skin
             )
 
             player_x, player_y = px, py
@@ -249,6 +266,39 @@ def main():
                 current_enemy = None
 
             current_state = STATE_PLATFORMER
+        elif current_state == STATE_SKIN_SELECT:
+            screen.fill(GRAY)
+
+            title_text = font.render("Choose Your Skin", True, WHITE)
+            title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 80))
+            screen.blit(title_text, title_rect)
+
+            mouse_pos = pygame.mouse.get_pos()
+
+            if not (
+                    pygame.Rect(250, 200, 300, 50).collidepoint(mouse_pos)
+                    or pygame.Rect(250, 280, 300, 50).collidepoint(mouse_pos)
+                    or pygame.Rect(250, 360, 300, 50).collidepoint(mouse_pos)
+            ):
+                button_hovered = False
+
+            # Example skins
+            if draw_button("Alien Skin", 250, 200, 300, 50, GREEN, (120, 220, 120)):
+                selected_skin = "alien"
+                click.play()
+
+            if draw_button("Elon Musk", 250, 280, 300, 50, GREEN, (120, 220, 120)):
+                selected_skin = "elon"
+                click.play()
+
+            if draw_button("Back", 250, 360, 300, 50, GREEN, (120, 220, 120)):
+                click.play()
+                current_state = STATE_MENU
+
+            skin_text = small_font.render(f"Current Skin: {selected_skin}", True, WHITE)
+            screen.blit(skin_text, (270, 450))
+
+            pygame.display.flip()
 
         clock.tick(60)
 
