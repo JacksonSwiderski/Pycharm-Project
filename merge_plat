@@ -1658,7 +1658,7 @@ def platformer_loop(screen, clock, show_hitboxes, px, py, defeated_enemies, leve
 
             (pygame.Rect(1967, 462, 49, 19), {}),
             (pygame.Rect(1071, 369, 91, 24), {}),
-            (pygame.Rect(1160, 480, 57, 33), {}),
+            (pygame.Rect(1160, 480+2, 57, 33), {}),
             (pygame.Rect(1038, 224 + 15, 153, 31), {}),
             (pygame.Rect(1367, 148, 37, 68), {}),
             (pygame.Rect(1316, 288, 315, 57), {}),
@@ -1732,6 +1732,14 @@ def platformer_loop(screen, clock, show_hitboxes, px, py, defeated_enemies, leve
             add_manual_coin(845, 156, level)
             add_manual_coin(601, 156, level)
             add_manual_coin(1251, 368, level)
+
+            add_manual_coin(1851, 483, level)
+            add_manual_coin(1640, 483, level)
+            add_manual_coin(860, 483, level)
+            add_manual_coin(920, 483, level)
+            add_manual_coin(984, 483, level)
+            add_manual_coin(1044, 483, level)
+            add_manual_coin(1101, 483, level)
 
             coins_generated[level] = True
 
