@@ -744,10 +744,15 @@ alienSkin = [
 elonSkin = [
     pygame.transform.scale(pygame.image.load(f"Elon{i}.png"), (11 * SCALE, 15 * SCALE)) for i
     in range(1, 4)]
+mikuSkin = [
+    pygame.transform.scale(pygame.image.load(f"Miku{i}.png"), (11 * SCALE, 15 * SCALE)) for i
+    in range(1, 4)]
 alienSkin.append(
     pygame.transform.scale(pygame.image.load("AlienSkinJump.png"), (11 * SCALE, 15 * SCALE)))
 elonSkin.append(
     pygame.transform.scale(pygame.image.load("Elon5.png"), (11 * SCALE, 15 * SCALE)))
+mikuSkin.append(
+    pygame.transform.scale(pygame.image.load("Miku5.png"), (11 * SCALE, 15 * SCALE)))
 
 enemy_frames = [pygame.transform.scale(pygame.image.load(f"RedEnemy{i}.png"), (22, 30)) for i in
                 range(1, 5)]
@@ -797,6 +802,8 @@ def platformer_loop(screen, clock, show_hitboxes, px, py, defeated_enemies, leve
         player = Player(start_x, start_y, alienSkin)
     elif selected_skin == "elon":
         player = Player(start_x, start_y, elonSkin)
+    elif selected_skin == "miku":
+        player = Player(start_x, start_y, mikuSkin)
 
     ui_font = pygame.font.Font(None, 22)
     dev_mode, show_controls = False, True
