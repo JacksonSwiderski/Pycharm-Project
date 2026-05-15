@@ -758,7 +758,7 @@ enemy_frames_anubis = [pygame.transform.scale(pygame.image.load(f"Anubis{i}.png"
                 range(1, 4)]
 anubis_img = pygame.transform.scale(pygame.image.load("Anubis5.png"), (32, 45))
 
-gem_img = pygame.transform.scale(pygame.image.load("Gem.png"), (32, 32))
+# gem_img = pygame.transform.scale(pygame.image.load("Gem.png"), (32, 32))
 
 enemy_frames_vulture = [pygame.transform.scale(pygame.image.load(f"Vulture{i}.png"), (32, 32)) for i in
                 range(1, 4)]
@@ -1630,7 +1630,7 @@ def platformer_loop(screen, clock, show_hitboxes, px, py, defeated_enemies,level
             (pygame.Rect(914, 106, 117, 26), {}),
 
             (pygame.Rect(1815, 331, 188, 59), {}),
-            (pygame.Rect(1857, 544, 148, 65), {}),
+            (pygame.Rect(1857, 545, 148, 65), {}),
             (pygame.Rect(1999, 389, 82, 242), {}),
             (pygame.Rect(1915, 227, 89, 37), {}),
             (pygame.Rect(1999, 228, 46, 113),{}),
