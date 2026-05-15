@@ -741,8 +741,14 @@ SCALE = 2
 alienSkin = [
     pygame.transform.scale(pygame.image.load(f"AlienSkin{i}.png"), (11 * SCALE, 15 * SCALE)) for i
     in range(1, 4)]
+elonSkin = [
+    pygame.transform.scale(pygame.image.load(f"Elon{i}.png"), (11 * SCALE, 15 * SCALE)) for i
+    in range(1, 4)]
 alienSkin.append(
     pygame.transform.scale(pygame.image.load("AlienSkinJump.png"), (11 * SCALE, 15 * SCALE)))
+elonSkin.append(
+    pygame.transform.scale(pygame.image.load("Elon5.png"), (11 * SCALE, 15 * SCALE)))
+
 enemy_frames = [pygame.transform.scale(pygame.image.load(f"RedEnemy{i}.png"), (22, 30)) for i in
                 range(1, 5)]
 enemy_frames_bat = [pygame.transform.scale(pygame.image.load(f"LavaBat{i}.png"), (22, 20)) for i in
@@ -765,7 +771,7 @@ enemy_frames_vulture = [pygame.transform.scale(pygame.image.load(f"Vulture{i}.pn
 enemy_frames_skeleton = [pygame.transform.scale(pygame.image.load(f"Skeleton{i}.png"), (32, 45)) for i in
                 range(1, 4)]
 
-def platformer_loop(screen, clock, show_hitboxes, px, py, defeated_enemies,level):
+def platformer_loop(screen, clock, show_hitboxes, px, py, defeated_enemies, level, selected_skin):
     SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_width(), screen.get_height()
     global coins, coin_count, coins_generated, enemy_kill_count, spawnpointsplayer, clouds, coin_countlevel1, enemy_kill_countlevel1, enemy_kill_count_level2, coin_countlevel2
 
@@ -785,7 +791,12 @@ def platformer_loop(screen, clock, show_hitboxes, px, py, defeated_enemies,level
     else:
         start_x, start_y = px, py
 
-    player = Player(start_x, start_y, alienSkin)
+    if selected_skin == "alien":
+        player = Player(start_x, start_y, alienSkin)
+    if selected_skin == "alien ":
+        player = Player(start_x, start_y, alienSkin)
+    elif selected_skin == "elon":
+        player = Player(start_x, start_y, elonSkin)
 
     ui_font = pygame.font.Font(None, 22)
     dev_mode, show_controls = False, True
