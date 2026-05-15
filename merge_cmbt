@@ -3,6 +3,8 @@ import pygame
 from enum import Enum
 import math
 
+from select import select
+
 pygame.mixer.init()
 
 MUSIC_LOOP_EVENT = pygame.USEREVENT + 1
@@ -96,7 +98,7 @@ def draw_hp_bar(screen, x, y, unit):
 ############### BATTLE  ###############
 
 class Battle:
-    def __init__(self, enemy_data_obj):
+    def __init__(self, enemy_data_obj, selected_skin):
         from moves import dash_attack, ray_blast, heal
         self.turn_locked = False
 
@@ -115,8 +117,18 @@ class Battle:
 
         # Asset loading: Moved here from draw() to fix memory/lag issues
         try:
-            self.player_sprite = pygame.image.load('AlienBattle.png').convert_alpha()
-            self.player_sprite = pygame.transform.scale(self.player_sprite, (150, 170))
+            if selected_skin == "alien":
+                self.player_sprite = pygame.image.load('AlienBattle.png').convert_alpha()
+                self.player_sprite = pygame.transform.scale(self.player_sprite, (150, 170))
+            elif selected_skin == "alien ":
+                self.player_sprite = pygame.image.load('AlienBattle.png').convert_alpha()
+                self.player_sprite = pygame.transform.scale(self.player_sprite, (150, 170))
+            elif selected_skin == "elon":
+                self.player_sprite = pygame.image.load('Elon3.png').convert_alpha()
+                self.player_sprite = pygame.transform.scale(self.player_sprite, (128, 170))
+            elif selected_skin == "miku":
+                self.player_sprite = pygame.image.load('Miku3.png').convert_alpha()
+                self.player_sprite = pygame.transform.scale(self.player_sprite, (115, 170))
         except:
             print("Warning: AlienBattle.png not found. Using placeholder.")
             self.player_sprite = pygame.Surface((150, 170))
@@ -232,8 +244,8 @@ class Battle:
 
 
 
-def combat_loop(screen, clock, enemy_data):
-    battle = Battle(enemy_data)
+def combat_loop(screen, clock, enemy_data, selected_skin):
+    battle = Battle(enemy_data, selected_skin)
     start_battle_music(enemy_data)
     while True:
         events = pygame.event.get()
