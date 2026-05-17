@@ -113,6 +113,7 @@ class Battle:
         self.menu = MoveMenu(self.player.moves)
         self.state = BattleState.PLAYER_TURN
         self.message = ''
+        self.instruction = 'Press Z to select attacks'
         self.font = pygame.font.Font(None, 32)
 
         # Asset loading: Moved here from draw() to fix memory/lag issues
@@ -211,6 +212,11 @@ class Battle:
         draw_hp_bar(screen, 50, 50, self.player)
         draw_hp_bar(screen, 550, 50, self.enemy)
 
+
+        pygame.draw.rect(screen, (0, 0, 0,), (265, 15, 268, 30), border_radius=6)
+        pygame.draw.rect(screen, (255, 255, 255,), (265, 15, 268, 30), 2, border_radius=6)
+        screen.blit(self.font.render(self.instruction, True, (255, 255, 255)), (270, 20))
+
         screen.blit(self.font.render(self.player.name, True, (255, 255, 255)), (50, 20))
         screen.blit(self.font.render(self.enemy.name, True, (255, 255, 255)), (550, 20))
 
@@ -223,7 +229,7 @@ class Battle:
         ground_y = 450
 
         if self.enemy.name == "Wrath King":
-            anchor_x -= 100
+            anchor_x -= 50
 
         enemy_rect = self.enemy_sprite.get_rect()
 
@@ -232,8 +238,8 @@ class Battle:
         screen.blit(self.enemy_sprite, enemy_rect)
 
         # Text/UI Box
-        pygame.draw.rect(screen, (0, 0, 0), (0, 500, 800, 100))
-        pygame.draw.rect(screen, (255, 255, 255), (0, 500, 800, 100), 2)
+        pygame.draw.rect(screen, (0, 0, 0), (0, 500, 800, 100), border_radius=6)
+        pygame.draw.rect(screen, (255, 255, 255), (0, 500, 800, 100), 2, border_radius=6)
 
         if self.state == BattleState.PLAYER_TURN:
             self.menu.draw(screen)
@@ -253,12 +259,12 @@ def combat_loop(screen, clock, enemy_data, selected_skin):
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.mixer.music.stop()
-                return "menu"
+                return "platformer"
             handle_battle_music(event)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pygame.mixer.music.stop()
-                    return "menu"
+                    return "platformer"
 
         result = battle.update(events)
         if result:
