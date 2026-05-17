@@ -47,7 +47,7 @@ def reset_level_state():
     enemy_kill_count = 0
 
 # Game states
-STATE_MENU, STATE_LEVEL_SELECT, STATE_PLATFORMER, STATE_COMBAT = "menu", "level_select", "platformer", "combat"
+STATE_MENU, STATE_LEVEL_SELECT, STATE_PLATFORMER, STATE_COMBAT, STATE_WIN = "menu", "level_select", "platformer", "combat", "win"
 
 # Global Variables
 current_state = STATE_MENU
@@ -144,9 +144,6 @@ def main():
 
             pygame.display.flip()
 
-
-
-
         elif current_state == STATE_LEVEL_SELECT:
             screen.fill(GRAY)
             # Title text
@@ -220,7 +217,7 @@ def main():
                         (120, 220, 120),
                         font_size
                 ):
-                    reset_level_state()  # 🔥 important
+                    reset_level_state()
 
                     selected_level = level["level"]
                     current_level_assets = level
@@ -263,9 +260,18 @@ def main():
 
             if res == 'enemy_defeated':
                 defeated_enemies[selected_level].append(current_enemy.enemy_id)
-                current_enemy = None
 
+            if current_enemy.enemy_data.name == 'Wrath King':
+                current_enemy = None
+                current_state = STATE_WIN
+                pygame.mixer.music.fadeout(1000)
+                reset_level_state()
+                print('Resetting Level...')
+                continue
+
+            current_enemy = None
             current_state = STATE_PLATFORMER
+
         elif current_state == STATE_SKIN_SELECT:
             screen.fill(GRAY)
 
@@ -305,6 +311,26 @@ def main():
             screen.blit(skin_text, (270, 450+85))
 
             pygame.display.flip()
+
+        elif current_state == STATE_WIN:
+            screen.fill(GRAY)
+
+            title_text = font.render("You Win!", True, GREEN)
+            title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 80))
+            screen.blit(title_text, title_rect)
+
+            mouse_pos = pygame.mouse.get_pos()
+
+            if not (pygame.Rect(300, 320, 200, 50).collidepoint(mouse_pos)):
+                button_hovered = False
+
+            if draw_button("Continue", 300, 275, 200, 50, GREEN, (120, 220, 120)):
+                pygame.time.delay(50)
+                click.play()
+                current_state = STATE_LEVEL_SELECT
+
+            pygame.display.flip()
+
 
         clock.tick(60)
 
