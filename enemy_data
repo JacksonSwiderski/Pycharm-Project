@@ -89,14 +89,37 @@ bat = EnemyData(
     scale=0.5
 )
 
+# Bosses
+
 wrath_king = EnemyData(
-    # Some placeholders present!!
     name='Wrath King',
-    hp=175,
+    hp=150,
     moves=[royal_swing, flamethrower, royal_service],
-    music='battle.mp3', #
-    music_loop=11.294, #
+    music='volcano_boss.mp3',
+    music_loop=0,
     bg='boss_battle_bg.png',
     sprite='wrath_king.png',
     scale=.7
+)
+
+big_slime = EnemyData(
+    name='Big Slime',
+    hp=100,
+    moves=[tackle, bite, solidify],
+    music='grass_boss.mp3',
+    music_loop=0,
+    bg='boss_battle_bg.png',
+    sprite='Flower1.png', #
+    scale=1.0
+
+)
+emperor_skeleton = EnemyData(
+    name='Emperor Skeleton',
+    hp=200,
+    moves=[tackle, bite, solidify],
+    music='desert_boss.mp3',
+    music_loop=0,
+    bg='boss_battle_bg.png',
+    sprite='Flower1.png', #
+    scale=1.0
 )
