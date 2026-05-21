@@ -105,6 +105,13 @@ def play_menu_music():
     except:
         print('File not found.')
 
+def play_level_music(music_file):
+    try:
+        pygame.mixer.music.load(music_file)
+        pygame.mixer.music.play(-1)
+    except pygame.error:
+        print(f'Could not load music file {music_file}')
+
 
 def main():
     global current_state, selected_level, player_x, player_y, defeated_enemies, current_enemy, show_hitboxes, button_hovered, current_level_assets, selected_skin
@@ -167,21 +174,24 @@ def main():
                     "level": 0,
                     "x": 60,
                     "image": grass_preview,
-                    'boss': wrath_king
+                    'boss': wrath_king,
+                    'music': 'grass_theme.mp3'
                 },
                 {
                     "name": "Ember Peak",
                     "level": 1,
                     "x": 310,
                     "image": volcano_preview,
-                    'boss': wrath_king
+                    'boss': wrath_king,
+                    'music': 'volcano_theme.mp3'
                 },
                 {
                     "name": "Golden Dunes",
                     "level": 2,
                     "x": 560,
                     "image": desert_preview,
-                    'boss': wrath_king
+                    'boss': wrath_king,
+                    'music': 'desert_theme.mp3'
                 }
             ]
             hovering_any_button = False
@@ -222,6 +232,8 @@ def main():
                     selected_level = level["level"]
                     current_level_assets = level
                     player_x, player_y = 100, 400
+                    pygame.mixer.music.fadeout(500)
+                    play_level_music(current_level_assets['music'])
                     click.play()
                     current_state = STATE_PLATFORMER
             pygame.display.flip()
@@ -261,16 +273,22 @@ def main():
             if res == 'enemy_defeated':
                 defeated_enemies[selected_level].append(current_enemy.enemy_id)
 
-            if current_enemy.enemy_data.name == 'Wrath King':
-                current_enemy = None
-                current_state = STATE_WIN
-                pygame.mixer.music.fadeout(1000)
-                reset_level_state()
-                print('Resetting Level...')
-                continue
+                if current_enemy.enemy_data.name == 'Wrath King':
+                    current_enemy = None
+                    current_state = STATE_WIN
+                    pygame.mixer.music.fadeout(1000)
+                    reset_level_state()
+                    print('Resetting Level...')
+                    continue
 
-            current_enemy = None
-            current_state = STATE_PLATFORMER
+                current_enemy = None
+                current_state = STATE_PLATFORMER
+
+                play_level_music(current_level_assets['music'])
+
+            else:
+                current_state = STATE_PLATFORMER
+                play_level_music(current_level_assets['music'])
 
         elif current_state == STATE_SKIN_SELECT:
             screen.fill(GRAY)
@@ -324,7 +342,7 @@ def main():
             if not (pygame.Rect(300, 320, 200, 50).collidepoint(mouse_pos)):
                 button_hovered = False
 
-            if draw_button("Continue", 300, 275, 200, 50, GREEN, (120, 220, 120)):
+            if draw_button("Continue", 300, 300, 200, 50, GREEN, (120, 220, 120)):
                 pygame.time.delay(50)
                 click.play()
                 current_state = STATE_LEVEL_SELECT
