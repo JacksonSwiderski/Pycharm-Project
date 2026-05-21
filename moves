@@ -16,9 +16,9 @@ def get_player_moves(selected_skin):
 
     elif selected_skin == "elon":
         return [
-            Move('Dash Attack', 15, 'normal', 10),
-            Move('Ray Blast', 18, 'energy', 5),
-            Move('Heal', -25, 'normal', 1)
+            Move('Cybertruck Slam', 15, 'normal', 10),
+            Move('Twitter Killer', 18, 'energy', 5),
+            Move('Tesla Recharge', -25, 'normal', 1)
         ]
 
     elif selected_skin == "miku":
