@@ -1,5 +1,5 @@
 import pygame, random, math
-from enemy_data import slime, slime1, bat, slimereal, anubis, vulture, skeleton
+from enemy_data import slime1, bat, slimereal, anubis, vulture, skeleton
 
 pygame.init()
 pygame.font.init()
@@ -11,7 +11,7 @@ required_coins = 25
 required_coinslevel1 = 30
 required_coinslevel2 = 40
 required_fights = 3
-required_fightslevel1 = 6
+required_fightslevel1 = 5
 required_fightslevel2 = 8
 coin_count = 0
 coin_countlevel1 = 0
