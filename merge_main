@@ -2,7 +2,7 @@ import pygame
 import sys
 from test_plat import platformer_loop, Enemy, enemy_frames
 from test_cmbt import combat_loop
-from enemy_data import wrath_king
+from enemy_data import wrath_king, big_slime, emperor_skeleton
 
 STATE_MENU, STATE_LEVEL_SELECT, STATE_PLATFORMER, STATE_COMBAT, STATE_SKIN_SELECT = (
     "menu", "level_select", "platformer", "combat", "skin_select"
@@ -174,7 +174,7 @@ def main():
                     "level": 0,
                     "x": 60,
                     "image": grass_preview,
-                    'boss': wrath_king,
+                    'boss': big_slime,
                     'music': 'grass_theme.mp3'
                 },
                 {
@@ -190,7 +190,7 @@ def main():
                     "level": 2,
                     "x": 560,
                     "image": desert_preview,
-                    'boss': wrath_king,
+                    'boss': emperor_skeleton,
                     'music': 'desert_theme.mp3'
                 }
             ]
@@ -273,7 +273,7 @@ def main():
             if res == 'enemy_defeated':
                 defeated_enemies[selected_level].append(current_enemy.enemy_id)
 
-                if current_enemy.enemy_data.name == 'Wrath King':
+                if current_enemy.enemy_data.name == 'Wrath King' or current_enemy.enemy_data.name == "Big Slime" or current_enemy.enemy_data.name == "Emperor Skeleton":
                     current_enemy = None
                     current_state = STATE_WIN
                     pygame.mixer.music.fadeout(1000)
@@ -342,7 +342,7 @@ def main():
             if not (pygame.Rect(300, 320, 200, 50).collidepoint(mouse_pos)):
                 button_hovered = False
 
-            if draw_button("Continue", 300, 300, 200, 50, GREEN, (120, 220, 120)):
+            if draw_button("Continue", 300, 350, 200, 50, GREEN, (120, 220, 120)):
                 pygame.time.delay(50)
                 click.play()
                 current_state = STATE_LEVEL_SELECT
