@@ -230,6 +230,10 @@ class Battle:
 
         if self.enemy.name == "Wrath King":
             anchor_x -= 50
+        if self.enemy.name == "Big Slime":
+            ground_y += 75
+        if self.enemy.name == "Emperor Skeleton":
+            ground_y += 30
 
         enemy_rect = self.enemy_sprite.get_rect()
 
