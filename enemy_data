@@ -1,4 +1,4 @@
-from moves import tackle, bite, solidify, Fireball_Burst, Flame_Dash, Lava_Drain, royal_swing, flamethrower, royal_service
+from moves import tackle, bite, solidify, Fireball_Burst, Flame_Dash, Lava_Drain, royal_swing, flamethrower, royal_service, slam, absorb, regeneration, bone_whack, sandstorm, reconstruction
 
 
 class EnemyData:
@@ -99,27 +99,27 @@ wrath_king = EnemyData(
     music_loop=0,
     bg='boss_battle_bg.png',
     sprite='wrath_king.png',
-    scale=.7
+    scale=1.0
 )
 
 big_slime = EnemyData(
     name='Big Slime',
     hp=100,
-    moves=[tackle, bite, solidify],
+    moves=[slam, absorb, regeneration],
     music='grass_boss.mp3',
     music_loop=0,
     bg='boss_battle_bg.png',
-    sprite='Flower1.png', #
-    scale=1.0
+    sprite='big_slime.png',
+    scale=0.5
 
 )
 emperor_skeleton = EnemyData(
     name='Emperor Skeleton',
     hp=200,
-    moves=[tackle, bite, solidify],
+    moves=[bone_whack, sandstorm, reconstruction],
     music='desert_boss.mp3',
     music_loop=0,
     bg='boss_battle_bg.png',
-    sprite='Flower1.png', #
-    scale=1.0
+    sprite='emperor_skeleton.png',
+    scale=0.7
 )
