@@ -10,14 +10,14 @@ def get_player_moves(selected_skin):
     if selected_skin == "alien":
         return [
             Move('Dash Attack', 15, 'normal', 10),
-            Move('Ray Blast', 18, 'energy', 5),
+            Move('Ray Blast', 20, 'energy', 5),
             Move('Heal', -25, 'normal', 1)
         ]
 
     elif selected_skin == "elon":
         return [
             Move('Cybertruck Slam', 15, 'normal', 10),
-            Move('Twitter Killer', 18, 'energy', 5),
+            Move('Twitter Killer', 20, 'energy', 5),
             Move('Tesla Recharge', -25, 'normal', 1)
         ]
 
@@ -48,5 +48,15 @@ Lava_Drain = Move('Lava Drain', -5, 'normal', 99)
 
 # Wrath King
 royal_swing = Move('Royal Swing', 15, 'normal', 99)
-flamethrower = Move('Flamethrower', 30, 'fire', 99)
+flamethrower = Move('Flamethrower', 20, 'fire', 99)
 royal_service = Move('Royal Service', -10, 'normal', 99)
+
+# Big Slime
+slam = Move('Slam', 12, 'normal', 99)
+absorb = Move('Absorb', 15, 'normal', 99)
+regeneration = Move('Regeneration', -15, 'normal', 99)
+
+# Emperor Skeleton
+bone_whack = Move('Bone Whack', 18, 'normal', 99)
+sandstorm = Move('Sandstorm', 30, 'normal', 99)
+reconstruction = Move('Reconstruction', -20, 'normal', 99)
